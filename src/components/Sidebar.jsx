@@ -20,6 +20,7 @@ import {
   PowerIcon,
 } from "@heroicons/react/24/solid";
 import { ChevronRightIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
+import { NavLink } from "react-router-dom";
 
 const Sidebar = () => {
   const [open, setOpen] = React.useState(0);
@@ -29,10 +30,14 @@ const Sidebar = () => {
   };
 
   return (
-    <Card className="h-[calc(100vh-2rem)] w-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5">
+    <Card className="h-[calc(100vh-2rem)] overflow-y-scroll w-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5">
       <div className="mb-2 p-4">
         <Typography variant="h5" color="blue-gray">
-          Sidebar
+          <img
+            src="https://breakbag.com/static/media/logo.3fff3126fefbf4f3afe7.png"
+            alt="Logo"
+            className="h-8"
+          />
         </Typography>
       </div>
       <List>
@@ -62,27 +67,36 @@ const Sidebar = () => {
           </ListItem>
           <AccordionBody className="py-1">
             <List className="p-0">
-              <ListItem>
-                <ListItemPrefix>
-                  <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
-                </ListItemPrefix>
-                Analytics
-              </ListItem>
-              <ListItem>
-                <ListItemPrefix>
-                  <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
-                </ListItemPrefix>
-                Reporting
-              </ListItem>
-              <ListItem>
-                <ListItemPrefix>
-                  <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
-                </ListItemPrefix>
-                Projects
-              </ListItem>
+              
+            <NavLink to={"/agent"}>
+                <ListItem>
+                  <ListItemPrefix>
+                    <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                  </ListItemPrefix>
+                  Agents
+                </ListItem>
+              </NavLink>
+              <NavLink to={"/team-leader"}>
+                <ListItem>
+                  <ListItemPrefix>
+                    <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                  </ListItemPrefix>
+                 Team leader
+                </ListItem>
+              </NavLink>
+              <NavLink to={"/travellers"}>
+                <ListItem>
+                  <ListItemPrefix>
+                    <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                  </ListItemPrefix>
+                  Travellers
+                </ListItem>
+              </NavLink>
             </List>
           </AccordionBody>
         </Accordion>
+
+        <hr className="my-2 border-blue-gray-50" />
         <Accordion
           open={open === 2}
           icon={
@@ -103,34 +117,76 @@ const Sidebar = () => {
                 <ShoppingBagIcon className="h-5 w-5" />
               </ListItemPrefix>
               <Typography color="blue-gray" className="mr-auto font-normal">
-                E-Commerce
+                Itianery Library
               </Typography>
             </AccordionHeader>
           </ListItem>
           <AccordionBody className="py-1">
             <List className="p-0">
+              <NavLink to={"/travel-summery"}>
+                <ListItem>
+                  <ListItemPrefix>
+                    <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                  </ListItemPrefix>
+                  Travel Summary
+                </ListItem>
+              </NavLink>
+              <NavLink to={"/activity"}>
+                <ListItem>
+                  <ListItemPrefix>
+                    <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                  </ListItemPrefix>
+                  Activities
+                </ListItem>
+              </NavLink>
+              <NavLink to={"/inclusion"}>
               <ListItem>
                 <ListItemPrefix>
                   <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
                 </ListItemPrefix>
-                Orders
+                Inclusion
               </ListItem>
+              </NavLink>
+              <NavLink to={"/exclusion"}>
               <ListItem>
                 <ListItemPrefix>
                   <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
                 </ListItemPrefix>
-                Products
+                Exclusion
               </ListItem>
+              </NavLink>
+              <NavLink to={"/transfer"}>
+              <ListItem>
+                <ListItemPrefix>
+                  <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                </ListItemPrefix>
+                Transfers
+              </ListItem>
+              </NavLink>
+              <NavLink to={"/other-information"}>
+              <ListItem>
+                <ListItemPrefix>
+                  <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                </ListItemPrefix>
+                Other Information
+              </ListItem>
+              </NavLink>
             </List>
           </AccordionBody>
         </Accordion>
-        <hr className="my-2 border-blue-gray-50" />
         <ListItem>
           <ListItemPrefix>
-            <InboxIcon className="h-5 w-5" />
+            <UserCircleIcon className="h-5 w-5" />
           </ListItemPrefix>
-          Inbox
-          <ListItemSuffix>
+          Profile
+        </ListItem>
+        <NavLink to={"/signin"}>
+          <ListItem>
+            <ListItemPrefix>
+              <InboxIcon className="h-5 w-5" />
+            </ListItemPrefix>
+            Sign in
+            {/* <ListItemSuffix>
             <Chip
               value="14"
               size="sm"
@@ -138,14 +194,9 @@ const Sidebar = () => {
               color="blue-gray"
               className="rounded-full"
             />
-          </ListItemSuffix>
-        </ListItem>
-        <ListItem>
-          <ListItemPrefix>
-            <UserCircleIcon className="h-5 w-5" />
-          </ListItemPrefix>
-          Profile
-        </ListItem>
+          </ListItemSuffix> */}
+          </ListItem>
+        </NavLink>
         <ListItem>
           <ListItemPrefix>
             <Cog6ToothIcon className="h-5 w-5" />

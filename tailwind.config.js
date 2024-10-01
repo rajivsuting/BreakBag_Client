@@ -6,7 +6,7 @@ export default withMT({
     extend: {
       colors: {
         main: "rgb(235, 28, 36)",
-        maincolor2: "#22d172",
+        maincolor2: "#1b78ef",
       },
     },
   },
