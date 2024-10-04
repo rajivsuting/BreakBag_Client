@@ -76,12 +76,12 @@ const Sidebar = () => {
                   Agents
                 </ListItem>
               </NavLink>
-              <NavLink to={"/team-leader"}>
+              <NavLink to={"/destination"}>
                 <ListItem>
                   <ListItemPrefix>
                     <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
                   </ListItemPrefix>
-                 Team leader
+                  Destination
                 </ListItem>
               </NavLink>
               <NavLink to={"/travellers"}>
@@ -90,6 +90,14 @@ const Sidebar = () => {
                     <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
                   </ListItemPrefix>
                   Travellers
+                </ListItem>
+              </NavLink>
+              <NavLink to={"/quote"}>
+                <ListItem>
+                  <ListItemPrefix>
+                    <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                  </ListItemPrefix>
+                  Quote
                 </ListItem>
               </NavLink>
             </List>

@@ -40,25 +40,28 @@ const data = [
 const Acitivities = () => {
   const [isAddTravelSummeryModal, setIsAddTravelSummeryModal] = useState(false);
 
-  const [data, setData] = useState([])
+  const [data, setData] = useState([]);
 
-  const getAlldata = ()=>{
-    axios.get(`${serverUrl}/api/activity/all`).then((res)=>{
-      setData(res.data.data)
-    })
-  }
+  const getAlldata = () => {
+    axios.get(`${serverUrl}/api/activity/all`).then((res) => {
+      setData(res.data.data);
+    });
+  };
 
-  useEffect(()=>{
+  useEffect(() => {
     getAlldata();
-    return(()=>{
-      console.log("Avoid errors")
-    })
-  },[])
+    return () => {
+      console.log("Avoid errors");
+    };
+  }, []);
 
   return (
     <div className="flex gap-5 ">
       <Sidebar />
-      <div className="w-[75%] m-auto mt-12 rounded-md">
+      <div className="w-[75%] m-auto mt-8 rounded-md">
+        <div>
+          <img src="/img/lanscape2.jpg" className="w-full h-[200px] mb-5 rounded-md" alt="" />
+        </div>
         <div className="flex justify-between items-center">
           <div className="text-2xl">Activities</div>
         </div>
@@ -149,7 +152,7 @@ const Acitivities = () => {
                     <td className="px-4 py-2">{user.title}</td>
                     <td className="px-4 py-2">{user.description}</td>
                     <td className="px-4 py-2">{user.images.length}</td>
-               
+
                     <td className="px-4 py-2">
                       <MdRemoveRedEye className="h-5 w-5 text-maincolor2 cursor-pointer" />
                     </td>

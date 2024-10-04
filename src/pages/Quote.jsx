@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import { Button, Input, Textarea } from "@material-tailwind/react";
-import { MdDelete, MdEdit, MdRemoveRedEye } from "react-icons/md";
+import { MdDelete, MdEdit } from "react-icons/md";
 import { LuPlusCircle } from "react-icons/lu";
 
 import {
@@ -11,60 +11,53 @@ import {
   IconButton,
   Tooltip,
 } from "@material-tailwind/react";
+
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 import { serverUrl } from "../api";
 import axios from "axios";
-import AddInclusion from "../components/AddInclusion";
-import AddExclusion from "../components/AddExclusion";
+import Addtraveller from "../components/Addtraveller";
+import AddQuote from "../components/AddQuote";
 
-const data = [
-  {
-    name: "John Doe",
-    email: "john@example.com",
-    role: "Admin",
-    status: "Active",
-  },
-  {
-    name: "Jane Smith",
-    email: "jane@example.com",
-    role: "Editor",
-    status: "Inactive",
-  },
-  {
-    name: "Tom Johnson",
-    email: "tom@example.com",
-    role: "Viewer",
-    status: "Active",
-  },
-];
 
-const Exclusion = () => {
-  const [isAddTravelSummeryModal, setIsAddTravelSummeryModal] = useState(false);
+const Travellers = () => {
+  const [isAddTravellersModal, setIsAddTravellersModal] = useState(false);
+  const [data, setData] = useState([])
 
-  const [data, setData] = useState([]);
+  const getAlldata = ()=>{
+    axios.get(`${serverUrl}/api/traveller/all`).then((res)=>{
+      setData(res.data.travellers)
+    })
+  }
 
-  const getAlldata = () => {
-    axios.get(`${serverUrl}/api/exclusion/exclusions`).then((res) => {
-      setData(res.data.data);
-    });
-  };
-
-  useEffect(() => {
+  useEffect(()=>{
     getAlldata();
-    return () => {
-      console.log("Avoid errors");
-    };
-  }, []);
+    return(()=>{
+      console.log("Avoid errors")
+    })
+  },[])
+
+  const handleEdit = ()=>{
+
+  }
+
+  const handleDelete = (id)=>{
+    axios.delete(`${serverUrl}/api/traveller/delete/${id}`).then((res)=>{
+      alert("Traveller deleted");
+      getAlldata()
+    }).catch((err)=>{
+      alert(err.response.data.error)
+    })
+  }
 
   return (
     <div className="flex gap-5 ">
       <Sidebar />
       <div className="w-[75%] m-auto mt-8 rounded-md">
         <div>
-          <img src="/img/lanscape2.jpg" className="w-full h-[200px] mb-5 rounded-md" alt="" />
+          <img src="/img/lanscape1.jpg" className="w-full h-[200px] mb-5 rounded-md" alt="" />
         </div>
         <div className="flex justify-between items-center">
-          <div className="text-2xl">Exclusion</div>
+          <div className="text-2xl">Quote</div>
         </div>
         <div className="flex justify-between items-center mb-2 gap-5">
           <div className="w-[50%]">
@@ -93,7 +86,7 @@ const Exclusion = () => {
           <div className="flex justify-end items-center mb-2 gap-5">
             <div className="">
               <LuPlusCircle
-                onClick={() => setIsAddTravelSummeryModal(true)}
+                onClick={() => setIsAddTravellersModal(true)}
                 className="h-6 w-6 text-maincolor2 cursor-pointer"
               />
             </div>
@@ -136,75 +129,44 @@ const Exclusion = () => {
             <table className="w-full table-auto text-left">
               <thead>
                 <tr className="bg-gray-200">
-                  <th className="px-4 py-2">Title</th>
-                  <th className="px-4 py-2">Description</th>
-                  <th className="px-4 py-2">Images</th>
-                  <th className="px-4 py-2"></th>
+                  <th className="px-4 py-2">Name</th>
+                  <th className="px-4 py-2">Email</th>
+                  <th className="px-4 py-2">Phone</th>
+                  <th className="px-4 py-2">Address</th>
                   <th className="px-4 py-2"></th>
                   <th className="px-4 py-2"></th>
                 </tr>
               </thead>
-              <tbody>
+              {/* <tbody>
                 {data.map((user, index) => (
                   <tr
                     key={index}
                     className="hover:bg-gray-100 transition-colors duration-200"
                   >
-                    {/* Titles Column */}
-                    <td className="px-4 py-2">
-                      {user.itemList.map((item, idx) => (
-                        <div key={idx}>{item.title}</div>
-                      ))}
-                    </td>
-
-                    {/* Descriptions Column */}
-                    <td className="px-4 py-2">
-                      {user.itemList.map((item, idx) => (
-                        <div key={idx}>{item.description.join(", ")}</div>
-                      ))}
-                    </td>
-
-                    {/* Images Column */}
-                    {/* <td className="px-4 py-2">
-                      {user.itemList.map((item, idx) => (
-                        <div key={idx}>
-                          {user.images[idx] ? (
-                            <img
-                              src={user.images[idx]}
-                              alt={item.title}
-                              className="w-20 h-20 object-cover"
-                            />
-                          ) : (
-                            "No Image"
-                          )}
-                        </div>
-                      ))}
-                    </td> */}
-
-                    {/* Action Buttons */}
-                    <td className="px-4 py-2">
-                      <MdRemoveRedEye className="h-5 w-5 text-maincolor2 cursor-pointer" />
-                    </td>
+                    <td className="px-4 py-2">{user.name}</td>
+                    <td className="px-4 py-2">{user.email}</td>
+                    <td className="px-4 py-2">{user.phone}</td>
+                    <td className="px-4 py-2">{user.address}</td>
                     <td className="px-4 py-2">
                       <MdEdit className="h-5 w-5 text-maincolor2 cursor-pointer" />
                     </td>
                     <td className="px-4 py-2">
-                      <MdDelete className="h-5 w-5 text-main cursor-pointer" />
+                      <MdDelete onClick={()=>handleDelete(user._id)} className="h-5 w-5 text-main cursor-pointer" />
                     </td>
                   </tr>
                 ))}
-              </tbody>
+              </tbody> */}
             </table>
           </CardBody>
         </Card>
       </div>
-      <AddExclusion
-        isOpen={isAddTravelSummeryModal}
-        onClose={() => setIsAddTravelSummeryModal(false)}
-        getAlldata={getAlldata}
+      <AddQuote
+        isOpen={isAddTravellersModal}
+        onClose={() => setIsAddTravellersModal(false)}
+        getAlldata= {getAlldata}
       />
     </div>
   );
 };
 
-export default Exclusion;
+export default Travellers;

@@ -58,7 +58,10 @@ const TravelSummery = () => {
   return (
     <div className="flex gap-5 ">
       <Sidebar />
-      <div className="w-[75%] m-auto mt-12 rounded-md">
+      <div className="w-[75%] m-auto mt-8 rounded-md">
+        <div>
+          <img src="/img/lanscape1.jpg" className="w-full h-[200px] mb-5 rounded-md" alt="" />
+        </div>
         <div className="flex justify-between items-center">
           <div className="text-2xl">Travel summery</div>
         </div>

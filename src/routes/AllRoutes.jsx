@@ -9,8 +9,9 @@ import Exclusion from "../pages/Exclusion";
 import OtherInformation from "../pages/OtherInformation";
 import Transfer from "../pages/Transfer";
 import Agents from "../pages/Agents";
-import TeamLeaders from "../pages/TeamLeaders";
 import Travellers from "../pages/Travellers";
+import Destination from "../pages/Destination";
+import Quote from "../pages/Quote";
 
 const AllRoutes = () => {
   return (
@@ -25,8 +26,9 @@ const AllRoutes = () => {
         <Route path="/transfer" element={<Transfer />} />
         <Route path="/other-information" element={<OtherInformation />} />
         <Route path="/agent" element={<Agents />} />
-        <Route path="/team-leader" element={<TeamLeaders />} />
+        <Route path="/destination" element={<Destination />} />
         <Route path="/travellers" element={<Travellers />} />
+        <Route path="/quote" element={<Quote />} />
       </Routes>
     </Router>
   );
