@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { Input, Button } from "@material-tailwind/react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
   const [otp, setOtp] = useState("");
 
   const handleGetOtp = async (e) => {
@@ -40,6 +42,7 @@ const SignIn = () => {
       );
 
       setMessage(response.data.message);
+      navigate("/");
     } catch (error) {
       console.error("Error during login:", error);
       setMessage("Failed to login. Please try again.");

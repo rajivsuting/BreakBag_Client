@@ -5,8 +5,6 @@ import {
   List,
   ListItem,
   ListItemPrefix,
-  ListItemSuffix,
-  Chip,
   Accordion,
   AccordionHeader,
   AccordionBody,
@@ -15,208 +13,255 @@ import {
   PresentationChartBarIcon,
   ShoppingBagIcon,
   UserCircleIcon,
-  Cog6ToothIcon,
   InboxIcon,
   PowerIcon,
 } from "@heroicons/react/24/solid";
-import { ChevronRightIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
-import { NavLink } from "react-router-dom";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import { NavLink, useLocation } from "react-router-dom";
+import { PiUploadDuotone } from "react-icons/pi";
+import { useAccordion } from "../context/AccordionContext"; // Import the custom hook
+import { MdChevronLeft } from "react-icons/md";
 
 const Sidebar = () => {
-  const [open, setOpen] = React.useState(0);
+  const { openAccordion, setOpenAccordion } = useAccordion();
+  const location = useLocation();
 
-  const handleOpen = (value) => {
-    setOpen(open === value ? 0 : value);
+  // Function to toggle accordion open state
+  const toggleAccordion = (value) => {
+    setOpenAccordion((prev) =>
+      prev.includes(value)
+        ? prev.filter((item) => item !== value)
+        : [...prev, value]
+    );
   };
 
+  // Function to check if the link is active
+  const isActive = (path) => location.pathname === path;
+
   return (
-    <Card className="h-[calc(100vh-2rem)] overflow-y-scroll w-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5">
-      <div className="mb-2 p-4">
+    <Card className="h-screen w-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5 relative overflow-hidden">
+      <div className="m-auto mb-2">
         <Typography variant="h5" color="blue-gray">
           <img
             src="https://breakbag.com/static/media/logo.3fff3126fefbf4f3afe7.png"
             alt="Logo"
-            className="h-8"
+            className="w-42 h-14"
           />
         </Typography>
       </div>
-      <List>
-        <Accordion
-          open={open === 1}
-          icon={
-            <ChevronDownIcon
-              strokeWidth={2.5}
-              className={`mx-auto h-4 w-4 transition-transform ${
-                open === 1 ? "rotate-180" : ""
-              }`}
-            />
-          }
-        >
-          <ListItem className="p-0" selected={open === 1}>
+      <List className="sidebar overflow-y-scroll h-full">
+        {/* Dashboard Accordion */}
+        <Accordion open={openAccordion.includes("dashboard")}>
+          <ListItem className="p-0" onClick={() => toggleAccordion("dashboard")}>
             <AccordionHeader
-              onClick={() => handleOpen(1)}
-              className="border-b-0 p-3"
+              
+              className="border-b-0 p-3 flex justify-between items-center"
             >
-              <ListItemPrefix>
-                <PresentationChartBarIcon className="h-5 w-5" />
-              </ListItemPrefix>
-              <Typography color="blue-gray" className="mr-auto font-normal">
-                Dashboard
-              </Typography>
+              <div className="w-[70%] flex items-center">
+                <ListItemPrefix>
+                  <PresentationChartBarIcon className={`h-5 w-5 ${
+                    isActive("/agent") ||
+                    isActive("/destination") ||
+                    isActive("/travellers")
+                      ? "text-main"
+                      : "text-blue-gray"
+                  }`} />
+                </ListItemPrefix>
+                <Typography
+                  color={
+                    isActive("/agent") ||
+                    isActive("/destination") ||
+                    isActive("/travellers")
+                      ? "red"
+                      : "blue-gray"
+                  }
+                  className="mr-auto font-normal"
+                >
+                  Dashboard
+                </Typography>
+              </div>
+              {/* Arrow Icon */}
+              <div>
+              <ChevronDownIcon
+                className={`h-3 w-3 transition-transform ${
+                  openAccordion.includes("dashboard") ? "rotate-180" : ""
+                }`}
+              />
+              </div>
             </AccordionHeader>
           </ListItem>
           <AccordionBody className="py-1">
             <List className="p-0">
-              
-            <NavLink to={"/agent"}>
-                <ListItem>
+              <NavLink to={"/agent"}>
+                <ListItem className={isActive("/agent") ? "text-red-500" : ""}>
                   <ListItemPrefix>
-                    <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                     <MdChevronLeft className="h-5 w-5" />
                   </ListItemPrefix>
                   Agents
                 </ListItem>
               </NavLink>
               <NavLink to={"/destination"}>
-                <ListItem>
+                <ListItem
+                  className={isActive("/destination") ? "text-red-500" : ""}
+                >
                   <ListItemPrefix>
-                    <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                     <MdChevronLeft className="h-5 w-5" />
                   </ListItemPrefix>
                   Destination
                 </ListItem>
               </NavLink>
               <NavLink to={"/travellers"}>
-                <ListItem>
+                <ListItem
+                  className={isActive("/travellers") ? "text-red-500" : ""}
+                >
                   <ListItemPrefix>
-                    <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                     <MdChevronLeft className="h-5 w-5" />
                   </ListItemPrefix>
                   Travellers
-                </ListItem>
-              </NavLink>
-              <NavLink to={"/quote"}>
-                <ListItem>
-                  <ListItemPrefix>
-                    <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
-                  </ListItemPrefix>
-                  Quote
                 </ListItem>
               </NavLink>
             </List>
           </AccordionBody>
         </Accordion>
 
-        <hr className="my-2 border-blue-gray-50" />
-        <Accordion
-          open={open === 2}
-          icon={
-            <ChevronDownIcon
-              strokeWidth={2.5}
-              className={`mx-auto h-4 w-4 transition-transform ${
-                open === 2 ? "rotate-180" : ""
-              }`}
-            />
-          }
-        >
-          <ListItem className="p-0" selected={open === 2}>
+        {/* Itinerary Library Accordion */}
+        <Accordion open={openAccordion.includes("itinerary")}>
+          <ListItem className="p-0" onClick={() => toggleAccordion("itinerary")}>
             <AccordionHeader
-              onClick={() => handleOpen(2)}
-              className="border-b-0 p-3"
+              
+              className="border-b-0 p-3 flex justify-between items-center"
             >
-              <ListItemPrefix>
-                <ShoppingBagIcon className="h-5 w-5" />
-              </ListItemPrefix>
-              <Typography color="blue-gray" className="mr-auto font-normal">
-                Itianery Library
-              </Typography>
+              <div className="w-[70%] flex items-center">
+                <ListItemPrefix>
+                  <ShoppingBagIcon className={`h-5 w-5 ${
+                  isActive("/travel-summery") ||
+                  isActive("/activity") ||
+                  isActive("/inclusion") ||
+                  isActive("/exclusion") ||
+                  isActive("/transfer") ||
+                  isActive("/other-information")
+                    ? "text-main"
+                    : "text-blue-gray"
+                }`} />
+                </ListItemPrefix>
+                <Typography
+                  color={
+                    isActive("/travel-summery") ||
+                    isActive("/activity") ||
+                    isActive("/inclusion") ||
+                    isActive("/exclusion") ||
+                    isActive("/transfer") ||
+                    isActive("/other-information")
+                      ? "red"
+                      : "blue-gray"
+                  }
+                  className="mr-auto font-normal"
+                >
+                  Itinerary Library
+                </Typography>
+              </div>
+              {/* Arrow Icon */}
+              <ChevronDownIcon
+                className={`h-3 w-3 transition-transform ${
+                  openAccordion.includes("itinerary") ? "rotate-180" : ""
+                }`}
+              />
             </AccordionHeader>
           </ListItem>
+
           <AccordionBody className="py-1">
             <List className="p-0">
               <NavLink to={"/travel-summery"}>
-                <ListItem>
+                <ListItem
+                  className={isActive("/travel-summery") ? "text-red-500" : ""}
+                >
                   <ListItemPrefix>
-                    <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                    <MdChevronLeft className="h-5 w-5" />
                   </ListItemPrefix>
                   Travel Summary
                 </ListItem>
               </NavLink>
               <NavLink to={"/activity"}>
-                <ListItem>
+                <ListItem
+                  className={isActive("/activity") ? "text-red-500" : ""}
+                >
                   <ListItemPrefix>
-                    <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                     <MdChevronLeft className="h-5 w-5" />
                   </ListItemPrefix>
                   Activities
                 </ListItem>
               </NavLink>
               <NavLink to={"/inclusion"}>
-              <ListItem>
-                <ListItemPrefix>
-                  <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
-                </ListItemPrefix>
-                Inclusion
-              </ListItem>
+                <ListItem
+                  className={isActive("/inclusion") ? "text-red-500" : ""}
+                >
+                  <ListItemPrefix>
+                     <MdChevronLeft className="h-5 w-5" />
+                  </ListItemPrefix>
+                  Inclusion
+                </ListItem>
               </NavLink>
               <NavLink to={"/exclusion"}>
-              <ListItem>
-                <ListItemPrefix>
-                  <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
-                </ListItemPrefix>
-                Exclusion
-              </ListItem>
+                <ListItem
+                  className={isActive("/exclusion") ? "text-red-500" : ""}
+                >
+                  <ListItemPrefix>
+                     <MdChevronLeft className="h-5 w-5" />
+                  </ListItemPrefix>
+                  Exclusion
+                </ListItem>
               </NavLink>
               <NavLink to={"/transfer"}>
-              <ListItem>
-                <ListItemPrefix>
-                  <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
-                </ListItemPrefix>
-                Transfers
-              </ListItem>
+                <ListItem
+                  className={isActive("/transfer") ? "text-red-500" : ""}
+                >
+                  <ListItemPrefix>
+                     <MdChevronLeft className="h-5 w-5" />
+                  </ListItemPrefix>
+                  Transfers
+                </ListItem>
               </NavLink>
               <NavLink to={"/other-information"}>
-              <ListItem>
-                <ListItemPrefix>
-                  <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
-                </ListItemPrefix>
-                Other Information
-              </ListItem>
+                <ListItem
+                  className={
+                    isActive("/other-information") ? "text-red-500" : ""
+                  }
+                >
+                  <ListItemPrefix>
+                     <MdChevronLeft className="h-5 w-5" />
+                  </ListItemPrefix>
+                  Other Information
+                </ListItem>
               </NavLink>
             </List>
           </AccordionBody>
         </Accordion>
-        <ListItem>
-          <ListItemPrefix>
-            <UserCircleIcon className="h-5 w-5" />
-          </ListItemPrefix>
-          Profile
-        </ListItem>
-        <NavLink to={"/signin"}>
-          <ListItem>
+
+        {/* Other Links */}
+        <NavLink to={"/quote"}>
+          <ListItem className={isActive("/quote") ? "text-red-500" : ""}>
+            <ListItemPrefix>
+              <UserCircleIcon className="h-5 w-5" />
+            </ListItemPrefix>
+            Quote
+          </ListItem>
+        </NavLink>
+        <NavLink to={"/contact"}>
+          <ListItem className={isActive("/contact") ? "text-red-500" : ""}>
             <ListItemPrefix>
               <InboxIcon className="h-5 w-5" />
             </ListItemPrefix>
-            Sign in
-            {/* <ListItemSuffix>
-            <Chip
-              value="14"
-              size="sm"
-              variant="ghost"
-              color="blue-gray"
-              className="rounded-full"
-            />
-          </ListItemSuffix> */}
+            Contact
           </ListItem>
         </NavLink>
-        <ListItem>
-          <ListItemPrefix>
-            <Cog6ToothIcon className="h-5 w-5" />
-          </ListItemPrefix>
-          Settings
-        </ListItem>
-        <ListItem>
-          <ListItemPrefix>
-            <PowerIcon className="h-5 w-5" />
-          </ListItemPrefix>
-          Log Out
-        </ListItem>
+        <NavLink to={"/logout"}>
+          <ListItem className={isActive("/logout") ? "text-red-500" : ""}>
+            <ListItemPrefix>
+              <PowerIcon className="h-5 w-5" />
+            </ListItemPrefix>
+            Logout
+          </ListItem>
+        </NavLink>
       </List>
     </Card>
   );

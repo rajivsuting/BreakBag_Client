@@ -37,7 +37,7 @@ const data = [
   },
 ];
 
-const Acitivities = () => {
+const CreateItinary = () => {
   const [isAddTravelSummeryModal, setIsAddTravelSummeryModal] = useState(false);
 
   const [data, setData] = useState([]);
@@ -130,52 +130,10 @@ const Acitivities = () => {
           </div>
         </div>
 
-        <Card className="overflow-hidden mt-5">
-          <CardBody className="p-0">
-            <table className="w-full table-auto text-left">
-              <thead>
-                <tr className="bg-gray-200">
-                  <th className="px-4 py-2">Title</th>
-                  <th className="px-4 py-2">Description</th>
-                  <th className="px-4 py-2">Images</th>
-                  <th className="px-4 py-2"></th>
-                  <th className="px-4 py-2"></th>
-                  <th className="px-4 py-2"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.map((user, index) => (
-                  <tr
-                    key={index}
-                    className="hover:bg-gray-100 transition-colors duration-200"
-                  >
-                    <td className="px-4 py-2">{user.title}</td>
-                    <td className="px-4 py-2">{user.description}</td>
-                    <td className="px-4 py-2">{user.images.length}</td>
-
-                    <td className="px-4 py-2">
-                      <MdRemoveRedEye className="h-5 w-5 text-maincolor2 cursor-pointer" />
-                    </td>
-                    <td className="px-4 py-2">
-                      <MdEdit className="h-5 w-5 text-maincolor2 cursor-pointer" />
-                    </td>
-                    <td className="px-4 py-2">
-                      <MdDelete className="h-5 w-5 text-main cursor-pointer" />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </CardBody>
-        </Card>
+        
       </div>
-      <AddActivities
-        isOpen={isAddTravelSummeryModal}
-        onClose={() => setIsAddTravelSummeryModal(false)}
-        getAlldata={getAlldata}
-      />
     </div>
   );
 };
 
-export default Acitivities;
+export default CreateItinary;

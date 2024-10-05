@@ -12,6 +12,9 @@ import Agents from "../pages/Agents";
 import Travellers from "../pages/Travellers";
 import Destination from "../pages/Destination";
 import Quote from "../pages/Quote";
+import AddQuote from "../components/AddQuote";
+import QuoteDetail from "../pages/QuoteDetail";
+import CreateItinary from "../pages/CreateItinary";
 
 const AllRoutes = () => {
   return (
@@ -29,6 +32,9 @@ const AllRoutes = () => {
         <Route path="/destination" element={<Destination />} />
         <Route path="/travellers" element={<Travellers />} />
         <Route path="/quote" element={<Quote />} />
+        <Route path="/add-quote" element={<AddQuote />} />
+        <Route path="/quote-detail/:tripid" element={<QuoteDetail />} />
+        <Route path="/create-intinary/:tripid" element={<CreateItinary />} />
       </Routes>
     </Router>
   );

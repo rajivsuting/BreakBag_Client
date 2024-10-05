@@ -9,7 +9,7 @@ import {
   import usePreventScrollOnNumberInput from "../CustomHook/usePreventScrollOnNumberInput";
   import { serverUrl } from "../api";
   
-  const AddDestination = ({ isOpen, onClose }) => {
+  const AddDestination = ({ isOpen, onClose,getAlldata }) => {
     usePreventScrollOnNumberInput();
   
     // State to manage form inputs
@@ -60,7 +60,7 @@ import {
         });
         console.log("Response:", response.data);
         alert("Destination added successfully");
-        // getAlldata();
+        getAlldata();
   
         // Reset form after successful submission
         setFormData({ title: "", image: "" });

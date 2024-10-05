@@ -43,18 +43,18 @@ const Destination = () => {
 
   const [data, setData] = useState([]);
 
-  // const getAlldata = () => {
-  //   axios.get(`${serverUrl}/api/activity/all`).then((res) => {
-  //     setData(res.data.data);
-  //   });
-  // };
+  const getAlldata = () => {
+    axios.get(`${serverUrl}/api/destination/destinaions`).then((res) => {
+      setData(res.data.data);
+    });
+  };
 
-  // useEffect(() => {
-  //   getAlldata();
-  //   return () => {
-  //     console.log("Avoid errors");
-  //   };
-  // }, []);
+  useEffect(() => {
+    getAlldata();
+    return () => {
+      console.log("Avoid errors");
+    };
+  }, []);
 
   return (
     <div className="flex gap-5 ">
@@ -142,7 +142,7 @@ const Destination = () => {
                   <th className="px-4 py-2"></th>
                 </tr>
               </thead>
-              {/* <tbody>
+              <tbody>
                 {data.map((user, index) => (
                   <tr
                     key={index}
@@ -160,7 +160,7 @@ const Destination = () => {
                     </td>
                   </tr>
                 ))}
-              </tbody> */}
+              </tbody>
             </table>
           </CardBody>
         </Card>
@@ -168,7 +168,7 @@ const Destination = () => {
       <AddDestination
         isOpen={isAddTravelSummeryModal}
         onClose={() => setIsAddTravelSummeryModal(false)}
-        // getAlldata={getAlldata}
+        getAlldata={getAlldata}
       />
     </div>
   );
