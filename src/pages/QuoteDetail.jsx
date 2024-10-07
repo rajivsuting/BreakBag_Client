@@ -17,6 +17,7 @@ import { serverUrl } from "../api";
 import axios from "axios";
 import AddDestination from "../components/AddDestination";
 import { Link, useParams } from "react-router-dom";
+import { convertDate } from "../Utils/Dateformat";
 
 const data = [
   {
@@ -40,7 +41,7 @@ const data = [
 ];
 
 const QuoteDetail = () => {
-  const [isAddTravelSummeryModal, setIsAddTravelSummeryModal] = useState(false);
+
   const { tripid } = useParams();
   const [data, setData] = useState([]);
 
@@ -57,6 +58,27 @@ const QuoteDetail = () => {
       console.log("Avoid errors");
     };
   }, []);
+
+  const getStatusColorbackground = (status) => {
+    switch (status) {
+      case "Active":
+        return "bg-green-500"; // Green
+      case "Quoted":
+        return "bg-blue-500"; // Blue
+      case "Follow Up":
+        return "bg-orange-500"; // Orange
+      case "Confirmed":
+        return "bg-dark-green-500"; // Dark Green
+      case "Cancelled":
+        return "bg-red-500"; // Red
+      case "CNP":
+        return "bg-gray-500"; // Gray
+      case "Groups":
+        return "bg-purple-500"; // Purple
+      default:
+        return "bg-black"; // Default color
+    }
+  }
 
   return (
     <div className="flex gap-5 ">
@@ -86,7 +108,7 @@ const QuoteDetail = () => {
         <Card className="overflow-hidden mt-5">
           <div className="p-8 pb-0 flex justify-between">
             <div className=" w-[50%] text-xl text-semibold">
-              Active - {tripid}
+              <span className={`px-4 py-2 rounded-md text-sm text-white ${getStatusColorbackground(data?.status)}`}>{data?.status}</span> {" "} {tripid}
             </div>
             <div className=" w-[50%] flex justify-end pb-2 gap-5 w-full">
               <Link to={`/create-intinary/${tripid}`}>
@@ -101,31 +123,39 @@ const QuoteDetail = () => {
               <div className="flex justify-between">
                 <div className="text-start w-[30%]">
                   <div className="text-gray-400">Starting date</div>
-                  <div>22323</div>
+                  <div>{(data?.startDate?.split("T")[0])}</div>
                 </div>
                 <div className="text-start w-[30%]">
                   <div className="text-gray-400">Ending date</div>
-                  <div>22323</div>
+                  <div>{(data?.endDate?.split("T")[0])}</div>
                 </div>
               </div>
               <div className="flex justify-between mt-5">
                 <div className="text-start w-[30%]">
                   <div className="text-gray-400">Destination</div>
-                  <div>22323</div>
+                  <div>{data?.destination?.title}</div>
                 </div>
                 <div className="text-start w-[30%]">
                   <div className="text-gray-400">No. of traveller</div>
-                  <div>22323</div>
+                  <div>{data?.numberOfTravellers}</div>
                 </div>
               </div>
               <div className="flex justify-between mt-5">
                 <div className="text-start w-[30%]">
                   <div className="text-gray-400">Duration</div>
-                  <div>22323</div>
+                  <div>{data?.duration}</div>
                 </div>
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-400">Ending date</div>
-                  <div>22323</div>
+                  <div className="text-gray-400">Travellers</div>
+                  <div>  {data?.travellers?.slice(0, 2).map((participant, index) => (
+                      <span key={index}>
+                        {participant.name}
+                        {index < 1 && data?.travellers?.length > 2 ? ", " : ""}
+                      </span>
+                    ))}
+                    {data?.travellers?.length > 2 && (
+                      <span> and {data?.travellers?.length - 2} more</span>
+                    )}</div>
                 </div>
               </div>
             </div>

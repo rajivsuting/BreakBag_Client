@@ -3,11 +3,7 @@ import Sidebar from "../components/Sidebar";
 import { Button, Input } from "@material-tailwind/react";
 import { MdDelete, MdEdit, MdRemoveRedEye } from "react-icons/md";
 import { LuPlusCircle } from "react-icons/lu";
-import {
-  Card,
-  CardBody,
-  IconButton,
-} from "@material-tailwind/react";
+import { Card, CardBody, IconButton } from "@material-tailwind/react";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 import { serverUrl } from "../api";
 import axios from "axios";
@@ -34,7 +30,7 @@ const Inclusion = () => {
     <div className="flex gap-5">
       <Sidebar />
       <div className="w-[75%] m-auto mt-8 rounded-md">
-      <div className="relative w-full">
+        <div className="relative w-full">
           {/* Background Image with dark overlay */}
           <div
             className="inset-0 bg-cover bg-center rounded-md relative"
@@ -48,9 +44,7 @@ const Inclusion = () => {
 
             {/* Content on top of the background */}
             <div className="absolute inset-0 flex flex-col p-4 pb-0 justify-between z-10">
-              <div className="text-3xl text-white font-semibold">
-              Inclusion
-              </div>
+              <div className="text-3xl text-white font-semibold">Inclusion</div>
 
               <div className="flex justify-between items-center pb-2 gap-5 w-full">
                 {/* Search Form */}
@@ -123,6 +117,7 @@ const Inclusion = () => {
                 <tr className="bg-gray-200">
                   <th className="px-4 py-2">Title</th>
                   <th className="px-4 py-2">Description</th>
+                  <th className="px-4 py-2">Destination</th>
                   <th className="px-4 py-2"></th>
                   <th className="px-4 py-2"></th>
                   <th className="px-4 py-2"></th>
@@ -148,24 +143,9 @@ const Inclusion = () => {
                       ))}
                     </td>
 
-                    {/* Images Column */}
-                    {/* <td className="px-4 py-2">
-                      {user.itemList.map((item, idx) => (
-                        <div key={idx}>
-                          {user.images[idx] ? (
-                            <img
-                              src={user.images[idx]}
-                              alt={item.title}
-                              className="w-20 h-20 object-cover"
-                            />
-                          ) : (
-                            "No Image"
-                          )}
-                        </div>
-                      ))}
-                    </td> */}
-
-                    {/* Action Buttons */}
+                    <td className="px-4 py-2">
+                      {user?.destination?.title || "NA"}
+                    </td>
                     <td className="px-4 py-2">
                       <MdRemoveRedEye className="h-5 w-5 text-maincolor2 cursor-pointer" />
                     </td>

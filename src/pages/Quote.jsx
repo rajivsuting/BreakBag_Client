@@ -49,24 +49,24 @@ const Travellers = () => {
     // })
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColorbackground = (status) => {
     switch (status) {
       case "Active":
-        return "text-green-500"; // Green
+        return "bg-green-500"; // Green
       case "Quoted":
-        return "text-blue-500"; // Blue
+        return "bg-blue-500"; // Blue
       case "Follow Up":
-        return "text-orange-500"; // Orange
+        return "bg-orange-500"; // Orange
       case "Confirmed":
-        return "text-dark-green-500"; // Dark Green
+        return "bg-dark-green-500"; // Dark Green
       case "Cancelled":
-        return "text-red-500"; // Red
+        return "bg-red-500"; // Red
       case "CNP":
-        return "text-gray-500"; // Gray
+        return "bg-gray-500"; // Gray
       case "Groups":
-        return "text-purple-500"; // Purple
+        return "bg-purple-500"; // Purple
       default:
-        return "text-black"; // Default color
+        return "bg-black"; // Default color
     }
   };
 
@@ -156,30 +156,18 @@ const Travellers = () => {
         <Card className="overflow-hidden mt-5">
           <CardBody className="p-0">
             <table className="w-full table-auto text-left">
-              <thead>
-                <tr className="bg-gray-200">
-                  <th className="px-4 py-2">Status</th>
-                  <th className="px-4 py-2">Trip ID</th>
-                  {/* <th className="px-4 py-2">Travellers</th>
-                  <th className="px-4 py-2">Destination</th> */}
-                  {/* <th className="px-4 py-2">Start date</th>
-                  <th className="px-4 py-2">End date</th>
-                  <th className="px-4 py-2">No. of traveller</th>
-                  <th className="px-4 py-2">Duration</th> */}
-                  <th className="px-4 py-2"></th>
-                </tr>
-              </thead>
+              
               <tbody>
                 {data.map((user, index) => (
                   <tr
                     key={index}
-                    className="hover:bg-gray-100 transition-colors duration-200"
+                    className="hover:bg-gray-100 transition-colors duration-200 border"
                   >
-                    <td className={`px-4 py-2 ${getStatusColor(user.status)}`}>
+                    <td className={`w-[100px] text-center text-sm px-4 py-4 bg text-white ${getStatusColorbackground(user.status)}`}>
                       {user.status}
                     </td>
                     <Link to={`/quote-detail/${user.tripId}`}>
-                      <td className="px-4 py-2 hover:text-main hover:border-b-2 hover:border-main transition-all duration-200">
+                      <td className="px-4 py-4 hover:text-main hover:border-b-2 hover:border-main transition-all duration-200">
                         {user.tripId}
                       </td>
                     </Link>

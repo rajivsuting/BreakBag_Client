@@ -38,42 +38,42 @@ const data = [
   },
 ];
 
-
 const Travellers = () => {
   const [isAddTravellersModal, setIsAddTravellersModal] = useState(false);
-  const [data, setData] = useState([])
+  const [data, setData] = useState([]);
 
-  const getAlldata = ()=>{
-    axios.get(`${serverUrl}/api/traveller/all`).then((res)=>{
-      setData(res.data.travellers)
-    })
-  }
+  const getAlldata = () => {
+    axios.get(`${serverUrl}/api/traveller/all`).then((res) => {
+      setData(res.data.travellers);
+    });
+  };
 
-  useEffect(()=>{
+  useEffect(() => {
     getAlldata();
-    return(()=>{
-      console.log("Avoid errors")
-    })
-  },[])
+    return () => {
+      console.log("Avoid errors");
+    };
+  }, []);
 
-  const handleEdit = ()=>{
+  const handleEdit = () => {};
 
-  }
-
-  const handleDelete = (id)=>{
-    axios.delete(`${serverUrl}/api/traveller/delete/${id}`).then((res)=>{
-      alert("Traveller deleted");
-      getAlldata()
-    }).catch((err)=>{
-      alert(err.response.data.error)
-    })
-  }
+  const handleDelete = (id) => {
+    axios
+      .delete(`${serverUrl}/api/traveller/delete/${id}`)
+      .then((res) => {
+        alert("Traveller deleted");
+        getAlldata();
+      })
+      .catch((err) => {
+        alert(err.response.data.error);
+      });
+  };
 
   return (
     <div className="flex gap-5 ">
       <Sidebar />
       <div className="w-[75%] m-auto mt-8 rounded-md">
-      <div className="relative w-full">
+        <div className="relative w-full">
           {/* Background Image with dark overlay */}
           <div
             className="inset-0 bg-cover bg-center rounded-md relative"
@@ -88,7 +88,7 @@ const Travellers = () => {
             {/* Content on top of the background */}
             <div className="absolute inset-0 flex flex-col p-4 pb-0 justify-between z-10">
               <div className="text-3xl text-white font-semibold">
-              Travellers
+                Travellers
               </div>
 
               <div className="flex justify-between items-center pb-2 gap-5 w-full">
@@ -122,7 +122,7 @@ const Travellers = () => {
                 <div className="flex justify-end items-center gap-5 text-white">
                   <div className="">
                     <LuPlusCircle
-                      onClick={() => setIsAddTravelSummeryModal(true)}
+                      onClick={() => setIsAddTravellersModal(true)}
                       className="h-6 w-6 cursor-pointer"
                     />
                   </div>
@@ -182,7 +182,10 @@ const Travellers = () => {
                       <MdEdit className="h-5 w-5 text-maincolor2 cursor-pointer" />
                     </td>
                     <td className="px-4 py-2">
-                      <MdDelete onClick={()=>handleDelete(user._id)} className="h-5 w-5 text-main cursor-pointer" />
+                      <MdDelete
+                        onClick={() => handleDelete(user._id)}
+                        className="h-5 w-5 text-main cursor-pointer"
+                      />
                     </td>
                   </tr>
                 ))}
@@ -194,7 +197,7 @@ const Travellers = () => {
       <Addtraveller
         isOpen={isAddTravellersModal}
         onClose={() => setIsAddTravellersModal(false)}
-        getAlldata= {getAlldata}
+        getAlldata={getAlldata}
       />
     </div>
   );

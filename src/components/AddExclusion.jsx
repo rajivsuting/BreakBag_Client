@@ -1,13 +1,27 @@
 import { Button, Input, Textarea } from "@material-tailwind/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AiOutlineClose, AiOutlinePlus } from "react-icons/ai";
 import axios from "axios";
 import { serverUrl } from "../api";
+import Select from "react-select";
 
 const AddExclusion = ({ isOpen, onClose, getAlldata }) => {
   // State to manage form inputs
   const [items, setItems] = useState([{ title: "", description: "" }]); // Initially 1 item
   const [isLoading, setIsLoading] = useState(false);
+  const [destinationAll, setDestinationAll] = useState([]);
+  const [selectedDestination, setSelectedDestination] = useState("");
+
+  useEffect(() => {
+    axios.get(`${serverUrl}/api/destination/destinaions`).then((res) => {
+      setDestinationAll(res.data.data);
+    });
+
+    return () => {
+      console.log("");
+    };
+  }, []);
+
 
   if (!isOpen) return null;
 
@@ -35,7 +49,7 @@ const AddExclusion = ({ isOpen, onClose, getAlldata }) => {
     e.preventDefault(); // Prevent the form from refreshing the page
     setIsLoading(true);
 
-    const data = { itemList: items };
+    const data = { itemList: items,destination:selectedDestination };
 
     try {
       // API call to submit form data
@@ -49,6 +63,7 @@ const AddExclusion = ({ isOpen, onClose, getAlldata }) => {
 
       // Reset form after successful submission
       setItems([{ title: "", description: "" }]);
+      setSelectedDestination("")
       onClose(); // Close modal on success
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -56,6 +71,13 @@ const AddExclusion = ({ isOpen, onClose, getAlldata }) => {
       setIsLoading(false);
     }
   };
+
+  const options = destinationAll.map((destination) => ({
+    value: destination._id,
+    label: destination.title,
+  }));
+
+
 
   return (
     <div className="fixed inset-0 z-[999] grid h-screen w-screen place-items-center bg-black bg-opacity-60 backdrop-blur-sm transition-opacity duration-300">
@@ -69,6 +91,22 @@ const AddExclusion = ({ isOpen, onClose, getAlldata }) => {
         </div>
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="text-xl font-normal">Add Exclusion</div>
+
+          <div className="w-[100%]">
+              {/* react-select component */}
+              <Select
+                options={options} // The options fetched from API
+                value={options.find(
+                  (option) => option.value === selectedDestination
+                )} // Pre-select the value if needed
+                onChange={(selectedOption) =>
+                  setSelectedDestination(selectedOption?.value || "")
+                }
+                placeholder="Select a destination"
+                isSearchable={true}
+                isClearable={true} // Allows clearing the selection
+              />
+            </div>
 
           {/* Dynamic input fields for Title and Description */}
           {items.map((item, index) => (

@@ -151,6 +151,7 @@ const OtherInformation = () => {
                 <tr className="bg-gray-200">
                   <th className="px-4 py-2">Title</th>
                   <th className="px-4 py-2">Description</th>
+                  <th className="px-4 py-2">Destination</th>
                   <th className="px-4 py-2"></th>
                   <th className="px-4 py-2"></th>
                   <th className="px-4 py-2"></th>
@@ -193,7 +194,10 @@ const OtherInformation = () => {
                       ))}
                     </td> */}
 
-                    {/* Action Buttons */}
+
+<td className="px-4 py-2">
+                      {user?.destination?.title || "NA"}
+                    </td>
                     <td className="px-4 py-2">
                       <MdRemoveRedEye className="h-5 w-5 text-maincolor2 cursor-pointer" />
                     </td>

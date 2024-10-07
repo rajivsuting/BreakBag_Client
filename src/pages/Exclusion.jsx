@@ -17,27 +17,6 @@ import axios from "axios";
 import AddInclusion from "../components/AddInclusion";
 import AddExclusion from "../components/AddExclusion";
 
-const data = [
-  {
-    name: "John Doe",
-    email: "john@example.com",
-    role: "Admin",
-    status: "Active",
-  },
-  {
-    name: "Jane Smith",
-    email: "jane@example.com",
-    role: "Editor",
-    status: "Inactive",
-  },
-  {
-    name: "Tom Johnson",
-    email: "tom@example.com",
-    role: "Viewer",
-    status: "Active",
-  },
-];
-
 const Exclusion = () => {
   const [isAddTravelSummeryModal, setIsAddTravelSummeryModal] = useState(false);
 
@@ -149,7 +128,7 @@ const Exclusion = () => {
                 <tr className="bg-gray-200">
                   <th className="px-4 py-2">Title</th>
                   <th className="px-4 py-2">Description</th>
-                  <th className="px-4 py-2">Images</th>
+                  <th className="px-4 py-2">Destination</th>
                   <th className="px-4 py-2"></th>
                   <th className="px-4 py-2"></th>
                   <th className="px-4 py-2"></th>
@@ -192,7 +171,9 @@ const Exclusion = () => {
                       ))}
                     </td> */}
 
-                    {/* Action Buttons */}
+<td className="px-4 py-2">
+                      {user?.destination?.title || "NA"}
+                    </td>
                     <td className="px-4 py-2">
                       <MdRemoveRedEye className="h-5 w-5 text-maincolor2 cursor-pointer" />
                     </td>

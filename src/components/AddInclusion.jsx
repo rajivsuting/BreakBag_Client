@@ -1,14 +1,27 @@
 import { Button, Input, Textarea } from "@material-tailwind/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AiOutlineClose, AiOutlinePlus } from "react-icons/ai";
 import axios from "axios";
 import { serverUrl } from "../api";
+import Select from "react-select";
 
 const AddInclusion = ({ isOpen, onClose, getAlldata }) => {
   // State to manage form inputs
   const [items, setItems] = useState([{ title: "", description: "" }]); // Initially 1 item
   const [images, setImages] = useState([]); // State to handle multiple images
   const [isLoading, setIsLoading] = useState(false);
+  const [destinationAll, setDestinationAll] = useState([]);
+  const [selectedDestination, setSelectedDestination] = useState("");
+
+  useEffect(() => {
+    axios.get(`${serverUrl}/api/destination/destinaions`).then((res) => {
+      setDestinationAll(res.data.data);
+    });
+
+    return () => {
+      console.log("");
+    };
+  }, []);
 
   if (!isOpen) return null;
 
@@ -45,6 +58,7 @@ const AddInclusion = ({ isOpen, onClose, getAlldata }) => {
 
     // Append items (title and description)
     data.append("itemList", JSON.stringify(items));
+    data.append("destination", selectedDestination);
 
     // Append multiple images
     if (images.length > 0) {
@@ -52,8 +66,6 @@ const AddInclusion = ({ isOpen, onClose, getAlldata }) => {
         data.append("images", image);
       });
     }
-
-    console.log(data)
 
     try {
       // API call to submit form data
@@ -73,6 +85,7 @@ const AddInclusion = ({ isOpen, onClose, getAlldata }) => {
       // Reset form after successful submission
       setItems([{ title: "", description: "" }]);
       setImages([]);
+      setSelectedDestination("")
       onClose(); // Close modal on success
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -80,6 +93,11 @@ const AddInclusion = ({ isOpen, onClose, getAlldata }) => {
       setIsLoading(false);
     }
   };
+
+  const options = destinationAll.map((destination) => ({
+    value: destination._id,
+    label: destination.title,
+  }));
 
   return (
     <div className="fixed inset-0 z-[999] grid h-screen w-screen place-items-center bg-black bg-opacity-60 backdrop-blur-sm transition-opacity duration-300">
@@ -93,6 +111,33 @@ const AddInclusion = ({ isOpen, onClose, getAlldata }) => {
         </div>
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="text-xl font-normal">Add Inclusion</div>
+
+          {/* File input for uploading multiple images */}
+          <div className="flex items-center gap-5">
+            <div className="w-[100%]">
+              {/* react-select component */}
+              <Select
+                options={options} // The options fetched from API
+                value={options.find(
+                  (option) => option.value === selectedDestination
+                )} // Pre-select the value if needed
+                onChange={(selectedOption) =>
+                  setSelectedDestination(selectedOption?.value || "")
+                }
+                placeholder="Select a destination"
+                isSearchable={true}
+                isClearable={true} // Allows clearing the selection
+              />
+            </div>
+            <Input
+              label="Upload Images"
+              type="file"
+              name="images"
+              onChange={handleImageChange}
+              multiple
+              required
+            />
+          </div>
 
           {/* Dynamic input fields for Title and Description */}
           {items.map((item, index) => (
@@ -133,18 +178,6 @@ const AddInclusion = ({ isOpen, onClose, getAlldata }) => {
               <hr />
             </>
           ))}
-
-          {/* File input for uploading multiple images */}
-          <div className="flex items-center">
-            <Input
-              label="Upload Images"
-              type="file"
-              name="images"
-              onChange={handleImageChange}
-              multiple
-              required
-            />
-          </div>
 
           {/* Submit button */}
           <div className="flex justify-center">

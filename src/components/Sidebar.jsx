@@ -49,7 +49,7 @@ const Sidebar = () => {
           />
         </Typography>
       </div>
-      <List className="sidebar overflow-y-scroll h-full">
+      <List className="sidebar overflow-y-scroll h-[100vh]">
         {/* Dashboard Accordion */}
         <Accordion open={openAccordion.includes("dashboard")}>
           <ListItem className="p-0" onClick={() => toggleAccordion("dashboard")}>

@@ -13,9 +13,9 @@ const Addagents = ({ isOpen, onClose }) => {
   // Form state
   const [formData, setFormData] = useState({
     name: "",
-    email:"",
+    email: "",
     phone: "",
-    role:"Agent"
+    isTeamlead:false
   });
 
   // Loading state
@@ -34,28 +34,30 @@ const Addagents = ({ isOpen, onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-console.log(formData);
+    console.log(formData);
 
     try {
       // Make the API call to submit the form data
-      const response = await axios.post(`${serverUrl}/api/auth/register`, formData, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await axios.post(
+        `${serverUrl}/api/agent/create`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-    //   console.log("Response:", response.data);
+      //   console.log("Response:", response.data);
 
-      alert("Agent added")
-    //   getAlldata()
+      alert("Agent added");
+      //   getAlldata()
       // Clear the form
       setFormData({
         name: "",
         email: "",
-        phone:""
+        phone: "",
       });
-
-      
 
       // Close the modal
       onClose();
@@ -72,12 +74,16 @@ console.log(formData);
     <div className="fixed inset-0 z-[999] grid h-screen w-screen place-items-center bg-black bg-opacity-60 backdrop-blur-sm transition-opacity duration-300">
       <div className="relative m-4 w-2/5 min-w-[50%] max-w-[50%] max-h-[90vh] overflow-y-auto rounded-lg bg-white font-sans text-base font-light leading-relaxed text-blue-gray-500 shadow-2xl p-8">
         <div className="flex items-center justify-end font-sans text-2xl font-semibold text-blue-gray-900">
-          <AiOutlineClose className="cursor-pointer" size={24} onClick={onClose} />
+          <AiOutlineClose
+            className="cursor-pointer"
+            size={24}
+            onClick={onClose}
+          />
         </div>
         <div className="">
           <form className="m-auto" onSubmit={handleSubmit}>
             <div className="m-auto mb-5">
-              <div className="font-normal text-xl">Add Travel Summery</div>
+              <div className="font-normal text-xl">Add Agent</div>
             </div>
             <div className="flex justify-between items-center m-auto gap-10 mt-5">
               <Input
@@ -107,11 +113,7 @@ console.log(formData);
               />
             </div>
             <div className="w-[90%] flex justify-center items-center text-center mt-5 m-auto">
-              <Button
-                className="bg-main"
-                type="submit"
-                disabled={isLoading}
-              >
+              <Button className="bg-main" type="submit" disabled={isLoading}>
                 {isLoading ? "Adding..." : "Add Agent"}
               </Button>
             </div>
