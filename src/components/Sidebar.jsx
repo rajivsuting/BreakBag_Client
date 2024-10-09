@@ -51,21 +51,25 @@ const Sidebar = () => {
       </div>
       <List className="sidebar overflow-y-scroll h-[100vh]">
         {/* Dashboard Accordion */}
+
+        {localStorage.getItem("userRole") == "Agent" ? null :
         <Accordion open={openAccordion.includes("dashboard")}>
-          <ListItem className="p-0" onClick={() => toggleAccordion("dashboard")}>
-            <AccordionHeader
-              
-              className="border-b-0 p-3 flex justify-between items-center"
-            >
+          <ListItem
+            className="p-0"
+            onClick={() => toggleAccordion("dashboard")}
+          >
+            <AccordionHeader className="border-b-0 p-3 flex justify-between items-center">
               <div className="w-[70%] flex items-center">
                 <ListItemPrefix>
-                  <PresentationChartBarIcon className={`h-5 w-5 ${
-                    isActive("/agent") ||
-                    isActive("/destination") ||
-                    isActive("/travellers")
-                      ? "text-main"
-                      : "text-blue-gray"
-                  }`} />
+                  <PresentationChartBarIcon
+                    className={`h-5 w-5 ${
+                      isActive("/agent") ||
+                      isActive("/destination") ||
+                      isActive("/travellers")
+                        ? "text-main"
+                        : "text-blue-gray"
+                    }`}
+                  />
                 </ListItemPrefix>
                 <Typography
                   color={
@@ -82,11 +86,11 @@ const Sidebar = () => {
               </div>
               {/* Arrow Icon */}
               <div>
-              <ChevronDownIcon
-                className={`h-3 w-3 transition-transform ${
-                  openAccordion.includes("dashboard") ? "rotate-180" : ""
-                }`}
-              />
+                <ChevronDownIcon
+                  className={`h-3 w-3 transition-transform ${
+                    openAccordion.includes("dashboard") ? "rotate-180" : ""
+                  }`}
+                />
               </div>
             </AccordionHeader>
           </ListItem>
@@ -95,7 +99,7 @@ const Sidebar = () => {
               <NavLink to={"/agent"}>
                 <ListItem className={isActive("/agent") ? "text-red-500" : ""}>
                   <ListItemPrefix>
-                     <MdChevronLeft className="h-5 w-5" />
+                    <MdChevronLeft className="h-5 w-5" />
                   </ListItemPrefix>
                   Agents
                 </ListItem>
@@ -105,7 +109,7 @@ const Sidebar = () => {
                   className={isActive("/destination") ? "text-red-500" : ""}
                 >
                   <ListItemPrefix>
-                     <MdChevronLeft className="h-5 w-5" />
+                    <MdChevronLeft className="h-5 w-5" />
                   </ListItemPrefix>
                   Destination
                 </ListItem>
@@ -115,50 +119,55 @@ const Sidebar = () => {
                   className={isActive("/travellers") ? "text-red-500" : ""}
                 >
                   <ListItemPrefix>
-                     <MdChevronLeft className="h-5 w-5" />
+                    <MdChevronLeft className="h-5 w-5" />
                   </ListItemPrefix>
                   Travellers
                 </ListItem>
               </NavLink>
             </List>
           </AccordionBody>
-        </Accordion>
+        </Accordion> }
 
         {/* Itinerary Library Accordion */}
+        {localStorage.getItem("userRole") == "Agent" ? null :
         <Accordion open={openAccordion.includes("itinerary")}>
-          <ListItem className="p-0" onClick={() => toggleAccordion("itinerary")}>
-            <AccordionHeader
-              
-              className="border-b-0 p-3 flex justify-between items-center"
-            >
+          <ListItem
+            className="p-0"
+            onClick={() => toggleAccordion("itinerary")}
+          >
+            <AccordionHeader className="border-b-0 p-3 flex justify-between items-center">
               <div className="w-[70%] flex items-center">
                 <ListItemPrefix>
-                  <ShoppingBagIcon className={`h-5 w-5 ${
-                  isActive("/travel-summery") ||
-                  isActive("/activity") ||
-                  isActive("/inclusion") ||
-                  isActive("/exclusion") ||
-                  isActive("/transfer") ||
-                  isActive("/other-information")
-                    ? "text-main"
-                    : "text-blue-gray"
-                }`} />
+                  <ShoppingBagIcon
+                    className={`h-5 w-5 ${
+                      isActive("/travel-summery") ||
+                      isActive("/activity") ||
+                      isActive("/inclusion") ||
+                      isActive("/exclusion") ||
+                      isActive("/transfer") ||
+                      isActive("/other-information")
+                        ? "text-main"
+                        : "text-blue-gray"
+                    }`}
+                  />
                 </ListItemPrefix>
-                <Typography
-                  color={
-                    isActive("/travel-summery") ||
-                    isActive("/activity") ||
-                    isActive("/inclusion") ||
-                    isActive("/exclusion") ||
-                    isActive("/transfer") ||
-                    isActive("/other-information")
-                      ? "red"
-                      : "blue-gray"
-                  }
-                  className="mr-auto font-normal"
-                >
-                  Itinerary Library
-                </Typography>
+                
+                  <Typography
+                    color={
+                      isActive("/travel-summery") ||
+                      isActive("/activity") ||
+                      isActive("/inclusion") ||
+                      isActive("/exclusion") ||
+                      isActive("/transfer") ||
+                      isActive("/other-information")
+                        ? "red"
+                        : "blue-gray"
+                    }
+                    className="mr-auto font-normal"
+                  >
+                    Itinerary Library
+                  </Typography>
+               
               </div>
               {/* Arrow Icon */}
               <ChevronDownIcon
@@ -169,75 +178,91 @@ const Sidebar = () => {
             </AccordionHeader>
           </ListItem>
 
-          <AccordionBody className="py-1">
-            <List className="p-0">
-              <NavLink to={"/travel-summery"}>
-                <ListItem
-                  className={isActive("/travel-summery") ? "text-red-500" : ""}
-                >
-                  <ListItemPrefix>
-                    <MdChevronLeft className="h-5 w-5" />
-                  </ListItemPrefix>
-                  Travel Summary
-                </ListItem>
-              </NavLink>
-              <NavLink to={"/activity"}>
-                <ListItem
-                  className={isActive("/activity") ? "text-red-500" : ""}
-                >
-                  <ListItemPrefix>
-                     <MdChevronLeft className="h-5 w-5" />
-                  </ListItemPrefix>
-                  Activities
-                </ListItem>
-              </NavLink>
-              <NavLink to={"/inclusion"}>
-                <ListItem
-                  className={isActive("/inclusion") ? "text-red-500" : ""}
-                >
-                  <ListItemPrefix>
-                     <MdChevronLeft className="h-5 w-5" />
-                  </ListItemPrefix>
-                  Inclusion
-                </ListItem>
-              </NavLink>
-              <NavLink to={"/exclusion"}>
-                <ListItem
-                  className={isActive("/exclusion") ? "text-red-500" : ""}
-                >
-                  <ListItemPrefix>
-                     <MdChevronLeft className="h-5 w-5" />
-                  </ListItemPrefix>
-                  Exclusion
-                </ListItem>
-              </NavLink>
-              <NavLink to={"/transfer"}>
-                <ListItem
-                  className={isActive("/transfer") ? "text-red-500" : ""}
-                >
-                  <ListItemPrefix>
-                     <MdChevronLeft className="h-5 w-5" />
-                  </ListItemPrefix>
-                  Transfers
-                </ListItem>
-              </NavLink>
-              <NavLink to={"/other-information"}>
-                <ListItem
-                  className={
-                    isActive("/other-information") ? "text-red-500" : ""
-                  }
-                >
-                  <ListItemPrefix>
-                     <MdChevronLeft className="h-5 w-5" />
-                  </ListItemPrefix>
-                  Other Information
-                </ListItem>
-              </NavLink>
-            </List>
-          </AccordionBody>
-        </Accordion>
+        
+            <AccordionBody className="py-1">
+              <List className="p-0">
+                <NavLink to={"/travel-summery"}>
+                  <ListItem
+                    className={
+                      isActive("/travel-summery") ? "text-red-500" : ""
+                    }
+                  >
+                    <ListItemPrefix>
+                      <MdChevronLeft className="h-5 w-5" />
+                    </ListItemPrefix>
+                    Travel Summary
+                  </ListItem>
+                </NavLink>
+                <NavLink to={"/activity"}>
+                  <ListItem
+                    className={isActive("/activity") ? "text-red-500" : ""}
+                  >
+                    <ListItemPrefix>
+                      <MdChevronLeft className="h-5 w-5" />
+                    </ListItemPrefix>
+                    Activities
+                  </ListItem>
+                </NavLink>
+                <NavLink to={"/inclusion"}>
+                  <ListItem
+                    className={isActive("/inclusion") ? "text-red-500" : ""}
+                  >
+                    <ListItemPrefix>
+                      <MdChevronLeft className="h-5 w-5" />
+                    </ListItemPrefix>
+                    Inclusion
+                  </ListItem>
+                </NavLink>
+                <NavLink to={"/exclusion"}>
+                  <ListItem
+                    className={isActive("/exclusion") ? "text-red-500" : ""}
+                  >
+                    <ListItemPrefix>
+                      <MdChevronLeft className="h-5 w-5" />
+                    </ListItemPrefix>
+                    Exclusion
+                  </ListItem>
+                </NavLink>
+                <NavLink to={"/transfer"}>
+                  <ListItem
+                    className={isActive("/transfer") ? "text-red-500" : ""}
+                  >
+                    <ListItemPrefix>
+                      <MdChevronLeft className="h-5 w-5" />
+                    </ListItemPrefix>
+                    Transfers
+                  </ListItem>
+                </NavLink>
+                <NavLink to={"/other-information"}>
+                  <ListItem
+                    className={
+                      isActive("/other-information") ? "text-red-500" : ""
+                    }
+                  >
+                    <ListItemPrefix>
+                      <MdChevronLeft className="h-5 w-5" />
+                    </ListItemPrefix>
+                    Other Information
+                  </ListItem>
+                </NavLink>
+              </List>
+            </AccordionBody>
+      
+        </Accordion> 
+        }
 
         {/* Other Links */}
+
+        {localStorage.getItem("userRole") == "Agent" ? <NavLink to={"/travellers"}>
+          <ListItem className={isActive("/travellers") ? "text-red-500" : ""}>
+            <ListItemPrefix>
+              <UserCircleIcon className="h-5 w-5" />
+            </ListItemPrefix>
+            Traveller
+          </ListItem>
+        </NavLink> : null}
+
+
         <NavLink to={"/quote"}>
           <ListItem className={isActive("/quote") ? "text-red-500" : ""}>
             <ListItemPrefix>

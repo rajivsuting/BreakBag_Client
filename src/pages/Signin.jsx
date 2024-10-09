@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Input, Button } from "@material-tailwind/react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { serverUrl } from "../api";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -15,7 +16,7 @@ const SignIn = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/auth/login",
+        `${serverUrl}/api/auth/login`,
         {
           email,
         }
@@ -31,24 +32,35 @@ const SignIn = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
+  
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/auth/verify-otp",
+        `${serverUrl}/api/auth/verify-otp`,
         {
           email,
           otp,
         }
       );
-
+  console.log(response.data);
+  
       setMessage(response.data.message);
-      navigate("/");
+      
+      // Store the user's role in localStorage for later use
+      localStorage.setItem('userRole', response.data.role); 
+  
+      // Navigate to dashboard after successful login
+      if (response.data.role == "Admin"){
+        console.log("yes")
+        navigate("/");
+      }else {
+        navigate("/travellers");
+      }
     } catch (error) {
       console.error("Error during login:", error);
       setMessage("Failed to login. Please try again.");
     }
   };
-
+  
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100 relative">
       <div className="absolute top-5 left-10 z-20">

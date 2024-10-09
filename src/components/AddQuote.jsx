@@ -5,6 +5,7 @@ import axios from "axios";
 import { serverUrl } from "../api";
 import Sidebar from "./Sidebar";
 import Select from "react-select";
+import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 
 const AddQuote = () => {
   const [data, setData] = useState([]); // List of travelers
@@ -45,7 +46,10 @@ const AddQuote = () => {
 
   // Function to handle destination selection in react-select
   const handleSelectChange = (selectedOption) => {
-    setFormState({ ...formState, destination: selectedOption ? selectedOption.value : "" });
+    setFormState({
+      ...formState,
+      destination: selectedOption ? selectedOption.value : "",
+    });
   };
 
   // Handle form submission
@@ -64,7 +68,7 @@ const AddQuote = () => {
       .post(`${serverUrl}/api/quote/quotes`, formData)
       .then((res) => {
         setIsLoading(false);
-        alert("Quote added successfully")
+        alert("Quote added successfully");
       })
       .catch((error) => {
         console.error("Error adding quote:", error);
@@ -82,15 +86,25 @@ const AddQuote = () => {
       <Sidebar />
       <div className="w-[75%] m-auto mt-8 rounded-md">
         <form className="space-y-5" onSubmit={handleSubmit}>
-          <div>
-            <img
-              src="/img/lanscape1.jpg"
-              className="w-full h-[200px] mb-5 rounded-md"
-              alt=""
-            />
-          </div>
-          <div className="flex justify-between items-center">
-            <div className="text-2xl">Quote</div>
+          <div className="relative w-full">
+            {/* Background Image with dark overlay */}
+            <div
+              className="inset-0 bg-cover bg-center rounded-md relative"
+              style={{
+                backgroundImage: 'url("/img/lanscape2.jpg")',
+                height: "200px", // Adjust height as needed
+              }}
+            >
+              {/* Dark Overlay on the background image */}
+              <div className="absolute inset-0 bg-black opacity-50 rounded-md pointer-events-none"></div>
+
+              {/* Content on top of the background */}
+              <div className="absolute inset-0 flex flex-col p-4 pb-0 justify-between z-10">
+                <div className="text-3xl text-white font-semibold">
+                  Add quote
+                </div>
+              </div>
+            </div>
           </div>
           <div className="flex justify-between m-auto gap-10 mt-5">
             {/* Left side: Form fields and selected travelers */}
@@ -100,7 +114,9 @@ const AddQuote = () => {
                   {/* react-select component */}
                   <Select
                     options={options} // The options fetched from API
-                    value={options.find((option) => option.value === formState.destination)} // Pre-select the value if needed
+                    value={options.find(
+                      (option) => option.value === formState.destination
+                    )} // Pre-select the value if needed
                     onChange={handleSelectChange} // Handle selection
                     placeholder="Select a destination"
                     isSearchable={true}

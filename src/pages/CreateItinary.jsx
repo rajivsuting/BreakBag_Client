@@ -14,24 +14,80 @@ import Select from "react-select";
 
 const CreateItinerary = () => {
   const { tripid } = useParams();
-  const [isAddTravelSummaryModal, setIsAddTravelSummaryModal] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("Travel Summary"); // Set default to "Travel Summary"
-  const [travelSummary, setTravelSummary] = useState([{ day: 1, summary: "" }]);
-  const [detailedItinerary, setDetailedItinerary] = useState([
-    { day: 1, itinerary: "" },
+  const [selectedCategory, setSelectedCategory] = useState("Travel Summary");
+  const [travelSummaryPerDay, setTravelSummaryPerDay] = useState([
+    {
+      day: 1,
+      selectedSummary: "",
+      summaryDetails: { title: "", description: "" },
+    },
   ]);
-  const [data, setData] = useState([]);
+
+  const [activityPerDay, setActivityPerDay] = useState([
+    {
+      day: 1,
+      selectedSummary: "",
+      summaryDetails: { title: "", description: "" },
+    },
+  ]);
+
   const [travelSummaryAll, setTravelSummaryAll] = useState([]);
-  const [selectedTravelSummary, setSelectedTravelSummary] = useState("");
+  const [otherinformation, setOtherinformation] = useState({});
   const [activityAll, setActivityAll] = useState([]);
-  const [selectedActivity, setSelectedActivity] = useState("");
-  const [singleTravelSummery, setSingleTravelSummery] = useState({});
-  const [singleActivity, setSingleActivity] = useState([]);
   const [inclusionAll, setInclusionAll] = useState({});
   const [exclusionAll, setExclusionAll] = useState({});
-  const [otherinformation, setOtherinformation] = useState({});
   const [transfer, setTransfer] = useState({});
+  const [data, setData] = useState([]);
+  const [adultCount, setAdultCount] = useState(1);
+  const [childCount, setChildCount] = useState(0);
+  const [adultPrice, setAdultPrice] = useState(100); // Default adult price
+  const [childPrice, setChildPrice] = useState(50); // Default child price
 
+  useEffect(() => {
+    axios.get(`${serverUrl}/api/travel-summary/travel-summary`).then((res) => {
+      setTravelSummaryAll(res.data.travelSummaries);
+    });
+
+    axios.get(`${serverUrl}/api/activity/all`).then((res) => {
+      setActivityAll(res.data.data);
+    });
+
+    axios.get(`${serverUrl}/api/quote/quotes/${tripid}`).then((res) => {
+      setData(res.data.data);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (data?.destination?._id) {
+      axios
+        .get(
+          `${serverUrl}/api/other-information/destination/${data?.destination?._id}`
+        )
+        .then((res) => {
+          console.log(res);
+          setOtherinformation(res.data.data.itemList || []);
+        });
+
+      axios
+        .get(`${serverUrl}/api/inclusion/destination/${data?.destination?._id}`)
+        .then((res) => {
+          console.log(res);
+          setInclusionAll(res.data.data.itemList || []);
+        });
+
+      axios
+        .get(`${serverUrl}/api/exclusion/destination/${data?.destination?._id}`)
+        .then((res) => {
+          setExclusionAll(res.data.data.itemList || []);
+        });
+
+      axios
+        .get(`${serverUrl}/api/transfer/destination/${data?.destination?._id}`)
+        .then((res) => {
+          setTransfer(res.data.data.itemList || []);
+        });
+    }
+  }, [data?.destination?._id]);
   const categories = [
     "Travel Summary",
     "Cost (Adult, child)",
@@ -43,94 +99,165 @@ const CreateItinerary = () => {
     "Other Information",
   ];
 
-  // Handle Category Change
   const handleCategoryClick = (category) => {
     setSelectedCategory(category);
   };
 
-  // Function to add more days to Travel Summary
   const addTravelSummaryDay = () => {
-    setTravelSummary([
-      ...travelSummary,
-      { day: travelSummary.length + 1, summary: "" },
+    setTravelSummaryPerDay([
+      ...travelSummaryPerDay,
+      {
+        day: travelSummaryPerDay.length + 1,
+        selectedSummary: "",
+        summaryDetails: { title: "", description: "" },
+      },
     ]);
   };
 
-  // Function to add more days to Activity
-  const addItineraryDay = () => {
-    setDetailedItinerary([
-      ...detailedItinerary,
-      { day: detailedItinerary.length + 1, itinerary: "" },
+  const addActivityDay = () => {
+    setActivityPerDay([
+      ...activityPerDay,
+      {
+        day: activityPerDay.length + 1,
+        selectedSummary: "",
+        summaryDetails: { title: "", description: "" },
+      },
     ]);
   };
 
-  const getAllData = () => {
-    axios.get(`${serverUrl}/api/quote/quotes/${tripid}`).then((res) => {
-      setData(res.data.data);
+  const handleSelectChange = (selectedOption, dayIndex) => {
+    const updatedSummary = travelSummaryPerDay.map((item, index) => {
+      if (index === dayIndex) {
+        return {
+          ...item,
+          selectedSummary: selectedOption?.value || "",
+          summaryDetails: travelSummaryAll?.find(
+            (option) => option._id === selectedOption?.value
+          ) || { title: "", description: "" },
+        };
+      }
+      return item;
     });
+    setTravelSummaryPerDay(updatedSummary);
   };
 
-
-  useEffect(() => {
-    getAllData();
-    axios.get(`${serverUrl}/api/travel-summary/travel-summary`).then((res) => {
-      setTravelSummaryAll(res.data.travelSummaries);
+  const handleSelectChangeActivity = (selectedOption, dayIndex) => {
+    const updatedSummary = activityPerDay.map((item, index) => {
+      if (index === dayIndex) {
+        return {
+          ...item,
+          selectedSummary: selectedOption?.value || "",
+          summaryDetails: activityAll?.find(
+            (option) => option._id === selectedOption?.value
+          ) || { title: "", description: "" },
+        };
+      }
+      return item;
     });
+    setActivityPerDay(updatedSummary);
+  };
 
-    axios.get(`${serverUrl}/api/activity/all`).then((res) => {
-      setActivityAll(res.data.data);
+  const handleInputChange = (e, field, dayIndex) => {
+    const updatedSummary = travelSummaryPerDay.map((item, index) => {
+      if (index === dayIndex) {
+        return {
+          ...item,
+          summaryDetails: {
+            ...item.summaryDetails,
+            [field]: e.target.value,
+          },
+        };
+      }
+      return item;
     });
+    setTravelSummaryPerDay(updatedSummary);
+  };
 
-    axios
-      .get(`${serverUrl}/api/inclusion/destination/${data?.destination?._id}`)
-      .then((res) => {
-        setInclusionAll(res.data.data);
-      });
+  const handleInputChangeActivity = (e, field, dayIndex) => {
+    const updatedSummary = activityPerDay.map((item, index) => {
+      if (index === dayIndex) {
+        return {
+          ...item,
+          summaryDetails: {
+            ...item.summaryDetails,
+            [field]: e.target.value,
+          },
+        };
+      }
+      return item;
+    });
+    setActivityPerDay(updatedSummary);
+  };
 
-    axios
-      .get(`${serverUrl}/api/exclusion/destination/${data?.destination?._id}`)
-      .then((res) => {
-        setExclusionAll(res.data.data);
-      });
-    axios
-      .get(
-        `${serverUrl}/api/other-information/destination/${data?.destination?._id}`
-      )
-      .then((res) => {
-        setOtherinformation(res.data.data);
-      });
-    axios
-      .get(`${serverUrl}/api/transfer/destination/${data?.destination?._id}`)
-      .then((res) => {
-        setTransfer(res.data.data);
-      });
+  const handleOtherInfoChange = (e, field, index) => {
+    const updatedOtherInfo = otherinformation?.map((item, idx) => {
+      if (idx === index) {
+        return {
+          ...item,
+          [field]: e.target.value,
+        };
+      }
+      return item;
+    });
+    setOtherinformation(updatedOtherInfo);
+  };
 
-    return () => {
-      console.log("Avoid errors");
-    };
-  }, [data?.destination?._id]);
+  const handleOtherInfoChangeTransfer = (e, field, index) => {
+    const updatedOtherInfo = transfer?.map((item, idx) => {
+      if (idx === index) {
+        return {
+          ...item,
+          [field]: e.target.value,
+        };
+      }
+      return item;
+    });
+    setTransfer(updatedOtherInfo);
+  };
 
-  // console.log(data?.destination?._id);
+  const handleOtherInfoChangeExclusion = (e, field, index) => {
+    const updatedOtherInfo = exclusionAll?.map((item, idx) => {
+      if (idx === index) {
+        return {
+          ...item,
+          [field]: e.target.value,
+        };
+      }
+      return item;
+    });
+    setExclusionAll(updatedOtherInfo);
+  };
 
-  const getStatusColorBackground = (status) => {
-    switch (status) {
-      case "Active":
-        return "bg-green-500"; // Green
-      case "Quoted":
-        return "bg-blue-500"; // Blue
-      case "Follow Up":
-        return "bg-orange-500"; // Orange
-      case "Confirmed":
-        return "bg-dark-green-500"; // Dark Green
-      case "Cancelled":
-        return "bg-red-500"; // Red
-      case "CNP":
-        return "bg-gray-500"; // Gray
-      case "Groups":
-        return "bg-purple-500"; // Purple
-      default:
-        return "bg-black"; // Default color
-    }
+  const handleInclusionChange = (e, field, index) => {
+    const updatedInclusions = inclusionAll.map((item, idx) => {
+      if (idx === index) {
+        return {
+          ...item,
+          [field]: e.target.value,
+        };
+      }
+      return item;
+    });
+    setInclusionAll(updatedInclusions);
+  };
+
+  const handleDescriptionChange = (e, inclusionIndex, descriptionIndex) => {
+    const updatedInclusions = inclusionAll.map((item, idx) => {
+      if (idx === inclusionIndex) {
+        const updatedDescriptions = item.description.map((desc, dIdx) => {
+          if (dIdx === descriptionIndex) {
+            return e.target.value; // Update the specific description
+          }
+          return desc;
+        });
+        return {
+          ...item,
+          description: updatedDescriptions,
+        };
+      }
+      return item;
+    });
+    setInclusionAll(updatedInclusions);
   };
 
   const options = travelSummaryAll?.map((destination) => ({
@@ -145,8 +272,26 @@ const CreateItinerary = () => {
     description: activity.description,
   }));
 
+  // Function to calculate total cost
+  const calculateTotal = () => {
+    return adultCount * adultPrice + childCount * childPrice;
+  };
+
+  const handleFinalSubmit = () => {
+    console.log({
+      travelSummaryPerDay,
+      activityPerDay,
+      travelSummaryAll,
+      otherinformation,
+      activityAll,
+      inclusionAll,
+      exclusionAll,
+      transfer,
+    });
+  };
+
   return (
-    <div className="flex gap-5 ">
+    <div className="flex gap-5">
       <Sidebar />
       <div className="w-[75%] m-auto mt-8 rounded-md">
         <div>
@@ -156,23 +301,17 @@ const CreateItinerary = () => {
             alt=""
           />
         </div>
-
         <Card className="overflow-hidden mt-5">
           <div className="p-8 pb-0 flex justify-between">
-            <div className=" w-[50%] text-xl text-semibold">
-              <span
-                className={`px-4 py-2 rounded-md text-sm text-white ${getStatusColorBackground(
-                  data?.status
-                )}`}
-              >
-                {data?.status}
+            <div className="w-[50%] text-xl text-semibold">
+              <span className="px-4 py-2 rounded-md text-sm text-white bg-green-500">
+                Active
               </span>{" "}
               {tripid}
             </div>
           </div>
           <CardBody className="p-4">
             <div className="flex justify-between gap-4 p-4">
-              {/* Left Panel (Category Selection) */}
               <div className="w-[20%] h-[100%] bg-gray-100 p-4 rounded-lg">
                 {categories.map((category, index) => (
                   <div
@@ -184,39 +323,15 @@ const CreateItinerary = () => {
                     }`}
                     onClick={() => handleCategoryClick(category)}
                   >
-                    <span className="">{category}</span>
+                    <span>{category}</span>
                   </div>
                 ))}
               </div>
 
-              {/* Middle Panel (Input Form) */}
               <div className="w-[80%] bg-white p-4 rounded-lg col-span-2">
                 {selectedCategory === "Travel Summary" && (
                   <>
-                    <div className="flex justify-between items-center gap-5">
-                      <div className="w-[70%]">
-                        {/* react-select component */}
-                        <Select
-                          options={options} // The options fetched from API
-                          value={options.find(
-                            (option) => option.value === selectedTravelSummary
-                          )} // Pre-select the value if needed
-                          onChange={(selectedOption) => {
-                            setSelectedTravelSummary(
-                              selectedOption?.value || ""
-                            );
-                            setSingleTravelSummery(
-                              options.find(
-                                (option) =>
-                                  option.value === selectedTravelSummary
-                              )
-                            );
-                          }} // Handle selection
-                          placeholder="Select a travel summary"
-                          isSearchable={true}
-                          isClearable={true} // Allows clearing the selection
-                        />
-                      </div>
+                    <div className="flex justify-between items-center gap-5 mb-4">
                       <Button
                         onClick={addTravelSummaryDay}
                         className="bg-main text-white"
@@ -224,48 +339,51 @@ const CreateItinerary = () => {
                         Add Another Day
                       </Button>
                     </div>
-                    {travelSummary.map((item, index) => (
+
+                    {travelSummaryPerDay.map((item, index) => (
                       <div key={index} className="mb-4">
                         <div className="mt-5 mb-5 text-lg font-normal">
                           Day {item.day}
                         </div>
-                        {selectedTravelSummary ? (
-                          <div className="flex justify-between items-center hover:bg-gray-100 p-2">
-                            <div>
-                              <div>Title : {singleTravelSummery?.label}</div>
-                              <div>
-                                Description : {singleTravelSummery?.description}
-                              </div>
-                            </div>
-                            <div className="border border-main text-main py-1 px-3 rounded-md cursor-pointer">
-                              Edit
-                            </div>
+
+                        <div className="flex justify-between items-center gap-5">
+                          <div className="w-[70%]">
+                            <Select
+                              options={options}
+                              value={options.find(
+                                (option) =>
+                                  option.value === item.selectedSummary
+                              )}
+                              onChange={(selectedOption) =>
+                                handleSelectChange(selectedOption, index)
+                              }
+                              placeholder="Select a travel summary"
+                              isSearchable={true}
+                              isClearable={true}
+                            />
                           </div>
-                        ) : (
-                          <div className="text-main text-center">
-                            No travel summery selected, please select one first
+                        </div>
+
+                        {item.selectedSummary && (
+                          <div className="flex flex-col gap-4 mt-4">
+                            <Input
+                              label={`Title ${index + 1}`}
+                              value={item.summaryDetails.title}
+                              onChange={(e) =>
+                                handleInputChange(e, "title", index)
+                              }
+                              placeholder="Edit travel summary title"
+                            />
+                            <Textarea
+                              label={`Description ${index + 1}`}
+                              value={item.summaryDetails.description}
+                              onChange={(e) =>
+                                handleInputChange(e, "description", index)
+                              }
+                              placeholder="Edit travel summary description"
+                            />
                           </div>
                         )}
-                        {/* <Input
-                          label="Title"
-                          value={item.summary}
-                          onChange={(e) => {
-                            const newSummary = [...travelSummary];
-                            newSummary[index].summary = e.target.value;
-                            setTravelSummary(newSummary);
-                          }}
-                        />
-                        <div className="mt-5">
-                          <Textarea
-                            label="Description"
-                            value={item.summary}
-                            onChange={(e) => {
-                              const newSummary = [...travelSummary];
-                              newSummary[index].summary = e.target.value;
-                              setTravelSummary(newSummary);
-                            }}
-                          />
-                        </div> */}
                       </div>
                     ))}
                   </>
@@ -273,75 +391,112 @@ const CreateItinerary = () => {
 
                 {selectedCategory === "Activity" && (
                   <>
-                    <div className="flex justify-between items-center gap-5">
-                      <div className="w-[70%]">
-                        {/* react-select component */}
-                        <Select
-                          options={optionsActivity} // The options fetched from API
-                          value={optionsActivity?.find(
-                            (option) => option.value === selectedActivity
-                          )} // Pre-select the value if needed
-                          onChange={(selectedOption) => {
-                            setSelectedActivity(selectedOption?.value || "");
-                            setSingleActivity(
-                              optionsActivity?.find(
-                                (option) => option.value === selectedActivity
-                              )
-                            );
-                          }} // Handle selection
-                          placeholder="Select an activity"
-                          isSearchable={true}
-                          isClearable={true} // Allows clearing the selection
-                        />
-                      </div>
+                    <div className="flex justify-between items-center gap-5 mb-4">
                       <Button
-                        onClick={addItineraryDay}
+                        onClick={addActivityDay}
                         className="bg-main text-white"
                       >
                         Add Another Day
                       </Button>
                     </div>
 
-                    {detailedItinerary.map((item, index) => (
+                    {activityPerDay.map((item, index) => (
                       <div key={index} className="mb-4">
                         <div className="mt-5 mb-5 text-lg font-normal">
                           Day {item.day}
                         </div>
-                        {
-                          <div className="flex justify-between items-center hover:bg-gray-100 p-2">
-                            <div>
-                              <div>Title : {singleActivity?.label}</div>
-                              <div>
-                                Description : {singleActivity?.description}
-                              </div>
-                            </div>
-                            <div className="border border-main text-main py-1 px-3 rounded-md cursor-pointer">
-                              Edit
-                            </div>
+
+                        <div className="flex justify-between items-center gap-5">
+                          <div className="w-[70%]">
+                            <Select
+                              options={optionsActivity} // Use optionsActivity here
+                              value={optionsActivity.find(
+                                (option) =>
+                                  option.value === item.selectedSummary
+                              )}
+                              onChange={(selectedOption) =>
+                                handleSelectChangeActivity(
+                                  selectedOption,
+                                  index
+                                )
+                              }
+                              placeholder="Select an activity"
+                              isSearchable={true}
+                              isClearable={true}
+                            />
                           </div>
-                        }
-                        {/* <Input
-                          label="Title"
-                          value={item.itinerary}
-                          onChange={(e) => {
-                            const newItinerary = [...detailedItinerary];
-                            newItinerary[index].itinerary = e.target.value;
-                            setDetailedItinerary(newItinerary);
-                          }}
-                        />
-                        <div className="mt-5">
-                          <Textarea
-                            label="Description"
-                            value={item.itinerary}
-                            onChange={(e) => {
-                              const newItinerary = [...detailedItinerary];
-                              newItinerary[index].itinerary = e.target.value;
-                              setDetailedItinerary(newItinerary);
-                            }}
-                          />
-                        </div> */}
+                        </div>
+
+                        {item.selectedSummary && (
+                          <div className="flex flex-col gap-4 mt-4">
+                            <Input
+                              label={`Title ${index + 1}`}
+                              value={item.summaryDetails.title}
+                              onChange={(e) =>
+                                handleInputChangeActivity(e, "title", index)
+                              }
+                              placeholder="Edit activity title"
+                            />
+                            <Textarea
+                              value={item.summaryDetails.description}
+                              onChange={(e) =>
+                                handleInputChangeActivity(
+                                  e,
+                                  "description",
+                                  index
+                                )
+                              }
+                              label={`Description ${index + 1}`}
+                              placeholder="Edit activity description"
+                            />
+                          </div>
+                        )}
                       </div>
                     ))}
+                  </>
+                )}
+                {selectedCategory === "Other Information" && (
+                  <>
+                    <div className="mt-5 mb-5 text-lg font-normal">
+                      Other Information details
+                    </div>
+                    <div className="flex justify-between hover:bg-gray-100 p-2">
+                      <div className="flex flex-col gap-4">
+                        {otherinformation?.map((el, index) => (
+                          <div
+                            key={index}
+                            className="w-[100%] flex flex-col gap-4 mt-4"
+                          >
+                            <div className="w-[100%] ">
+                              <Input
+                                label={`Title ${index + 1}`}
+                                value={el.title}
+                                onChange={(e) =>
+                                  handleOtherInfoChange(e, "title", index)
+                                }
+                                placeholder="Edit title"
+                              />
+                            </div>
+                            <div className="w-[100%] ">
+                              <Textarea
+                                label={`Description ${index + 1}`}
+                                value={el.description}
+                                onChange={(e) =>
+                                  handleOtherInfoChange(e, "description", index)
+                                }
+                                placeholder="Edit description"
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <Button
+                      onClick={handleFinalSubmit}
+                      className={"bg-main text-white"}
+                    >
+                      Final submit
+                    </Button>
                   </>
                 )}
 
@@ -354,20 +509,40 @@ const CreateItinerary = () => {
                       {
                         <div className="flex justify-between items-center hover:bg-gray-100 p-2">
                           <div>
-                            {transfer?.itemList?.map((el, index) => {
-                              return (
-                                <div className={`mb-5`}>
-                                  <div>Title : {el.title}</div>
-                                  <div>Description : {el.description}</div>
-                                </div>
-                              );
-                            })}
+                            {transfer?.map((el, index) => (
+                              <div
+                                key={index}
+                                className="w-[100%] flex flex-col gap-4 mt-4"
+                              >
+                                <Input
+                                  label={`Title ${index + 1}`}
+                                  value={el.title}
+                                  onChange={(e) =>
+                                    handleOtherInfoChangeTransfer(
+                                      e,
+                                      "title",
+                                      index
+                                    )
+                                  }
+                                  placeholder="Edit title"
+                                />
+                                <Textarea
+                                  label={`Description ${index + 1}`}
+                                  value={el.description}
+                                  onChange={(e) =>
+                                    handleOtherInfoChangeTransfer(
+                                      e,
+                                      "description",
+                                      index
+                                    )
+                                  }
+                                  placeholder="Edit description"
+                                />
+                              </div>
+                            ))}
                           </div>
                         </div>
                       }
-                      <div className="h-[35px] border border-main text-main py-1 px-3 rounded-md cursor-pointer">
-                        Edit
-                      </div>
                     </div>
                   </>
                 )}
@@ -378,28 +553,39 @@ const CreateItinerary = () => {
                       Inclusion details
                     </div>
                     <div className="flex justify-between hover:bg-gray-100 p-2">
-                      {
-                        <div className="flex justify-between items-center hover:bg-gray-100 p-2">
-                          <div>
-                            {inclusionAll?.itemList?.map((el, index) => {
-                              return (
-                                <div className={`mb-5`}>
-                                  <div>Title : {el.title}</div>
-                                  <div>Description : {el.description}</div>
-                                </div>
-                              );
-                            })}
+                      <div className="flex flex-col gap-4">
+                        {inclusionAll?.map((el, index) => (
+                          <div
+                            key={index}
+                            className="w-[100%] flex flex-col gap-4 mt-4"
+                          >
+                            <Input
+                              label={`Title ${index + 1}`}
+                              value={el.title}
+                              onChange={(e) =>
+                                handleInclusionChange(e, "title", index)
+                              }
+                              placeholder="Edit title"
+                            />
+                            {el.description.map((dl, descIndex) => (
+                              <Textarea
+                                key={descIndex}
+                                label={`Description ${descIndex + 1}`}
+                                value={dl}
+                                onChange={(e) =>
+                                  handleDescriptionChange(e, index, descIndex)
+                                }
+                                placeholder="Edit description"
+                              />
+                            ))}
                           </div>
-                        </div>
-                      }
-                      <div className="h-[35px] border border-main text-main py-1 px-3 rounded-md cursor-pointer">
-                        Edit
+                        ))}
                       </div>
                     </div>
                   </>
                 )}
 
-{selectedCategory === "Exclusion" && (
+                {selectedCategory === "Exclusion" && (
                   <>
                     <div className="mt-5 mb-5 text-lg font-normal">
                       Exclusion details
@@ -408,47 +594,136 @@ const CreateItinerary = () => {
                       {
                         <div className="flex justify-between items-center hover:bg-gray-100 p-2">
                           <div>
-                            {exclusionAll?.itemList?.map((el, index) => {
-                              return (
-                                <div className={`mb-5`}>
-                                  <div>Title : {el.title}</div>
-                                  <div>Description : {el.description}</div>
-                                </div>
-                              );
-                            })}
+                            {exclusionAll?.map((el, index) => (
+                              <div
+                                key={index}
+                                className="w-[100%] flex flex-col gap-4 mt-4"
+                              >
+                                <Input
+                                  label={`Title ${index + 1}`}
+                                  value={el.title}
+                                  onChange={(e) =>
+                                    handleOtherInfoChangeExclusion(
+                                      e,
+                                      "title",
+                                      index
+                                    )
+                                  }
+                                  placeholder="Edit title"
+                                />
+                                <Textarea
+                                  label={`Description ${index + 1}`}
+                                  value={el.description}
+                                  onChange={(e) =>
+                                    handleOtherInfoChangeExclusion(
+                                      e,
+                                      "description",
+                                      index
+                                    )
+                                  }
+                                  placeholder="Edit description"
+                                />
+                              </div>
+                            ))}
                           </div>
                         </div>
                       }
-                      <div className="h-[35px] border border-main text-main py-1 px-3 rounded-md cursor-pointer">
-                        Edit
-                      </div>
                     </div>
                   </>
                 )}
 
-
-{selectedCategory === "Other Information" && (
+                {selectedCategory === "Cost (Adult, child)" && (
                   <>
                     <div className="mt-5 mb-5 text-lg font-normal">
-                    Other Information details
+                      Cost (Adult, child) details
                     </div>
-                    <div className="flex justify-between hover:bg-gray-100 p-2">
-                      {
-                        <div className="flex justify-between items-center hover:bg-gray-100 p-2">
-                          <div>
-                            {otherinformation?.itemList?.map((el, index) => {
-                              return (
-                                <div className={`mb-5`}>
-                                  <div>Title : {el.title}</div>
-                                  <div>Description : {el.description}</div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      }
-                      <div className="h-[35px] border border-main text-main py-1 px-3 rounded-md cursor-pointer">
-                        Edit
+                    <div className="p-5">
+                      <h2 className="text-lg font-bold mb-4">
+                        Cost Calculation
+                      </h2>
+
+                      {/* Adult Price */}
+                      <div className="mb-4">
+                        <label className="block mb-2">Adult Price:</label>
+                        <Input
+                          type="number"
+                          value={adultPrice}
+                          onChange={(e) =>
+                            setAdultPrice(Number(e.target.value))
+                          }
+                          placeholder="Set adult price"
+                        />
+                      </div>
+
+                      {/* Child Price */}
+                      <div className="mb-4">
+                        <label className="block mb-2">Child Price:</label>
+                        <Input
+                          type="number"
+                          value={childPrice}
+                          onChange={(e) =>
+                            setChildPrice(Number(e.target.value))
+                          }
+                          placeholder="Set child price"
+                        />
+                      </div>
+
+                      {/* Adult Count */}
+                      <div className="flex items-center mb-4">
+                        <span className="mr-2">Adults:</span>
+                        <Button
+                          color="lightBlue"
+                          onClick={() =>
+                            setAdultCount((prev) => Math.max(prev - 1, 0))
+                          }
+                        >
+                          -
+                        </Button>
+                        <Input
+                          type="number"
+                          value={adultCount}
+                          readOnly
+                          className="mx-2 w-[60px]"
+                        />
+                        <Button
+                          color="lightBlue"
+                          onClick={() => setAdultCount((prev) => prev + 1)}
+                        >
+                          +
+                        </Button>
+                      </div>
+
+                      {/* Child Count */}
+                      <div className="flex items-center mb-4">
+                        <span className="mr-2">Children:</span>
+                        <Button
+                          color="lightBlue"
+                          onClick={() =>
+                            setChildCount((prev) => Math.max(prev - 1, 0))
+                          }
+                        >
+                          -
+                        </Button>
+                        <Input
+                          type="number"
+                          value={childCount}
+                          readOnly
+                          className="mx-2 w-[60px]"
+                        />
+                        <Button
+                          color="lightBlue"
+                          onClick={() => setChildCount((prev) => prev + 1)}
+                        >
+                          +
+                        </Button>
+                      </div>
+
+                      {/* Total Cost Display */}
+                      <div className="border border-gray-300 p-4 rounded-md mt-4">
+                        <h3 className="font-semibold">Total Cost:</h3>
+                        <p className="text-xl font-bold">
+                          Rs. {calculateTotal()}
+                        </p>
                       </div>
                     </div>
                   </>
@@ -463,3 +738,165 @@ const CreateItinerary = () => {
 };
 
 export default CreateItinerary;
+
+// {selectedCategory === "Activity" && (
+//   <>
+//     <div className="flex justify-between items-center gap-5">
+//       <div className="w-[70%]">
+//         {/* react-select component */}
+//         <Select
+//           options={optionsActivity} // The options fetched from API
+//           value={optionsActivity?.find(
+//             (option) => option.value === selectedActivity
+//           )} // Pre-select the value if needed
+//           onChange={(selectedOption) => {
+//             setSelectedActivity(selectedOption?.value || "");
+//             setSingleActivity(
+//               optionsActivity?.find(
+//                 (option) => option.value === selectedActivity
+//               )
+//             );
+//           }} // Handle selection
+//           placeholder="Select an activity"
+//           isSearchable={true}
+//           isClearable={true} // Allows clearing the selection
+//         />
+//       </div>
+//       <Button
+//         onClick={addItineraryDay}
+//         className="bg-main text-white"
+//       >
+//         Add Another Day
+//       </Button>
+//     </div>
+
+//     {detailedItinerary.map((item, index) => (
+//       <div key={index} className="mb-4">
+//         <div className="mt-5 mb-5 text-lg font-normal">
+//           Day {item.day}
+//         </div>
+//         {
+//           <div className="flex justify-between items-center hover:bg-gray-100 p-2">
+//             <div>
+//               <div>Title : {singleActivity?.label}</div>
+//               <div>
+//                 Description : {singleActivity?.description}
+//               </div>
+//             </div>
+//             <div className="border border-main text-main py-1 px-3 rounded-md cursor-pointer">
+//               Edit
+//             </div>
+//           </div>
+//         }
+//       </div>
+//     ))}
+//   </>
+// )}
+
+// {selectedCategory === "Transfers" && (
+//   <>
+//     <div className="mt-5 mb-5 text-lg font-normal">
+//       Transfer details
+//     </div>
+//     <div className="flex justify-between hover:bg-gray-100 p-2">
+//       {
+//         <div className="flex justify-between items-center hover:bg-gray-100 p-2">
+//           <div>
+//             {transfer?.itemList?.map((el, index) => {
+//               return (
+//                 <div className={`mb-5`}>
+//                   <div>Title : {el.title}</div>
+//                   <div>Description : {el.description}</div>
+//                 </div>
+//               );
+//             })}
+//           </div>
+//         </div>
+//       }
+//       <div className="h-[35px] border border-main text-main py-1 px-3 rounded-md cursor-pointer">
+//         Edit
+//       </div>
+//     </div>
+//   </>
+// )}
+
+// {selectedCategory === "Inclusion" && (
+//   <>
+//     <div className="mt-5 mb-5 text-lg font-normal">
+//       Inclusion details
+//     </div>
+//     <div className="flex justify-between hover:bg-gray-100 p-2">
+//       {
+//         <div className="flex justify-between items-center hover:bg-gray-100 p-2">
+//           <div>
+//             {inclusionAll?.itemList?.map((el, index) => {
+//               return (
+//                 <div className={`mb-5`}>
+//                   <div>Title : {el.title}</div>
+//                   <div>Description : {el.description}</div>
+//                 </div>
+//               );
+//             })}
+//           </div>
+//         </div>
+//       }
+//       <div className="h-[35px] border border-main text-main py-1 px-3 rounded-md cursor-pointer">
+//         Edit
+//       </div>
+//     </div>
+//   </>
+// )}
+
+// {selectedCategory === "Exclusion" && (
+//   <>
+//     <div className="mt-5 mb-5 text-lg font-normal">
+//       Exclusion details
+//     </div>
+//     <div className="flex justify-between hover:bg-gray-100 p-2">
+//       {
+//         <div className="flex justify-between items-center hover:bg-gray-100 p-2">
+//           <div>
+//             {exclusionAll?.itemList?.map((el, index) => {
+//               return (
+//                 <div className={`mb-5`}>
+//                   <div>Title : {el.title}</div>
+//                   <div>Description : {el.description}</div>
+//                 </div>
+//               );
+//             })}
+//           </div>
+//         </div>
+//       }
+//       <div className="h-[35px] border border-main text-main py-1 px-3 rounded-md cursor-pointer">
+//         Edit
+//       </div>
+//     </div>
+//   </>
+// )}
+
+// {selectedCategory === "Other Information" && (
+//   <>
+//     <div className="mt-5 mb-5 text-lg font-normal">
+//       Other Information details
+//     </div>
+//     <div className="flex justify-between hover:bg-gray-100 p-2">
+//       {
+//         <div className="flex justify-between items-center hover:bg-gray-100 p-2">
+//           <div>
+//             {otherinformation?.itemList?.map((el, index) => {
+//               return (
+//                 <div className={`mb-5`}>
+//                   <div>Title : {el.title}</div>
+//                   <div>Description : {el.description}</div>
+//                 </div>
+//               );
+//             })}
+//           </div>
+//         </div>
+//       }
+//       <div className="h-[35px] border border-main text-main py-1 px-3 rounded-md cursor-pointer">
+//         Edit
+//       </div>
+//     </div>
+//   </>
+// )}

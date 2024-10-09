@@ -7,7 +7,7 @@ import Select from "react-select";
 
 const AddInclusion = ({ isOpen, onClose, getAlldata }) => {
   // State to manage form inputs
-  const [items, setItems] = useState([{ title: "", description: "" }]); // Initially 1 item
+  const [items, setItems] = useState([{ title: "", description: [""] }]); // Description is now an array
   const [images, setImages] = useState([]); // State to handle multiple images
   const [isLoading, setIsLoading] = useState(false);
   const [destinationAll, setDestinationAll] = useState([]);
@@ -33,6 +33,30 @@ const AddInclusion = ({ isOpen, onClose, getAlldata }) => {
     setItems(updatedItems);
   };
 
+  // Handle description input changes (multiple descriptions for each item)
+  const handleDescriptionChange = (itemIndex, descIndex, e) => {
+    const value = e.target.value;
+    const updatedItems = [...items];
+    updatedItems[itemIndex].description[descIndex] = value;
+    setItems(updatedItems);
+  };
+
+  // Add a new empty description field for a specific item
+  const addDescription = (itemIndex) => {
+    const updatedItems = [...items];
+    updatedItems[itemIndex].description.push(""); // Add empty string for new description
+    setItems(updatedItems);
+  };
+
+  // Remove a specific description field
+  const removeDescription = (itemIndex, descIndex) => {
+    const updatedItems = [...items];
+    updatedItems[itemIndex].description = updatedItems[itemIndex].description.filter(
+      (_, i) => i !== descIndex
+    );
+    setItems(updatedItems);
+  };
+
   // Handle image input changes
   const handleImageChange = (e) => {
     setImages(e.target.files);
@@ -40,7 +64,7 @@ const AddInclusion = ({ isOpen, onClose, getAlldata }) => {
 
   // Add new title and description fields
   const addItem = () => {
-    setItems([...items, { title: "", description: "" }]);
+    setItems([...items, { title: "", description: [""] }]); // Start with an empty description array
   };
 
   // Remove title and description fields
@@ -67,6 +91,8 @@ const AddInclusion = ({ isOpen, onClose, getAlldata }) => {
       });
     }
 
+    console.log(data);
+
     try {
       // API call to submit form data
       const response = await axios.post(
@@ -83,9 +109,9 @@ const AddInclusion = ({ isOpen, onClose, getAlldata }) => {
       getAlldata();
 
       // Reset form after successful submission
-      setItems([{ title: "", description: "" }]);
+      setItems([{ title: "", description: [""] }]); // Reset description to array
       setImages([]);
-      setSelectedDestination("")
+      setSelectedDestination("");
       onClose(); // Close modal on success
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -140,43 +166,62 @@ const AddInclusion = ({ isOpen, onClose, getAlldata }) => {
           </div>
 
           {/* Dynamic input fields for Title and Description */}
-          {items.map((item, index) => (
-            <>
-              <div key={index} className="flex  gap-5">
-                <div className="w-full">
-                  <Input
-                    label={`Title ${index + 1}`}
-                    name="title"
-                    value={item.title}
-                    onChange={(e) => handleItemChange(index, e)}
-                    required
-                  />
-                  <div className="mt-3">
-                    <Textarea
-                      label={`Description ${index + 1}`}
-                      name="description"
-                      value={item.description}
-                      onChange={(e) => handleItemChange(index, e)}
-                      required
-                    />
-                  </div>
-                </div>
-                {index === 0 ? (
+          {items.map((item, itemIndex) => (
+            <div key={itemIndex} className="space-y-4">
+              <div className="flex gap-5">
+                <Input
+                  label={`Title ${itemIndex + 1}`}
+                  name="title"
+                  value={item.title}
+                  onChange={(e) => handleItemChange(itemIndex, e)}
+                  required
+                />
+                {itemIndex === 0 ? (
                   <AiOutlinePlus
                     className="cursor-pointer"
                     size={24}
                     onClick={addItem}
                   />
-                ) : (
-                  <AiOutlineClose
-                    className="cursor-pointer text-red-500"
-                    size={24}
-                    onClick={() => removeItem(index)}
-                  />
-                )}
+                ) : null}
+                {
+                  itemIndex > 0 ?
+                  (
+                    <AiOutlineClose
+                      className="cursor-pointer text-red-500"
+                      size={24}
+                      onClick={() => removeItem(itemIndex)}
+                    />
+                  ) : null
+                }
               </div>
+
+              {item.description.map((desc, descIndex) => (
+                <div key={descIndex} className="flex gap-5">
+                  <Textarea
+                    label={`Description ${itemIndex + 1}.${descIndex + 1}`}
+                    value={desc}
+                    onChange={(e) => handleDescriptionChange(itemIndex, descIndex, e)}
+                    required
+                  />
+                  <div className="flex items-center">
+                    {descIndex === 0 ? (
+                      <AiOutlinePlus
+                        className="cursor-pointer"
+                        size={24}
+                        onClick={() => addDescription(itemIndex)}
+                      />
+                    ) : (
+                      <AiOutlineClose
+                        className="cursor-pointer text-red-500"
+                        size={24}
+                        onClick={() => removeDescription(itemIndex, descIndex)}
+                      />
+                    )}
+                  </div>
+                </div>
+              ))}
               <hr />
-            </>
+            </div>
           ))}
 
           {/* Submit button */}
