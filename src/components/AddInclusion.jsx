@@ -6,9 +6,17 @@ import { serverUrl } from "../api";
 import Select from "react-select";
 
 const AddInclusion = ({ isOpen, onClose, getAlldata }) => {
-  // State to manage form inputs
-  const [items, setItems] = useState([{ title: "", description: [""] }]); // Description is now an array
-  const [images, setImages] = useState([]); // State to handle multiple images
+  const titles = [
+    "Stay",
+    "Meals",
+    "Transfers",
+    "Support",
+    "Experience Covered",
+  ];
+
+  const [selectedTitle, setSelectedTitle] = useState("Stay");
+  const [descriptions, setDescriptions] = useState({});
+  const [images, setImages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [destinationAll, setDestinationAll] = useState([]);
   const [selectedDestination, setSelectedDestination] = useState("");
@@ -18,6 +26,13 @@ const AddInclusion = ({ isOpen, onClose, getAlldata }) => {
       setDestinationAll(res.data.data);
     });
 
+    // Initialize descriptions with an empty box for each title
+    const initialDescriptions = {};
+    titles.forEach((title) => {
+      initialDescriptions[title] = [""];
+    });
+    setDescriptions(initialDescriptions);
+
     return () => {
       console.log("");
     };
@@ -25,76 +40,60 @@ const AddInclusion = ({ isOpen, onClose, getAlldata }) => {
 
   if (!isOpen) return null;
 
-  // Handle form input changes for dynamic items
-  const handleItemChange = (index, e) => {
-    const { name, value } = e.target;
-    const updatedItems = [...items];
-    updatedItems[index][name] = value;
-    setItems(updatedItems);
-  };
-
-  // Handle description input changes (multiple descriptions for each item)
-  const handleDescriptionChange = (itemIndex, descIndex, e) => {
+  const handleDescriptionChange = (descIndex, e) => {
     const value = e.target.value;
-    const updatedItems = [...items];
-    updatedItems[itemIndex].description[descIndex] = value;
-    setItems(updatedItems);
+    const updatedDescriptions = { ...descriptions };
+    updatedDescriptions[selectedTitle][descIndex] = value;
+    setDescriptions(updatedDescriptions);
   };
 
-  // Add a new empty description field for a specific item
-  const addDescription = (itemIndex) => {
-    const updatedItems = [...items];
-    updatedItems[itemIndex].description.push(""); // Add empty string for new description
-    setItems(updatedItems);
+  const addDescription = () => {
+    const updatedDescriptions = { ...descriptions };
+    if (!updatedDescriptions[selectedTitle]) {
+      updatedDescriptions[selectedTitle] = [""];
+    } else {
+      updatedDescriptions[selectedTitle].push("");
+    }
+    setDescriptions(updatedDescriptions);
   };
 
-  // Remove a specific description field
-  const removeDescription = (itemIndex, descIndex) => {
-    const updatedItems = [...items];
-    updatedItems[itemIndex].description = updatedItems[itemIndex].description.filter(
-      (_, i) => i !== descIndex
-    );
-    setItems(updatedItems);
+  const removeDescription = (descIndex) => {
+    const updatedDescriptions = { ...descriptions };
+    updatedDescriptions[selectedTitle] = updatedDescriptions[
+      selectedTitle
+    ].filter((_, i) => i !== descIndex);
+    setDescriptions(updatedDescriptions);
   };
 
-  // Handle image input changes
   const handleImageChange = (e) => {
     setImages(e.target.files);
   };
 
-  // Add new title and description fields
-  const addItem = () => {
-    setItems([...items, { title: "", description: [""] }]); // Start with an empty description array
-  };
-
-  // Remove title and description fields
-  const removeItem = (index) => {
-    const updatedItems = items.filter((_, i) => i !== index);
-    setItems(updatedItems);
-  };
-
-  // Handle form submission
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent the form from refreshing the page
+    e.preventDefault();
     setIsLoading(true);
 
     const data = new FormData();
 
-    // Append items (title and description)
-    data.append("itemList", JSON.stringify(items));
+    // Include only descriptions with text
+    data.append(
+      "itemList",
+      JSON.stringify(
+        Object.keys(descriptions).map((title) => ({
+          title,
+          description: descriptions[title].filter((desc) => desc.trim() !== ""),
+        }))
+      )
+    );
     data.append("destination", selectedDestination);
 
-    // Append multiple images
     if (images.length > 0) {
       Array.from(images).forEach((image) => {
         data.append("images", image);
       });
     }
 
-    console.log(data);
-
     try {
-      // API call to submit form data
       const response = await axios.post(
         `${serverUrl}/api/inclusion/inclusions/create`,
         data,
@@ -107,12 +106,10 @@ const AddInclusion = ({ isOpen, onClose, getAlldata }) => {
       console.log("Response:", response.data);
       alert("Inclusion added successfully");
       getAlldata();
-
-      // Reset form after successful submission
-      setItems([{ title: "", description: [""] }]); // Reset description to array
+      setDescriptions({});
       setImages([]);
       setSelectedDestination("");
-      onClose(); // Close modal on success
+      onClose();
     } catch (error) {
       console.error("Error submitting form:", error);
     } finally {
@@ -127,34 +124,33 @@ const AddInclusion = ({ isOpen, onClose, getAlldata }) => {
 
   return (
     <div className="fixed inset-0 z-[999] grid h-screen w-screen place-items-center bg-black bg-opacity-60 backdrop-blur-sm transition-opacity duration-300">
-      <div className="relative m-4 w-3/5 max-w-[90%] max-h-[90vh] overflow-y-auto rounded-lg bg-white text-blue-gray-500 shadow-2xl p-8">
+      <div className="sidebar relative m-4 w-3/5 max-w-[90%] max-h-[90vh] overflow-y-auto rounded-lg bg-white text-blue-gray-500 shadow-2xl p-8">
         <div className="flex items-center justify-end font-sans text-2xl font-semibold text-blue-gray-900">
           <AiOutlineClose
-            className="cursor-pointer"
+          className="cursor-pointer text-sm text-red-500 hover:bg-main hover:text-white rounded-[50%] p-1"
             size={24}
             onClick={onClose}
           />
         </div>
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="text-xl font-normal">Add Inclusion</div>
-
-          {/* File input for uploading multiple images */}
-          <div className="flex items-center gap-5">
+          <div className="flex justify-between items-center gap-5">
             <div className="w-[100%]">
-              {/* react-select component */}
               <Select
-                options={options} // The options fetched from API
+                options={options}
                 value={options.find(
                   (option) => option.value === selectedDestination
-                )} // Pre-select the value if needed
+                )}
                 onChange={(selectedOption) =>
                   setSelectedDestination(selectedOption?.value || "")
                 }
                 placeholder="Select a destination"
                 isSearchable={true}
-                isClearable={true} // Allows clearing the selection
+                isClearable={true}
+                required
               />
             </div>
+
             <Input
               label="Upload Images"
               type="file"
@@ -165,66 +161,60 @@ const AddInclusion = ({ isOpen, onClose, getAlldata }) => {
             />
           </div>
 
-          {/* Dynamic input fields for Title and Description */}
-          {items.map((item, itemIndex) => (
-            <div key={itemIndex} className="space-y-4">
-              <div className="flex gap-5">
-                <Input
-                  label={`Title ${itemIndex + 1}`}
-                  name="title"
-                  value={item.title}
-                  onChange={(e) => handleItemChange(itemIndex, e)}
-                  required
-                />
-                {itemIndex === 0 ? (
-                  <AiOutlinePlus
-                    className="cursor-pointer"
-                    size={24}
-                    onClick={addItem}
-                  />
-                ) : null}
-                {
-                  itemIndex > 0 ?
-                  (
+          <div className="flex justify-between gap-4 p-4">
+            <div className="w-[30%] border-r pr-4">
+              <h3 className="font-bold">Titles</h3>
+              <div className="w-[100%] h-full bg-gray-100 p-4 rounded-lg overflow-y-auto">
+                {titles.map((title, index) => (
+                  <div
+                    key={index}
+                    className={`p-2 cursor-pointer ${
+                      selectedTitle === title
+                        ? "border-b-2 border-main text-main font-semibold"
+                        : ""
+                    }`}
+                    onClick={() => setSelectedTitle(title)}
+                  >
+                    <span> {title}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="w-[70%]">
+              <h3 className="font-bold mb-4">
+                Descriptions for "{selectedTitle}"
+              </h3>
+              {selectedTitle &&
+                descriptions[selectedTitle]?.map((desc, descIndex) => (
+                  <div key={descIndex} className="flex gap-5 mb-4">
+                    <Textarea
+                      label={`Description ${descIndex + 1}`}
+                      value={desc}
+                      onChange={(e) => handleDescriptionChange(descIndex, e)}
+                      className="min-h-[50px] h-auto" // Adjusted height
+                      required
+                    />
+
                     <AiOutlineClose
                       className="cursor-pointer text-red-500"
                       size={24}
-                      onClick={() => removeItem(itemIndex)}
+                      onClick={() => removeDescription(descIndex)}
                     />
-                  ) : null
-                }
-              </div>
-
-              {item.description.map((desc, descIndex) => (
-                <div key={descIndex} className="flex gap-5">
-                  <Textarea
-                    label={`Description ${itemIndex + 1}.${descIndex + 1}`}
-                    value={desc}
-                    onChange={(e) => handleDescriptionChange(itemIndex, descIndex, e)}
-                    required
-                  />
-                  <div className="flex items-center">
-                    {descIndex === 0 ? (
-                      <AiOutlinePlus
-                        className="cursor-pointer"
-                        size={24}
-                        onClick={() => addDescription(itemIndex)}
-                      />
-                    ) : (
-                      <AiOutlineClose
-                        className="cursor-pointer text-red-500"
-                        size={24}
-                        onClick={() => removeDescription(itemIndex, descIndex)}
-                      />
-                    )}
                   </div>
+                ))}
+              {selectedTitle && (
+                <div>
+                  <AiOutlinePlus
+                    className="cursor-pointer text-blue-500"
+                    size={24}
+                    onClick={addDescription}
+                  />
                 </div>
-              ))}
-              <hr />
+              )}
             </div>
-          ))}
+          </div>
 
-          {/* Submit button */}
           <div className="flex justify-center">
             <Button className="bg-main" type="submit" disabled={isLoading}>
               {isLoading ? "Adding Inclusion..." : "Add Inclusion"}

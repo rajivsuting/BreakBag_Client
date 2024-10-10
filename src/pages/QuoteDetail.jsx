@@ -41,7 +41,6 @@ const data = [
 ];
 
 const QuoteDetail = () => {
-
   const { tripid } = useParams();
   const [data, setData] = useState([]);
 
@@ -78,7 +77,7 @@ const QuoteDetail = () => {
       default:
         return "bg-black"; // Default color
     }
-  }
+  };
 
   return (
     <div className="flex gap-5 ">
@@ -108,7 +107,14 @@ const QuoteDetail = () => {
         <Card className="overflow-hidden mt-5">
           <div className="p-8 pb-0 flex justify-between">
             <div className=" w-[50%] text-xl text-semibold">
-              <span className={`px-4 py-2 rounded-md text-sm text-white ${getStatusColorbackground(data?.status)}`}>{data?.status}</span> {" "} {tripid}
+              <span
+                className={`px-4 py-2 rounded-md text-sm text-white ${getStatusColorbackground(
+                  data?.status
+                )}`}
+              >
+                {data?.status}
+              </span>{" "}
+              {tripid}
             </div>
             <div className=" w-[50%] flex justify-end pb-2 gap-5 w-full">
               <Link to={`/create-intinary/${tripid}`}>
@@ -123,11 +129,11 @@ const QuoteDetail = () => {
               <div className="flex justify-between">
                 <div className="text-start w-[30%]">
                   <div className="text-gray-400">Starting date</div>
-                  <div>{(data?.startDate?.split("T")[0])}</div>
+                  <div>{data?.startDate?.split("T")[0]}</div>
                 </div>
                 <div className="text-start w-[30%]">
                   <div className="text-gray-400">Ending date</div>
-                  <div>{(data?.endDate?.split("T")[0])}</div>
+                  <div>{data?.endDate?.split("T")[0]}</div>
                 </div>
               </div>
               <div className="flex justify-between mt-5">
@@ -147,7 +153,9 @@ const QuoteDetail = () => {
                 </div>
                 <div className="text-start w-[30%]">
                   <div className="text-gray-400">Travellers</div>
-                  <div>  {data?.travellers?.slice(0, 2).map((participant, index) => (
+                  <div>
+                    {" "}
+                    {data?.travellers?.slice(0, 2).map((participant, index) => (
                       <span key={index}>
                         {participant.name}
                         {index < 1 && data?.travellers?.length > 2 ? ", " : ""}
@@ -155,7 +163,8 @@ const QuoteDetail = () => {
                     ))}
                     {data?.travellers?.length > 2 && (
                       <span> and {data?.travellers?.length - 2} more</span>
-                    )}</div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

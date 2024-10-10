@@ -1,30 +1,87 @@
-
-
 // import AgentDashboard from "./components/AgentDashboard";
-
+import { useEffect, useState } from "react";
 import { AccordionProvider } from "./context/AccordionContext";
 import AllRoutes from "./routes/AllRoutes";
+import axios from "axios";
 
 function App() {
-  const apiKey = 'AIzaSyDzRH7D5s3eU5EBEPsfB0jhCWCQAwn2zvM'; // Replace with your API key
-const location = '37.7749,-122.4194'; // Example: San Francisco latitude and longitude
-const radius = 5000; // Search within 5000 meters
-const type = 'lodging'; // Type of place (hotel)
+//   const [place, setPlace] = useState(""); // Store user's place input
+//   const [location, setLocation] = useState(null); // Store geocoded location
+//   const [hotels, setHotels] = useState([]); // Store list of hotels
+//   const [error, setError] = useState(null); // Handle errors
 
-const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location}&radius=${radius}&type=${type}&key=${apiKey}`;
+//   // Geocode the place name entered by the user
+//   const geocodePlace = async () => {
+//     const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${place}&key=AIzaSyAn79D_s4nCii1jXCPTTZ-o6KQuGpNEQcI`;
 
-fetch(url)
-  .then(response => response.json())
-  .then(data => {
-    console.log(data.results); // Handle the results here
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
+//     try {
+//       const response = await axios.get(geocodeUrl);
+//       const results = response.data.results;
+
+//       if (results.length > 0) {
+//         const { lat, lng } = results[0].geometry.location;
+//         setLocation(`${lat},${lng}`);
+//       } else {
+//         setError("Place not found");
+//       }
+//     } catch (error) {
+//       setError("Error geocoding place");
+//     }
+//   };
+
+//   // Fetch nearby hotels once location is set
+//   useEffect(() => {
+//     if (location) {
+//       axios
+//         .get(`http://localhost:8080/hotels?location=${location}`)
+//         .then((response) => {
+//           console.log(response)
+//           setHotels(response.data);
+//         })
+//         .catch((error) => {
+//           setError("Error fetching hotels");
+//         });
+//     }
+//   }, [location]);
+// console.log(location)
+//   const handleSearch = () => {
+//     if (place) {
+//       console.log("knfekendkn")
+//       geocodePlace(); // Convert place to lat/lng before fetching hotels
+//     } else {
+//       setError("Please enter a place name");
+//     }
+//   };
+
   return (
     <div>
+      {/* <h1>Search Nearby Hotels</h1>
+      <input
+        type="text"
+        value={place}
+        onChange={(e) => setPlace(e.target.value)}
+        placeholder="Enter a place name"
+      />
+      <button onClick={handleSearch}>Search</button>
+
+      {error && <p style={{ color: "red" }}>{error}</p>}
+
+      {hotels.length > 0 && (
+        <div>
+          <h2>Nearby Hotels</h2>
+          <ul>
+            {hotels.map((hotel) => (
+              <li key={hotel.place_id}>
+                <h3>{hotel.name}</h3>
+                <p>{hotel.vicinity}</p>
+                <p>Rating: {hotel.rating}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )} */}
       <AccordionProvider>
-      <AllRoutes/>
+        <AllRoutes />
       </AccordionProvider>
     </div>
   );

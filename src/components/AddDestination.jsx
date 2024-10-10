@@ -75,9 +75,9 @@ import {
   
     return (
       <div className="fixed inset-0 z-[999] grid h-screen w-screen place-items-center bg-black bg-opacity-60 backdrop-blur-sm transition-opacity duration-300">
-        <div className="relative m-4 w-2/5 min-w-[40%] max-w-[40%] max-h-[90vh] overflow-y-auto rounded-lg bg-white font-sans text-base font-light leading-relaxed text-blue-gray-500 shadow-2xl p-8">
+        <div className="sidebar relative m-4 w-2/5 min-w-[40%] max-w-[40%] max-h-[90vh] overflow-y-auto rounded-lg bg-white font-sans text-base font-light leading-relaxed text-blue-gray-500 shadow-2xl p-8">
           <div className="flex items-center justify-end font-sans text-2xl font-semibold text-blue-gray-900">
-            <AiOutlineClose className="cursor-pointer" size={24} onClick={onClose} />
+            <AiOutlineClose className="cursor-pointer text-sm text-red-500 hover:bg-main hover:text-white rounded-[50%] p-1" size={24} onClick={onClose} />
           </div>
           <div>
             <form onSubmit={handleSubmit} className="m-auto">

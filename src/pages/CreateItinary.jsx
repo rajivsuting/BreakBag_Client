@@ -27,31 +27,22 @@ const CreateItinerary = () => {
     {
       day: 1,
       selectedSummary: "",
-      summaryDetails: { title: "", description: "" },
+      summaryDetails: { title: "", description: [""] },
     },
   ]);
 
   const [travelSummaryAll, setTravelSummaryAll] = useState([]);
-  const [otherinformation, setOtherinformation] = useState({});
+  const [otherinformation, setOtherinformation] = useState([]);
   const [activityAll, setActivityAll] = useState([]);
   const [inclusionAll, setInclusionAll] = useState({});
-  const [exclusionAll, setExclusionAll] = useState({});
-  const [transfer, setTransfer] = useState({});
+  const [exclusionAll, setExclusionAll] = useState([]);
+  const [transfer, setTransfer] = useState([]);
   const [data, setData] = useState([]);
-  const [adultCount, setAdultCount] = useState(1);
-  const [childCount, setChildCount] = useState(0);
-  const [adultPrice, setAdultPrice] = useState(100); // Default adult price
-  const [childPrice, setChildPrice] = useState(50); // Default child price
+  const [adultPrice, setAdultPrice] = useState(0); // Default adult price
+  const [childPrice, setChildPrice] = useState(0); // Default child price
+  const [priceDetails, setPriceDetails] = useState([]); // To store the formatted data
 
   useEffect(() => {
-    axios.get(`${serverUrl}/api/travel-summary/travel-summary`).then((res) => {
-      setTravelSummaryAll(res.data.travelSummaries);
-    });
-
-    axios.get(`${serverUrl}/api/activity/all`).then((res) => {
-      setActivityAll(res.data.data);
-    });
-
     axios.get(`${serverUrl}/api/quote/quotes/${tripid}`).then((res) => {
       setData(res.data.data);
     });
@@ -61,30 +52,46 @@ const CreateItinerary = () => {
     if (data?.destination?._id) {
       axios
         .get(
+          `${serverUrl}/api/travel-summary/travel-summary/search/${data?.destination?._id}`
+        )
+        .then((res) => {
+          
+          setTravelSummaryAll(res.data.travelSummaries);
+        });
+
+      axios
+        .get(
+          `${serverUrl}/api/activity/activity/search/${data?.destination?._id}`
+        )
+        .then((res) => {
+          
+          setActivityAll(res.data.data);
+        });
+
+      axios
+        .get(
           `${serverUrl}/api/other-information/destination/${data?.destination?._id}`
         )
         .then((res) => {
-          console.log(res);
-          setOtherinformation(res.data.data.itemList || []);
+          setOtherinformation(res.data.data.description || []);
         });
 
       axios
         .get(`${serverUrl}/api/inclusion/destination/${data?.destination?._id}`)
         .then((res) => {
-          console.log(res);
           setInclusionAll(res.data.data.itemList || []);
         });
 
       axios
         .get(`${serverUrl}/api/exclusion/destination/${data?.destination?._id}`)
         .then((res) => {
-          setExclusionAll(res.data.data.itemList || []);
+          setExclusionAll(res.data.data.description || []);
         });
 
       axios
         .get(`${serverUrl}/api/transfer/destination/${data?.destination?._id}`)
         .then((res) => {
-          setTransfer(res.data.data.itemList || []);
+          setTransfer(res.data.data.description || []);
         });
     }
   }, [data?.destination?._id]);
@@ -173,59 +180,71 @@ const CreateItinerary = () => {
     setTravelSummaryPerDay(updatedSummary);
   };
 
-  const handleInputChangeActivity = (e, field, dayIndex) => {
+  const handleInputChangeActivity = (e, field, dayIndex, descIndex = null) => {
     const updatedSummary = activityPerDay.map((item, index) => {
       if (index === dayIndex) {
-        return {
-          ...item,
-          summaryDetails: {
-            ...item.summaryDetails,
-            [field]: e.target.value,
-          },
-        };
+        // Update descriptions array
+        if (field === "description" && descIndex !== null) {
+          const updatedDescriptions = item.summaryDetails.description.map(
+            (desc, idx) => {
+              if (idx === descIndex) {
+                return e.target.value;
+              }
+              return desc;
+            }
+          );
+          return {
+            ...item,
+            summaryDetails: {
+              ...item.summaryDetails,
+              description: updatedDescriptions, // Update the description array
+            },
+          };
+        } else {
+          // Update other fields (e.g., title)
+          return {
+            ...item,
+            summaryDetails: {
+              ...item.summaryDetails,
+              [field]: e.target.value,
+            },
+          };
+        }
       }
       return item;
     });
     setActivityPerDay(updatedSummary);
   };
+  
 
-  const handleOtherInfoChange = (e, field, index) => {
+  const handleOtherInfoChange = (e, index) => {
     const updatedOtherInfo = otherinformation?.map((item, idx) => {
       if (idx === index) {
-        return {
-          ...item,
-          [field]: e.target.value,
-        };
+        return e.target.value; // Update the value at the specific index
       }
       return item;
     });
     setOtherinformation(updatedOtherInfo);
   };
 
-  const handleOtherInfoChangeTransfer = (e, field, index) => {
+  const handleOtherInfoChangeTransfer = (e, index) => {
     const updatedOtherInfo = transfer?.map((item, idx) => {
       if (idx === index) {
-        return {
-          ...item,
-          [field]: e.target.value,
-        };
+        return e.target.value; // Update the value at the specific index
       }
       return item;
     });
     setTransfer(updatedOtherInfo);
   };
 
-  const handleOtherInfoChangeExclusion = (e, field, index) => {
-    const updatedOtherInfo = exclusionAll?.map((item, idx) => {
+  const handleOtherInfoChangeExclusion = (e, index) => {
+    const updatedExclusions = exclusionAll?.map((item, idx) => {
       if (idx === index) {
-        return {
-          ...item,
-          [field]: e.target.value,
-        };
+        return e.target.value; // Update the value at the specific index
       }
       return item;
     });
-    setExclusionAll(updatedOtherInfo);
+    setExclusionAll(updatedExclusions); // Update state with new values
   };
 
   const handleInclusionChange = (e, field, index) => {
@@ -272,23 +291,57 @@ const CreateItinerary = () => {
     description: activity.description,
   }));
 
-  // Function to calculate total cost
   const calculateTotal = () => {
-    return adultCount * adultPrice + childCount * childPrice;
+    return (
+      data?.travellers?.filter((el) => el.userType === "Adult").length *
+        adultPrice +
+      data?.travellers?.filter((el) => el.userType === "Child").length *
+        childPrice
+    );
   };
-
+  
+  // Function to update the price details in the desired format
+  const updatePriceDetails = () => {
+    const adultCount = data?.travellers?.filter((el) => el.userType === "Adult")
+      ?.length;
+    const childCount = data?.travellers?.filter((el) => el.userType === "Child")
+      ?.length;
+  
+    const newPriceDetails = [
+      {
+        userType: "Adult",
+        price: adultPrice,
+        quantity: adultCount,
+        amount: adultPrice * adultCount,
+      },
+      {
+        userType: "Child",
+        price: childPrice,
+        quantity: childCount,
+        amount: childPrice * childCount,
+      },
+    ];
+  
+    setPriceDetails(newPriceDetails);
+  };
+  
+  // Call updatePriceDetails whenever price or data changes
+  useEffect(() => {
+    updatePriceDetails();
+  }, [adultPrice, childPrice, data]);
   const handleFinalSubmit = () => {
     console.log({
       travelSummaryPerDay,
       activityPerDay,
-      travelSummaryAll,
       otherinformation,
-      activityAll,
+      priceDetails,
       inclusionAll,
       exclusionAll,
       transfer,
     });
   };
+
+  console.log(data)
 
   return (
     <div className="flex gap-5">
@@ -380,7 +433,7 @@ const CreateItinerary = () => {
                               onChange={(e) =>
                                 handleInputChange(e, "description", index)
                               }
-                              placeholder="Edit travel summary description"
+                              className="min-h-[50px] h-auto"
                             />
                           </div>
                         )}
@@ -391,70 +444,64 @@ const CreateItinerary = () => {
 
                 {selectedCategory === "Activity" && (
                   <>
-                    <div className="flex justify-between items-center gap-5 mb-4">
-                      <Button
-                        onClick={addActivityDay}
-                        className="bg-main text-white"
-                      >
-                        Add Another Day
-                      </Button>
-                    </div>
-
-                    {activityPerDay.map((item, index) => (
-                      <div key={index} className="mb-4">
-                        <div className="mt-5 mb-5 text-lg font-normal">
-                          Day {item.day}
+                  <div className="flex justify-between items-center gap-5 mb-4">
+                    <Button onClick={addActivityDay} className="bg-main text-white">
+                      Add Another Day
+                    </Button>
+                  </div>
+                
+                  {activityPerDay.map((item, index) => (
+                    <div key={index} className="mb-4">
+                      <div className="mt-5 mb-5 text-lg font-normal">Day {item.day}</div>
+                
+                      <div className="flex justify-between items-center gap-5">
+                        <div className="w-[70%]">
+                          <Select
+                            options={optionsActivity}
+                            value={optionsActivity.find(
+                              (option) => option.value === item.selectedSummary
+                            )}
+                            onChange={(selectedOption) =>
+                              handleSelectChangeActivity(selectedOption, index)
+                            }
+                            placeholder="Select an activity"
+                            isSearchable={true}
+                            isClearable={true}
+                          />
                         </div>
-
-                        <div className="flex justify-between items-center gap-5">
-                          <div className="w-[70%]">
-                            <Select
-                              options={optionsActivity} // Use optionsActivity here
-                              value={optionsActivity.find(
-                                (option) =>
-                                  option.value === item.selectedSummary
-                              )}
-                              onChange={(selectedOption) =>
-                                handleSelectChangeActivity(
-                                  selectedOption,
-                                  index
-                                )
-                              }
-                              placeholder="Select an activity"
-                              isSearchable={true}
-                              isClearable={true}
-                            />
-                          </div>
-                        </div>
-
-                        {item.selectedSummary && (
-                          <div className="flex flex-col gap-4 mt-4">
-                            <Input
-                              label={`Title ${index + 1}`}
-                              value={item.summaryDetails.title}
-                              onChange={(e) =>
-                                handleInputChangeActivity(e, "title", index)
-                              }
-                              placeholder="Edit activity title"
-                            />
-                            <Textarea
-                              value={item.summaryDetails.description}
-                              onChange={(e) =>
-                                handleInputChangeActivity(
-                                  e,
-                                  "description",
-                                  index
-                                )
-                              }
-                              label={`Description ${index + 1}`}
-                              placeholder="Edit activity description"
-                            />
-                          </div>
-                        )}
                       </div>
-                    ))}
-                  </>
+                
+                      {item.selectedSummary && (
+                        <div className="flex flex-col gap-4 mt-4">
+                          <Input
+                            label={`Title ${index + 1}`}
+                            value={item.summaryDetails.title}
+                            onChange={(e) =>
+                              handleInputChangeActivity(e, "title", index)
+                            }
+                            placeholder="Edit activity title"
+                          />
+                          
+                          {/* Map over the description array to show multiple text areas */}
+                          {item.summaryDetails.description?.map((desc, descIndex) => (
+                            <Textarea
+                              key={descIndex}
+                              value={desc}
+                              onChange={(e) =>
+                                handleInputChangeActivity(e, "description", index, descIndex)
+                              }
+                              label={`Description ${index + 1} - Part ${descIndex + 1}`}
+                              className="min-h-[50px] h-auto"
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </>
+                
                 )}
+
                 {selectedCategory === "Other Information" && (
                   <>
                     <div className="mt-5 mb-5 text-lg font-normal">
@@ -468,23 +515,13 @@ const CreateItinerary = () => {
                             className="w-[100%] flex flex-col gap-4 mt-4"
                           >
                             <div className="w-[100%] ">
-                              <Input
-                                label={`Title ${index + 1}`}
-                                value={el.title}
-                                onChange={(e) =>
-                                  handleOtherInfoChange(e, "title", index)
-                                }
-                                placeholder="Edit title"
-                              />
-                            </div>
-                            <div className="w-[100%] ">
                               <Textarea
                                 label={`Description ${index + 1}`}
-                                value={el.description}
+                                value={el}
                                 onChange={(e) =>
-                                  handleOtherInfoChange(e, "description", index)
+                                  handleOtherInfoChange(e, index)
                                 }
-                                placeholder="Edit description"
+                                className="min-h-[50px] h-auto"
                               />
                             </div>
                           </div>
@@ -514,29 +551,17 @@ const CreateItinerary = () => {
                                 key={index}
                                 className="w-[100%] flex flex-col gap-4 mt-4"
                               >
-                                <Input
-                                  label={`Title ${index + 1}`}
-                                  value={el.title}
-                                  onChange={(e) =>
-                                    handleOtherInfoChangeTransfer(
-                                      e,
-                                      "title",
-                                      index
-                                    )
-                                  }
-                                  placeholder="Edit title"
-                                />
                                 <Textarea
                                   label={`Description ${index + 1}`}
-                                  value={el.description}
+                                  value={el}
                                   onChange={(e) =>
                                     handleOtherInfoChangeTransfer(
                                       e,
-                                      "description",
+
                                       index
                                     )
                                   }
-                                  placeholder="Edit description"
+                                 className="min-h-[50px] h-auto"
                                 />
                               </div>
                             ))}
@@ -575,7 +600,7 @@ const CreateItinerary = () => {
                                 onChange={(e) =>
                                   handleDescriptionChange(e, index, descIndex)
                                 }
-                                placeholder="Edit description"
+                              className="min-h-[50px] h-auto"
                               />
                             ))}
                           </div>
@@ -599,29 +624,17 @@ const CreateItinerary = () => {
                                 key={index}
                                 className="w-[100%] flex flex-col gap-4 mt-4"
                               >
-                                <Input
-                                  label={`Title ${index + 1}`}
-                                  value={el.title}
-                                  onChange={(e) =>
-                                    handleOtherInfoChangeExclusion(
-                                      e,
-                                      "title",
-                                      index
-                                    )
-                                  }
-                                  placeholder="Edit title"
-                                />
                                 <Textarea
                                   label={`Description ${index + 1}`}
-                                  value={el.description}
+                                  value={el}
                                   onChange={(e) =>
                                     handleOtherInfoChangeExclusion(
                                       e,
-                                      "description",
+
                                       index
                                     )
                                   }
-                                  placeholder="Edit description"
+                            className="min-h-[50px] h-auto"
                                 />
                               </div>
                             ))}
@@ -633,100 +646,58 @@ const CreateItinerary = () => {
                 )}
 
                 {selectedCategory === "Cost (Adult, child)" && (
-                  <>
-                    <div className="mt-5 mb-5 text-lg font-normal">
-                      Cost (Adult, child) details
+                  <div className="mt-2 mb-2 text-lg font-normal">
+                  Cost (Adult, child) details
+                  <div className="p-5">
+                    <h2 className="text-lg font-bold mb-4">
+                      {data?.travellers?.filter((el) => el.userType === "Adult")?.length}{" "}
+                      Adults and{" "}
+                      {data?.travellers?.filter((el) => el.userType === "Child")?.length}{" "}
+                      Child
+                    </h2>
+              
+                    <div className="flex justify-between items-center mb-2 gap-5">
+                      <label className="w-[50%] block mb-2">Adult Price:</label>
+                      <label className="w-[50%] block mb-2">Child Price:</label>
                     </div>
-                    <div className="p-5">
-                      <h2 className="text-lg font-bold mb-4">
-                        Cost Calculation
-                      </h2>
-
-                      {/* Adult Price */}
-                      <div className="mb-4">
-                        <label className="block mb-2">Adult Price:</label>
-                        <Input
-                          type="number"
-                          value={adultPrice}
-                          onChange={(e) =>
-                            setAdultPrice(Number(e.target.value))
-                          }
-                          placeholder="Set adult price"
-                        />
-                      </div>
-
-                      {/* Child Price */}
-                      <div className="mb-4">
-                        <label className="block mb-2">Child Price:</label>
-                        <Input
-                          type="number"
-                          value={childPrice}
-                          onChange={(e) =>
-                            setChildPrice(Number(e.target.value))
-                          }
-                          placeholder="Set child price"
-                        />
-                      </div>
-
-                      {/* Adult Count */}
-                      <div className="flex items-center mb-4">
-                        <span className="mr-2">Adults:</span>
-                        <Button
-                          color="lightBlue"
-                          onClick={() =>
-                            setAdultCount((prev) => Math.max(prev - 1, 0))
-                          }
-                        >
-                          -
-                        </Button>
-                        <Input
-                          type="number"
-                          value={adultCount}
-                          readOnly
-                          className="mx-2 w-[60px]"
-                        />
-                        <Button
-                          color="lightBlue"
-                          onClick={() => setAdultCount((prev) => prev + 1)}
-                        >
-                          +
-                        </Button>
-                      </div>
-
-                      {/* Child Count */}
-                      <div className="flex items-center mb-4">
-                        <span className="mr-2">Children:</span>
-                        <Button
-                          color="lightBlue"
-                          onClick={() =>
-                            setChildCount((prev) => Math.max(prev - 1, 0))
-                          }
-                        >
-                          -
-                        </Button>
-                        <Input
-                          type="number"
-                          value={childCount}
-                          readOnly
-                          className="mx-2 w-[60px]"
-                        />
-                        <Button
-                          color="lightBlue"
-                          onClick={() => setChildCount((prev) => prev + 1)}
-                        >
-                          +
-                        </Button>
-                      </div>
-
-                      {/* Total Cost Display */}
-                      <div className="border border-gray-300 p-4 rounded-md mt-4">
-                        <h3 className="font-semibold">Total Cost:</h3>
-                        <p className="text-xl font-bold">
-                          Rs. {calculateTotal()}
-                        </p>
-                      </div>
+              
+                    {/* Input for Adult and Child Price */}
+                    <div className="flex justify-between items-center mb-2 gap-5">
+                      <Input
+                        type="number"
+                        value={adultPrice}
+                        onChange={(e) => setAdultPrice(Number(e.target.value))}
+                        placeholder="Set adult price"
+                      />
+                      <Input
+                        type="number"
+                        value={childPrice}
+                        onChange={(e) => setChildPrice(Number(e.target.value))}
+                        placeholder="Set child price"
+                      />
                     </div>
-                  </>
+              
+                    {/* Total Cost Display */}
+                    <div className="border border-gray-300 p-4 rounded-md mt-4">
+                      <h3 className="font-semibold">Total Cost:</h3>
+                      <p className="text-xl font-bold">Rs. {calculateTotal()}</p>
+                    </div>
+              
+                    {/* Displaying price details */}
+                    <div className="mt-4">
+        <h3 className="font-semibold">Price Details:</h3>
+        <pre>{JSON.stringify({
+      travelSummaryPerDay,
+      activityPerDay,
+      otherinformation,
+      priceDetails,
+      inclusionAll,
+      exclusionAll,
+      transfer,
+    }, null, 2)}</pre>
+      </div>
+                  </div>
+                </div>
                 )}
               </div>
             </div>

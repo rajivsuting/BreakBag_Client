@@ -147,6 +147,7 @@ const TravelSummery = () => {
                 <tr className="bg-gray-200">
                   <th className="px-4 py-2">Title</th>
                   <th className="px-4 py-2">Description</th>
+                  <th className="px-4 py-2">Destination</th>
                   <th className="px-4 py-2"></th>
                   <th className="px-4 py-2"></th>
                 </tr>
@@ -159,6 +160,7 @@ const TravelSummery = () => {
                   >
                     <td className="px-4 py-2">{user.title}</td>
                     <td className="px-4 py-2">{user.description}</td>
+                    <td className="px-4 py-2">{user?.destination?.title}</td>
                     <td className="px-4 py-2">
                       <MdEdit className="h-5 w-5 text-maincolor2 cursor-pointer" />
                     </td>

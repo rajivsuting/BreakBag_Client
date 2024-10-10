@@ -39,7 +39,7 @@ const Exclusion = () => {
     <div className="flex gap-5 ">
       <Sidebar />
       <div className="w-[75%] m-auto mt-8 rounded-md">
-      <div className="relative w-full">
+        <div className="relative w-full">
           {/* Background Image with dark overlay */}
           <div
             className="inset-0 bg-cover bg-center rounded-md relative"
@@ -53,9 +53,7 @@ const Exclusion = () => {
 
             {/* Content on top of the background */}
             <div className="absolute inset-0 flex flex-col p-4 pb-0 justify-between z-10">
-              <div className="text-3xl text-white font-semibold">
-               Exclusion
-              </div>
+              <div className="text-3xl text-white font-semibold">Exclusion</div>
 
               <div className="flex justify-between items-center pb-2 gap-5 w-full">
                 {/* Search Form */}
@@ -126,7 +124,6 @@ const Exclusion = () => {
             <table className="w-full table-auto text-left">
               <thead>
                 <tr className="bg-gray-200">
-                  <th className="px-4 py-2">Title</th>
                   <th className="px-4 py-2">Description</th>
                   <th className="px-4 py-2">Destination</th>
                   <th className="px-4 py-2"></th>
@@ -142,36 +139,20 @@ const Exclusion = () => {
                   >
                     {/* Titles Column */}
                     <td className="px-4 py-2">
-                      {user.itemList.map((item, idx) => (
-                        <div key={idx}>{item.title}</div>
+                      {user?.description?.slice(0, 2).map((el, index) => (
+                        <span key={index}>
+                          {el}
+                          {index < 1 && user?.description?.length >= 2
+                            ? ", "
+                            : ""}
+                        </span>
                       ))}
+                      {user?.description?.length > 2 && (
+                        <span> and {user?.description?.length - 2} more</span>
+                      )}
                     </td>
 
-                    {/* Descriptions Column */}
                     <td className="px-4 py-2">
-                      {user.itemList.map((item, idx) => (
-                        <div key={idx}>{item.description.join(", ")}</div>
-                      ))}
-                    </td>
-
-                    {/* Images Column */}
-                    {/* <td className="px-4 py-2">
-                      {user.itemList.map((item, idx) => (
-                        <div key={idx}>
-                          {user.images[idx] ? (
-                            <img
-                              src={user.images[idx]}
-                              alt={item.title}
-                              className="w-20 h-20 object-cover"
-                            />
-                          ) : (
-                            "No Image"
-                          )}
-                        </div>
-                      ))}
-                    </td> */}
-
-<td className="px-4 py-2">
                       {user?.destination?.title || "NA"}
                     </td>
                     <td className="px-4 py-2">

@@ -148,7 +148,7 @@ const Acitivities = () => {
                 <tr className="bg-gray-200">
                   <th className="px-4 py-2">Title</th>
                   <th className="px-4 py-2">Description</th>
-                  <th className="px-4 py-2">Images</th>
+                  <th className="px-4 py-2">Destination</th>
                   <th className="px-4 py-2"></th>
                   <th className="px-4 py-2"></th>
                   <th className="px-4 py-2"></th>
@@ -160,10 +160,19 @@ const Acitivities = () => {
                     key={index}
                     className="hover:bg-gray-100 transition-colors duration-200"
                   >
-                    <td className="px-4 py-2">{user.title}</td>
-                    <td className="px-4 py-2">{user.description}</td>
-                    <td className="px-4 py-2">{user.images.length}</td>
-
+                    <td className="px-4 py-2">{user?.title}</td>
+                    <td className="px-4 py-2">{user?.description?.slice(0, 2).map((el, index) => (
+                        <span key={index}>
+                          {el}
+                          {index < 1 && user?.description?.length >= 2
+                            ? ", "
+                            : ""}
+                        </span>
+                      ))}
+                      {user?.description?.length > 2 && (
+                        <span> and {user?.description?.length - 2} more</span>
+                      )}</td>
+                    <td className="px-4 py-2">{user?.destination?.title}</td>
                     <td className="px-4 py-2">
                       <MdRemoveRedEye className="h-5 w-5 text-maincolor2 cursor-pointer" />
                     </td>
