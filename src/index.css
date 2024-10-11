@@ -49,3 +49,16 @@ input[type="number"] {
 .sidebar::-webkit-scrollbar-thumb:hover {
   background-color: rgb(235, 28, 36); /* Darker color when hovered */
 }
+
+
+/* Sidebar styles */
+.fixed-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh; /* Full viewport height */
+  width: 250px; /* Adjust based on your sidebar width */
+  background-color: #333; /* Adjust based on your design */
+  z-index: 1000; /* Ensure it stays on top */
+  overflow-y: auto; /* If you want the sidebar content to be scrollable */
+}

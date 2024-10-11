@@ -39,16 +39,16 @@ const Sidebar = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <Card className="h-screen w-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5 relative overflow-hidden">
-      <div className="m-auto mb-2">
-        <Typography variant="h5" color="blue-gray">
-          <img
-            src="https://breakbag.com/static/media/logo.3fff3126fefbf4f3afe7.png"
-            alt="Logo"
-            className="w-42 h-14"
-          />
-        </Typography>
-      </div>
+    <div className="fixed top-0 left-0 h-screen w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5">
+  <div className="m-auto mb-2">
+    <Typography variant="h5" color="blue-gray">
+      <img
+        src="https://breakbag.com/static/media/logo.3fff3126fefbf4f3afe7.png"
+        alt="Logo"
+        className="w-42 h-14"
+      />
+    </Typography>
+  </div>
       <List className="sidebar overflow-y-scroll h-[100vh]">
         {/* Dashboard Accordion */}
 
@@ -288,7 +288,7 @@ const Sidebar = () => {
           </ListItem>
         </NavLink>
       </List>
-    </Card>
+    </div>
   );
 };
 
