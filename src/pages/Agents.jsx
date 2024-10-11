@@ -44,7 +44,7 @@ const Agents = () => {
   const [isAddAgentsModal, setIsAddAgentsModal] = useState(false);
   const [data, setData] = useState([]);
 const [toogleLead, setToogleLead] = useState(false)
-  const getAlldata = () => {
+  const getAllData = () => {
     axios.get(`${serverUrl}/api/agent/all`).then((res) => {
       setData(res.data.data);
     });
@@ -55,7 +55,7 @@ const [toogleLead, setToogleLead] = useState(false)
   }
 
   useEffect(() => {
-    getAlldata();
+    getAllData();
     return () => {
       console.log("Avoid errors");
     };
@@ -216,7 +216,7 @@ const [toogleLead, setToogleLead] = useState(false)
       <Addagents
         isOpen={isAddAgentsModal}
         onClose={() => setIsAddAgentsModal(false)}
-        // getAlldata= {getAlldata}
+        getAllData= {getAllData}
       />
     </div>
   );

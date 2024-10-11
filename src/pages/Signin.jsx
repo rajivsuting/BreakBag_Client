@@ -41,19 +41,23 @@ const SignIn = () => {
           otp,
         }
       );
-  console.log(response.data);
   
       setMessage(response.data.message);
-      
+      console.log(response)
       // Store the user's role in localStorage for later use
       localStorage.setItem('userRole', response.data.role); 
+      localStorage.setItem('token', response.data.token); 
   
       // Navigate to dashboard after successful login
       if (response.data.role == "Admin"){
         console.log("yes")
-        navigate("/");
+       setTimeout(() => {
+        navigate("/travel-summery");
+       }, 1000);
       }else {
-        navigate("/travellers");
+        setTimeout(() => {
+          navigate("/travellers");
+         }, 1000);
       }
     } catch (error) {
       console.error("Error during login:", error);

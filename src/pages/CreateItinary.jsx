@@ -41,9 +41,12 @@ const CreateItinerary = () => {
   const [adultPrice, setAdultPrice] = useState(0); // Default adult price
   const [childPrice, setChildPrice] = useState(0); // Default child price
   const [priceDetails, setPriceDetails] = useState([]); // To store the formatted data
+  const [selectedTitle, setSelectedTitle] = useState("");
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   useEffect(() => {
     axios.get(`${serverUrl}/api/quote/quotes/${tripid}`).then((res) => {
+      console.log(res.data.data)
       setData(res.data.data);
     });
   }, []);
@@ -55,7 +58,6 @@ const CreateItinerary = () => {
           `${serverUrl}/api/travel-summary/travel-summary/search/${data?.destination?._id}`
         )
         .then((res) => {
-          
           setTravelSummaryAll(res.data.travelSummaries);
         });
 
@@ -64,7 +66,6 @@ const CreateItinerary = () => {
           `${serverUrl}/api/activity/activity/search/${data?.destination?._id}`
         )
         .then((res) => {
-          
           setActivityAll(res.data.data);
         });
 
@@ -80,6 +81,10 @@ const CreateItinerary = () => {
         .get(`${serverUrl}/api/inclusion/destination/${data?.destination?._id}`)
         .then((res) => {
           setInclusionAll(res.data.data.itemList || []);
+          if (res.data.data.itemList.length > 0) {
+            setSelectedTitle(res.data.data.itemList[0].title);
+            setSelectedIndex(0); // Automatically select the first title
+          }
         });
 
       axios
@@ -98,7 +103,7 @@ const CreateItinerary = () => {
   const categories = [
     "Travel Summary",
     "Cost (Adult, child)",
-    "Total Cost",
+
     "Transfers",
     "Activity",
     "Inclusion",
@@ -215,7 +220,6 @@ const CreateItinerary = () => {
     });
     setActivityPerDay(updatedSummary);
   };
-  
 
   const handleOtherInfoChange = (e, index) => {
     const updatedOtherInfo = otherinformation?.map((item, idx) => {
@@ -260,19 +264,15 @@ const CreateItinerary = () => {
     setInclusionAll(updatedInclusions);
   };
 
-  const handleDescriptionChange = (e, inclusionIndex, descriptionIndex) => {
+  // Handle updating description for a particular title
+  const handleDescriptionChange = (e, descIndex) => {
     const updatedInclusions = inclusionAll.map((item, idx) => {
-      if (idx === inclusionIndex) {
-        const updatedDescriptions = item.description.map((desc, dIdx) => {
-          if (dIdx === descriptionIndex) {
-            return e.target.value; // Update the specific description
-          }
-          return desc;
+      if (idx === selectedIndex) {
+        const updatedDescriptions = item.description.map((desc, index) => {
+          return index === descIndex ? e.target.value : desc;
         });
-        return {
-          ...item,
-          description: updatedDescriptions,
-        };
+
+        return { ...item, description: updatedDescriptions };
       }
       return item;
     });
@@ -299,14 +299,16 @@ const CreateItinerary = () => {
         childPrice
     );
   };
-  
+
   // Function to update the price details in the desired format
   const updatePriceDetails = () => {
-    const adultCount = data?.travellers?.filter((el) => el.userType === "Adult")
-      ?.length;
-    const childCount = data?.travellers?.filter((el) => el.userType === "Child")
-      ?.length;
-  
+    const adultCount = data?.travellers?.filter(
+      (el) => el.userType === "Adult"
+    )?.length;
+    const childCount = data?.travellers?.filter(
+      (el) => el.userType === "Child"
+    )?.length;
+
     const newPriceDetails = [
       {
         userType: "Adult",
@@ -321,10 +323,10 @@ const CreateItinerary = () => {
         amount: childPrice * childCount,
       },
     ];
-  
+
     setPriceDetails(newPriceDetails);
   };
-  
+
   // Call updatePriceDetails whenever price or data changes
   useEffect(() => {
     updatePriceDetails();
@@ -341,7 +343,7 @@ const CreateItinerary = () => {
     });
   };
 
-  console.log(data)
+  console.log(data);
 
   return (
     <div className="flex gap-5">
@@ -384,6 +386,8 @@ const CreateItinerary = () => {
               <div className="w-[80%] bg-white p-4 rounded-lg col-span-2">
                 {selectedCategory === "Travel Summary" && (
                   <>
+                  {
+                    data?.duration > travelSummaryPerDay?.length ? 
                     <div className="flex justify-between items-center gap-5 mb-4">
                       <Button
                         onClick={addTravelSummaryDay}
@@ -392,6 +396,8 @@ const CreateItinerary = () => {
                         Add Another Day
                       </Button>
                     </div>
+                     : null
+                  }
 
                     {travelSummaryPerDay.map((item, index) => (
                       <div key={index} className="mb-4">
@@ -444,62 +450,81 @@ const CreateItinerary = () => {
 
                 {selectedCategory === "Activity" && (
                   <>
-                  <div className="flex justify-between items-center gap-5 mb-4">
-                    <Button onClick={addActivityDay} className="bg-main text-white">
-                      Add Another Day
-                    </Button>
-                  </div>
-                
-                  {activityPerDay.map((item, index) => (
-                    <div key={index} className="mb-4">
-                      <div className="mt-5 mb-5 text-lg font-normal">Day {item.day}</div>
-                
-                      <div className="flex justify-between items-center gap-5">
-                        <div className="w-[70%]">
-                          <Select
-                            options={optionsActivity}
-                            value={optionsActivity.find(
-                              (option) => option.value === item.selectedSummary
-                            )}
-                            onChange={(selectedOption) =>
-                              handleSelectChangeActivity(selectedOption, index)
-                            }
-                            placeholder="Select an activity"
-                            isSearchable={true}
-                            isClearable={true}
-                          />
+                  {
+                    data?.duration > activityPerDay?.length ? 
+                    <div className="flex justify-between items-center gap-5 mb-4">
+                      <Button
+                        onClick={addActivityDay}
+                        className="bg-main text-white"
+                      >
+                        Add Another Day
+                      </Button>
+                    </div> : null
+}
+                    {activityPerDay.map((item, index) => (
+                      <div key={index} className="mb-4">
+                        <div className="mt-5 mb-5 text-lg font-normal">
+                          Day {item.day}
                         </div>
-                      </div>
-                
-                      {item.selectedSummary && (
-                        <div className="flex flex-col gap-4 mt-4">
-                          <Input
-                            label={`Title ${index + 1}`}
-                            value={item.summaryDetails.title}
-                            onChange={(e) =>
-                              handleInputChangeActivity(e, "title", index)
-                            }
-                            placeholder="Edit activity title"
-                          />
-                          
-                          {/* Map over the description array to show multiple text areas */}
-                          {item.summaryDetails.description?.map((desc, descIndex) => (
-                            <Textarea
-                              key={descIndex}
-                              value={desc}
-                              onChange={(e) =>
-                                handleInputChangeActivity(e, "description", index, descIndex)
+
+                        <div className="flex justify-between items-center gap-5">
+                          <div className="w-[70%]">
+                            <Select
+                              options={optionsActivity}
+                              value={optionsActivity.find(
+                                (option) =>
+                                  option.value === item.selectedSummary
+                              )}
+                              onChange={(selectedOption) =>
+                                handleSelectChangeActivity(
+                                  selectedOption,
+                                  index
+                                )
                               }
-                              label={`Description ${index + 1} - Part ${descIndex + 1}`}
-                              className="min-h-[50px] h-auto"
+                              placeholder="Select an activity"
+                              isSearchable={true}
+                              isClearable={true}
                             />
-                          ))}
+                          </div>
                         </div>
-                      )}
-                    </div>
-                  ))}
-                </>
-                
+
+                        {item.selectedSummary && (
+                          <div className="flex flex-col gap-4 mt-4">
+                            <Input
+                              label={`Title ${index + 1}`}
+                              value={item.summaryDetails.title}
+                              onChange={(e) =>
+                                handleInputChangeActivity(e, "title", index)
+                              }
+                              placeholder="Edit activity title"
+                            />
+
+                            {/* Map over the description array to show multiple text areas */}
+                            {item.summaryDetails.description?.map(
+                              (desc, descIndex) => (
+                                <Textarea
+                                  key={descIndex}
+                                  value={desc}
+                                  onChange={(e) =>
+                                    handleInputChangeActivity(
+                                      e,
+                                      "description",
+                                      index,
+                                      descIndex
+                                    )
+                                  }
+                                  label={`Description ${index + 1} - Part ${
+                                    descIndex + 1
+                                  }`}
+                                  className="min-h-[50px] h-auto"
+                                />
+                              )
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </>
                 )}
 
                 {selectedCategory === "Other Information" && (
@@ -507,8 +532,8 @@ const CreateItinerary = () => {
                     <div className="mt-5 mb-5 text-lg font-normal">
                       Other Information details
                     </div>
-                    <div className="flex justify-between hover:bg-gray-100 p-2">
-                      <div className="flex flex-col gap-4">
+                    <div className="flex flex-col w-full hover:bg-gray-100 p-2">
+                      <div className="w-full">
                         {otherinformation?.map((el, index) => (
                           <div
                             key={index}
@@ -528,12 +553,14 @@ const CreateItinerary = () => {
                         ))}
                       </div>
                     </div>
+                    <div className="m-auto flex justify-center items-center">
                     <Button
                       onClick={handleFinalSubmit}
-                      className={"bg-main text-white"}
+                      className={"bg-main text-white m-auto w-[200px]"}
                     >
                       Final submit
                     </Button>
+                    </div>
                   </>
                 )}
 
@@ -542,67 +569,25 @@ const CreateItinerary = () => {
                     <div className="mt-5 mb-5 text-lg font-normal">
                       Transfer details
                     </div>
-                    <div className="flex justify-between hover:bg-gray-100 p-2">
-                      {
-                        <div className="flex justify-between items-center hover:bg-gray-100 p-2">
-                          <div>
-                            {transfer?.map((el, index) => (
-                              <div
-                                key={index}
-                                className="w-[100%] flex flex-col gap-4 mt-4"
-                              >
-                                <Textarea
-                                  label={`Description ${index + 1}`}
-                                  value={el}
-                                  onChange={(e) =>
-                                    handleOtherInfoChangeTransfer(
-                                      e,
-
-                                      index
-                                    )
-                                  }
-                                 className="min-h-[50px] h-auto"
-                                />
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      }
-                    </div>
-                  </>
-                )}
-
-                {selectedCategory === "Inclusion" && (
-                  <>
-                    <div className="mt-5 mb-5 text-lg font-normal">
-                      Inclusion details
-                    </div>
-                    <div className="flex justify-between hover:bg-gray-100 p-2">
-                      <div className="flex flex-col gap-4">
-                        {inclusionAll?.map((el, index) => (
+                    <div className="flex flex-col w-full hover:bg-gray-100 p-2">
+                      <div className="w-full">
+                        {transfer?.map((el, index) => (
                           <div
                             key={index}
-                            className="w-[100%] flex flex-col gap-4 mt-4"
+                            className="w-full flex flex-col gap-4 mt-4"
                           >
-                            <Input
-                              label={`Title ${index + 1}`}
-                              value={el.title}
+                            <Textarea
+                              label={`Description ${index + 1}`}
+                              value={el}
                               onChange={(e) =>
-                                handleInclusionChange(e, "title", index)
+                                handleOtherInfoChangeTransfer(
+                                  e,
+
+                                  index
+                                )
                               }
-                              placeholder="Edit title"
-                            />
-                            {el.description.map((dl, descIndex) => (
-                              <Textarea
-                                key={descIndex}
-                                label={`Description ${descIndex + 1}`}
-                                value={dl}
-                                onChange={(e) =>
-                                  handleDescriptionChange(e, index, descIndex)
-                                }
                               className="min-h-[50px] h-auto"
-                              />
-                            ))}
+                            />
                           </div>
                         ))}
                       </div>
@@ -610,94 +595,145 @@ const CreateItinerary = () => {
                   </>
                 )}
 
+                {selectedCategory === "Inclusion" && (
+                  <div className="flex">
+                    {/* Left side: Titles */}
+                    <div className="w-[20%] border-r pr-4">
+                      <h3 className="font-bold">Titles</h3>
+                      <div className="w-[100%] h-full bg-gray-100 p-4 rounded-lg overflow-y-auto">
+                        {inclusionAll?.map((item, index) => (
+                          <div
+                            key={index}
+                            className={`p-2 cursor-pointer ${
+                              selectedIndex === index
+                                ? "border-b-2 border-main text-main font-semibold"
+                                : ""
+                            }`}
+                            onClick={() => {
+                              setSelectedTitle(item.title);
+                              setSelectedIndex(index);
+                            }}
+                          >
+                            {item.title}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Right side: Descriptions */}
+                    <div className="w-[80%] pl-4">
+                      <h3 className="font-bold mb-4">
+                        Descriptions for "{selectedTitle}"
+                      </h3>
+                      {inclusionAll[selectedIndex]?.description?.map(
+                        (desc, descIndex) => (
+                          <div key={descIndex} className="flex gap-5 mb-4">
+                            <Textarea
+                              label={`Description ${descIndex + 1}`}
+                              value={desc}
+                              onChange={(e) =>
+                                handleDescriptionChange(e, descIndex)
+                              }
+                              className="min-h-[50px] h-auto" // Adjusted height
+                              required
+                            />
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {selectedCategory === "Exclusion" && (
                   <>
                     <div className="mt-5 mb-5 text-lg font-normal">
                       Exclusion details
                     </div>
-                    <div className="flex justify-between hover:bg-gray-100 p-2">
-                      {
-                        <div className="flex justify-between items-center hover:bg-gray-100 p-2">
-                          <div>
-                            {exclusionAll?.map((el, index) => (
-                              <div
-                                key={index}
-                                className="w-[100%] flex flex-col gap-4 mt-4"
-                              >
-                                <Textarea
-                                  label={`Description ${index + 1}`}
-                                  value={el}
-                                  onChange={(e) =>
-                                    handleOtherInfoChangeExclusion(
-                                      e,
-
-                                      index
-                                    )
-                                  }
-                            className="min-h-[50px] h-auto"
-                                />
-                              </div>
-                            ))}
+                    <div className="flex flex-col w-full hover:bg-gray-100 p-2">
+                      <div className="w-full">
+                        {exclusionAll?.map((el, index) => (
+                          <div
+                            key={index}
+                            className="w-full flex flex-col gap-4 mt-4"
+                          >
+                            <Textarea
+                              label={`Description ${index + 1}`}
+                              value={el}
+                              onChange={(e) =>
+                                handleOtherInfoChangeExclusion(e, index)
+                              }
+                              className="min-h-[50px] h-auto w-full" // Adjusted to 100% width
+                            />
                           </div>
-                        </div>
-                      }
+                        ))}
+                      </div>
                     </div>
                   </>
                 )}
 
                 {selectedCategory === "Cost (Adult, child)" && (
                   <div className="mt-2 mb-2 text-lg font-normal">
-                  Cost (Adult, child) details
-                  <div className="p-5">
-                    <h2 className="text-lg font-bold mb-4">
-                      {data?.travellers?.filter((el) => el.userType === "Adult")?.length}{" "}
-                      Adults and{" "}
-                      {data?.travellers?.filter((el) => el.userType === "Child")?.length}{" "}
-                      Child
-                    </h2>
-              
-                    <div className="flex justify-between items-center mb-2 gap-5">
-                      <label className="w-[50%] block mb-2">Adult Price:</label>
-                      <label className="w-[50%] block mb-2">Child Price:</label>
+                    Cost (Adult, child) details
+                    <div className="p-5">
+                      <h2 className="text-lg font-bold mb-4">
+                        {
+                          data?.travellers?.filter(
+                            (el) => el.userType === "Adult"
+                          )?.length
+                        }{" "}
+                        Adults and{" "}
+                        {
+                          data?.travellers?.filter(
+                            (el) => el.userType === "Child"
+                          )?.length
+                        }{" "}
+                        Child
+                      </h2>
+
+                      <div className="flex justify-between items-center mb-2 gap-5">
+                        <label className="w-[50%] block mb-2">
+                          Adult Price:
+                        </label>
+                        <label className="w-[50%] block mb-2">
+                          Child Price:
+                        </label>
+                      </div>
+
+                      {/* Input for Adult and Child Price */}
+                      <div className="flex justify-between items-center mb-2 gap-5">
+                        <Input
+                          type="number"
+                          value={adultPrice}
+                          onChange={(e) =>
+                            setAdultPrice(Number(e.target.value))
+                          }
+                          placeholder="Set adult price"
+                        />
+                        <Input
+                          type="number"
+                          value={childPrice}
+                          onChange={(e) =>
+                            setChildPrice(Number(e.target.value))
+                          }
+                          placeholder="Set child price"
+                        />
+                      </div>
+
+                      {/* Total Cost Display */}
+                      <div className="border border-gray-300 p-4 rounded-md mt-4">
+                        <h3 className="font-semibold">Total Cost:</h3>
+                        <p className="text-xl font-bold">
+                          Rs. {calculateTotal()}
+                        </p>
+                      </div>
+
+                      {/* Displaying price details */}
+                      {/* <div className="mt-4">
+                      <h3 className="font-semibold">Price Details:</h3>
+                      <pre>{JSON.stringify(priceDetails, null, 2)}</pre>
+                    </div> */}
                     </div>
-              
-                    {/* Input for Adult and Child Price */}
-                    <div className="flex justify-between items-center mb-2 gap-5">
-                      <Input
-                        type="number"
-                        value={adultPrice}
-                        onChange={(e) => setAdultPrice(Number(e.target.value))}
-                        placeholder="Set adult price"
-                      />
-                      <Input
-                        type="number"
-                        value={childPrice}
-                        onChange={(e) => setChildPrice(Number(e.target.value))}
-                        placeholder="Set child price"
-                      />
-                    </div>
-              
-                    {/* Total Cost Display */}
-                    <div className="border border-gray-300 p-4 rounded-md mt-4">
-                      <h3 className="font-semibold">Total Cost:</h3>
-                      <p className="text-xl font-bold">Rs. {calculateTotal()}</p>
-                    </div>
-              
-                    {/* Displaying price details */}
-                    <div className="mt-4">
-        <h3 className="font-semibold">Price Details:</h3>
-        <pre>{JSON.stringify({
-      travelSummaryPerDay,
-      activityPerDay,
-      otherinformation,
-      priceDetails,
-      inclusionAll,
-      exclusionAll,
-      transfer,
-    }, null, 2)}</pre>
-      </div>
                   </div>
-                </div>
                 )}
               </div>
             </div>

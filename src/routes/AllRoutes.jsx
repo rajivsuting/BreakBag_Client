@@ -103,7 +103,7 @@ const App = () => {
         <Route 
           path="/quote" 
           element={
-            <ProtectedRoute role={role} allowedRoles={['Admin']}>
+            <ProtectedRoute role={role} allowedRoles={['Admin','Agent']}>
               <Quote />
             </ProtectedRoute>
           } 

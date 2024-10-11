@@ -6,7 +6,7 @@ import usePreventScrollOnNumberInput from "../CustomHook/usePreventScrollOnNumbe
 import { toast } from "react-toastify";
 import { serverUrl } from "../api";
 
-const Addagents = ({ isOpen, onClose }) => {
+const Addagents = ({ isOpen, onClose,getAllData }) => {
   // Prevent scrolling on number inputs (custom hook)
   usePreventScrollOnNumberInput();
 
@@ -51,7 +51,7 @@ const Addagents = ({ isOpen, onClose }) => {
       //   console.log("Response:", response.data);
 
       alert("Agent added");
-      //   getAlldata()
+      getAllData()
       // Clear the form
       setFormData({
         name: "",

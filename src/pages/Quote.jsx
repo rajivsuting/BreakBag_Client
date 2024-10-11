@@ -17,11 +17,14 @@ import { serverUrl } from "../api";
 import axios from "axios";
 import Addtraveller from "../components/Addtraveller";
 import AddQuote from "../components/AddQuote";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import Addcomment from "../components/Addcomment";
+import { FiInfo } from "react-icons/fi";
 
 const Travellers = () => {
   const navigate = useNavigate();
-  const [isAddTravellersModal, setIsAddTravellersModal] = useState(false);
+  const [commentModalOpen, setCommentModalOpen] = useState(false);
+  const [searchparam, setSearchParams] = useSearchParams();
   const [data, setData] = useState([]);
 
   const getAlldata = () => {
@@ -68,6 +71,11 @@ const Travellers = () => {
       default:
         return "bg-black"; // Default color
     }
+  };
+
+  const handleComment = (quote) => {
+    setCommentModalOpen(true);
+    setSearchParams({ quote });
   };
 
   return (
@@ -153,56 +161,72 @@ const Travellers = () => {
           </div>
         </div>
 
-        <Card className="overflow-hidden mt-5">
-          <CardBody className="p-0">
-            <table className="w-full table-auto text-left">
-              
-              <tbody>
-                {data.map((user, index) => (
-                  <tr
-                    key={index}
-                    className="hover:bg-gray-100 transition-colors duration-200 border"
+        {/* Add margin here to push content down below the image */}
+        <div className="mt-5">
+          {/* <Card className="overflow-hidden mt-5">
+        <CardBody className="p-0"> */}
+          <table className="w-full table-auto text-left">
+            <tbody>
+              {data.map((user, index) => (
+                <tr
+                  key={index}
+                  className="hover:bg-gray-100 transition-colors duration-200 border"
+                >
+                  <td
+                    className={`w-[100px] text-center text-sm px-4 py-4 bg text-white ${getStatusColorbackground(
+                      user.status
+                    )}`}
                   >
-                    <td className={`w-[100px] text-center text-sm px-4 py-4 bg text-white ${getStatusColorbackground(user.status)}`}>
-                      {user.status}
+                    {user.status}
+                  </td>
+                  <Link to={`/quote-detail/${user.tripId}`}>
+                    <td className="px-4 py-4 hover:text-main hover:border-b-2 hover:border-main transition-all duration-200">
+                      {user.tripId}
                     </td>
-                    <Link to={`/quote-detail/${user.tripId}`}>
-                      <td className="px-4 py-4 hover:text-main hover:border-b-2 hover:border-main transition-all duration-200">
-                        {user.tripId}
-                      </td>
-                    </Link>
-                    {/* <td className="px-4 py-2">
-                    {user.travellers?.slice(0, 2).map((el, index) => (
-                      <span key={index}>
-                        {el.name}
-                        {index < 1 && user.travellers.length > 2 ? ", " : ""}
-                      </span>
-                    ))}
-                    {user.travellers.length > 2 && (
-                      <span> and {user.travellers.length - 2} more</span>
-                    )}
-                    </td> */}
-                    {/* <td className="px-4 py-2">{user.destination?.title || "-"}</td> */}
-                    {/* <td className="px-4 py-2">{user.startDate.split("T")[0]}</td>
-                    <td className="px-4 py-2">{user.endDate.split("T")[0]}</td>
-                    <td className="px-4 py-2">{user.numberOfTravellers}</td>
-                    <td className="px-4 py-2">{user.duration}</td> */}
-                    {/* <td className="px-4 py-2">
-                      <MdEdit className="h-5 w-5 text-maincolor2 cursor-pointer" />
-                    </td> */}
-                    <td className="px-4 py-2">
-                      <MdDelete
-                        onClick={() => handleDelete(user._id)}
-                        className="h-5 w-5 text-main cursor-pointer"
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </CardBody>
-        </Card>
+                  </Link>
+                  <td className="px-4 py-2 cursor-pointer">
+                    <div className="relative group">
+                      {
+                        user?.comments?.[user?.comments?.length - 1]
+                          ?.author?.name
+                      }{" "}
+                      has put a comment
+                      <ul className="w-[200px] absolute shadow text-center hidden bg-white border rounded p-2 text-gray-700 group-hover:block z-10 m-auto">
+                        <li className=" flex justify-center items-center gap-2 w-full text-xs font-semibold">
+                          {
+                            user?.comments?.[
+                              user?.comments?.length - 1
+                            ]?.content
+                          }
+                        </li>
+                      </ul>
+                    </div>
+                  </td>
+                  <td
+                    onClick={() => handleComment(user._id)}
+                    className="cursor-pointer px-4 py-2"
+                  >
+                    Add a comment
+                  </td>
+                  <td className="px-4 py-2">
+                    <MdDelete
+                      onClick={() => handleDelete(user._id)}
+                      className="h-5 w-5 text-main cursor-pointer"
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {/* </CardBody>
+      </Card> */}
+        </div>
       </div>
+      <Addcomment
+        isOpen={commentModalOpen}
+        onClose={() => setCommentModalOpen(false)}
+        getAlldata={getAlldata}
+      />
     </div>
   );
 };
