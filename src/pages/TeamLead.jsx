@@ -15,6 +15,9 @@ import AddTravelSummery from "../components/AddTravelSummery";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 import { serverUrl } from "../api";
 import axios from "axios";
+import Addagents from "../components/Addagents";
+import ToogleTeamLead from "../components/ToogleTeamLead";
+import { FiInfo } from "react-icons/fi";
 
 const data = [
   {
@@ -37,22 +40,26 @@ const data = [
   },
 ];
 
-const TravelSummery = () => {
-  const [isAddTravelSummeryModal, setIsAddTravelSummeryModal] = useState(false);
+const TeamLead = () => {
+  const [isAddAgentsModal, setIsAddAgentsModal] = useState(false);
   const [data, setData] = useState([]);
-
-  const getAlldata = () => {
-    axios.get(`${serverUrl}/api/travel-summary/travel-summary`).then((res) => {
-      setData(res.data.travelSummaries);
+const [toogleLead, setToogleLead] = useState(false)
+  const getAllData = () => {
+    axios.get(`${serverUrl}/api/agent/all`).then((res) => {
+      setData(res.data.data);
     });
   };
 
+  const handleToogle = ()=>{
+    setToogleLead(!toogleLead)
+  }
+
   useEffect(() => {
-    getAlldata();
+    getAllData();
     return () => {
       console.log("Avoid errors");
     };
-  }, []);
+  }, [toogleLead]);
 
   return (
     <div className="flex gap-5 ">
@@ -72,9 +79,7 @@ const TravelSummery = () => {
 
             {/* Content on top of the background */}
             <div className="absolute inset-0 flex flex-col p-4 pb-0 justify-between z-10">
-              <div className="text-3xl text-white font-semibold">
-                Travel Summary
-              </div>
+              <div className="text-3xl text-white font-semibold">Agents</div>
 
               <div className="flex justify-between items-center pb-2 gap-5 w-full">
                 {/* Search Form */}
@@ -107,7 +112,7 @@ const TravelSummery = () => {
                 <div className="flex justify-end items-center gap-5 text-white">
                   <div className="">
                     <LuPlusCircle
-                      onClick={() => setIsAddTravelSummeryModal(true)}
+                      onClick={() => setIsAddAgentsModal(true)}
                       className="h-6 w-6 cursor-pointer"
                     />
                   </div>
@@ -145,8 +150,11 @@ const TravelSummery = () => {
             <table className="w-full table-auto text-left">
               <thead>
                 <tr className="bg-gray-200">
-                <th className="px-4 py-2">Title</th>
-                <th className="px-4 py-2">Destination</th>
+                  <th className="px-4 py-2">Name</th>
+                  <th className="px-4 py-2">Email</th>
+                  <th className="px-4 py-2">Phone</th>
+                  <th className="px-4 py-2">Position</th>
+                  <th className="px-4 py-2"></th>
                   <th className="px-4 py-2"></th>
                   <th className="px-4 py-2"></th>
                 </tr>
@@ -157,13 +165,41 @@ const TravelSummery = () => {
                     key={index}
                     className="hover:bg-gray-100 transition-colors duration-200"
                   >
-                <td className="px-4 py-2">
-                      {user.title}
+                    <td className="px-4 py-2">{user.name}</td>
+                    <td className="px-4 py-2">{user.email}</td>
+                    <td className="px-4 py-2">{user.phone}</td>
+                    <td className=" px-4 py-2">
+                      {user.isTeamlead ? (
+                        <div className="w-[80px] flex justify-start items-center gap-1 text-emerald-700 px-1 w-[60px] rounded-[50px] text-center mt-2 font-semibold text-xs">
+                          <span
+                            className={`w-2 h-2 border  rounded-[50%] bg-green-500`}
+                          ></span>{" "}
+                          <span className="">Team lead</span>
+                        </div>
+                      ) : (
+                        <div className="flex justify-start items-center gap-1 p-1 w-[80px] rounded-[50px] text-center text-rose-500 mt-2 font-semibold text-xs">
+                          <span
+                            className={`w-2 h-2 border rounded-[50%] bg-blue-500`}
+                          ></span>{" "}
+                          Agent
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-4 py-2 cursor-pointer relative group">
+                      <div onClick={handleToogle}>
+                        <ToogleTeamLead
+                          active={user.isTeamlead}
+                          id={user._id}
+                        />
+                      </div>
+                      <ul className="w-[150px] absolute right-0 shadow text-center hidden bg-white border rounded p-2 text-gray-700 group-hover:block z-10">
+                        <li className=" flex justify-center items-center gap-2 w-full text-xs font-semibold">
+                          <FiInfo className="font-bold" /> Make him{" "}
+                          {user.isTeamlead ? "Agent " : "Team lead"}
+                        </li>
+                      </ul>
                     </td>
 
-                    <td className="px-4 py-2">
-                      {user?.description || "NA"}
-                    </td>
                     <td className="px-4 py-2">
                       <MdEdit className="h-5 w-5 text-maincolor2 cursor-pointer" />
                     </td>
@@ -177,13 +213,13 @@ const TravelSummery = () => {
           </CardBody>
         </Card>
       </div>
-      <AddTravelSummery
-        isOpen={isAddTravelSummeryModal}
-        onClose={() => setIsAddTravelSummeryModal(false)}
-        getAlldata={getAlldata}
+      <Addagents
+        isOpen={isAddAgentsModal}
+        onClose={() => setIsAddAgentsModal(false)}
+        getAllData= {getAllData}
       />
     </div>
   );
 };
 
-export default TravelSummery;
+export default TeamLead;

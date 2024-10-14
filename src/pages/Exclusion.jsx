@@ -124,8 +124,8 @@ const Exclusion = () => {
             <table className="w-full table-auto text-left">
               <thead>
                 <tr className="bg-gray-200">
-                  <th className="px-4 py-2">Description</th>
-                  <th className="px-4 py-2">Destination</th>
+                <th className="px-4 py-2">Title</th>
+                <th className="px-4 py-2">Destination</th>
                   <th className="px-4 py-2"></th>
                   <th className="px-4 py-2"></th>
                   <th className="px-4 py-2"></th>
@@ -139,21 +139,11 @@ const Exclusion = () => {
                   >
                     {/* Titles Column */}
                     <td className="px-4 py-2">
-                      {user?.description?.slice(0, 2).map((el, index) => (
-                        <span key={index}>
-                          {el}
-                          {index < 1 && user?.description?.length >= 2
-                            ? ", "
-                            : ""}
-                        </span>
-                      ))}
-                      {user?.description?.length > 2 && (
-                        <span> and {user?.description?.length - 2} more</span>
-                      )}
+                      {user.title}
                     </td>
 
                     <td className="px-4 py-2">
-                      {user?.destination?.title || "NA"}
+                      {user?.description || "NA"}
                     </td>
                     <td className="px-4 py-2">
                       <MdRemoveRedEye className="h-5 w-5 text-maincolor2 cursor-pointer" />

@@ -3,42 +3,15 @@ import Sidebar from "../components/Sidebar";
 import { Button, Input, Textarea } from "@material-tailwind/react";
 import { MdDelete, MdEdit, MdRemoveRedEye } from "react-icons/md";
 import { LuPlusCircle } from "react-icons/lu";
-
 import {
   Card,
   CardBody,
-  Typography,
-  IconButton,
-  Tooltip,
 } from "@material-tailwind/react";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 import { serverUrl } from "../api";
 import axios from "axios";
-import AddInclusion from "../components/AddInclusion";
-import AddExclusion from "../components/AddExclusion";
-import AddTransfer from "../components/AddTransfer";
 import AddOtherinformation from "../components/AddOtherInformation";
 
-const data = [
-  {
-    name: "John Doe",
-    email: "john@example.com",
-    role: "Admin",
-    status: "Active",
-  },
-  {
-    name: "Jane Smith",
-    email: "jane@example.com",
-    role: "Editor",
-    status: "Inactive",
-  },
-  {
-    name: "Tom Johnson",
-    email: "tom@example.com",
-    role: "Viewer",
-    status: "Active",
-  },
-];
 
 const OtherInformation = () => {
   const [isAddTravelSummeryModal, setIsAddTravelSummeryModal] = useState(false);
@@ -151,8 +124,8 @@ const OtherInformation = () => {
             <table className="w-full table-auto text-left">
               <thead>
                 <tr className="bg-gray-200">
-                  <th className="px-4 py-2">Description</th>
-                  <th className="px-4 py-2">Destination</th>
+                <th className="px-4 py-2">Title</th>
+                <th className="px-4 py-2">Destination</th>
                   <th className="px-4 py-2"></th>
                   <th className="px-4 py-2"></th>
                   <th className="px-4 py-2"></th>
@@ -166,21 +139,11 @@ const OtherInformation = () => {
                   >
                     {/* Titles Column */}
                     <td className="px-4 py-2">
-                      {user?.description?.slice(0, 2).map((el, index) => (
-                        <span key={index}>
-                          {el}
-                          {index < 1 && user?.description?.length >= 2
-                            ? ", "
-                            : ""}
-                        </span>
-                      ))}
-                      {user?.description?.length > 2 && (
-                        <span> and {user?.description?.length - 2} more</span>
-                      )}
+                      {user.title}
                     </td>
 
                     <td className="px-4 py-2">
-                      {user?.destination?.title || "NA"}
+                      {user?.description || "NA"}
                     </td>
                     <td className="px-4 py-2">
                       <MdRemoveRedEye className="h-5 w-5 text-maincolor2 cursor-pointer" />

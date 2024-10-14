@@ -1,6 +1,6 @@
 import { Button, Input, Textarea } from "@material-tailwind/react";
 import React, { useEffect, useState } from "react";
-import { AiOutlineClose } from "react-icons/ai";
+import { AiOutlineClose, AiOutlinePlus } from "react-icons/ai";
 import axios from "axios";
 import usePreventScrollOnNumberInput from "../CustomHook/usePreventScrollOnNumberInput";
 import { serverUrl } from "../api";
@@ -74,9 +74,7 @@ const AddActivities = ({ isOpen, onClose, getAlldata }) => {
 
   // Remove a description field
   const handleRemoveDescription = (index) => {
-    const newDescriptions = formData.description.filter(
-      (_, i) => i !== index
-    );
+    const newDescriptions = formData.description.filter((_, i) => i !== index);
     setFormData({ ...formData, description: newDescriptions });
   };
 
@@ -98,7 +96,6 @@ const AddActivities = ({ isOpen, onClose, getAlldata }) => {
       data.append(`description[${i}]`, description);
     });
     data.append("destination", formData.destination);
-
 
     // Append multiple files
     if (files.length > 0) {
@@ -181,34 +178,44 @@ const AddActivities = ({ isOpen, onClose, getAlldata }) => {
               />
             </div>
             <div className="m-auto mt-5">
-              <div className="font-normal text-lg mb-2">Description</div>
+              <div className="font-normal text-lg mb-2">Points</div>
               {formData.description.map((description, index) => (
-                <div key={index} className="flex items-center gap-4 mb-4">
+                <div key={index} className="flex gap-4 mb-4">
                   <Textarea
-                    label={`Description ${index + 1}`}
+                    label={`Point ${index + 1}`}
                     name={`description${index}`}
+                    className="min-h-[50px] h-auto" // Adjusted height
                     value={description}
                     onChange={(e) =>
                       handleDescriptionChange(index, e.target.value)
                     }
                     required
                   />
-                  {index > 0 && (
-                    <Button
-                      className="bg-red-500"
-                      onClick={() => handleRemoveDescription(index)}
-                    >
-                      Remove
-                    </Button>
+                  {index > 0 ? (
+                    <div>
+                      <AiOutlineClose
+                        className="cursor-pointer text-sm text-red-500 hover:bg-main hover:text-white rounded-[50%] p-1"
+                        size={24}
+                        onClick={() => handleRemoveDescription(index)}
+                      />
+                    </div>
+                  ) : (
+                    <div>
+                      <AiOutlinePlus
+                        className="cursor-pointer text-sm text-green-500 hover:bg-main hover:text-white rounded-[50%] p-1"
+                        size={24}
+                        onClick={handleAddDescription}
+                      />
+                    </div>
+                    // <Button
+                    //   className="bg-green-500"
+                    //   onClick={handleAddDescription}
+                    // >
+                    //   Add More Description
+                    // </Button>
                   )}
                 </div>
               ))}
-              <Button
-                className="bg-green-500"
-                onClick={handleAddDescription}
-              >
-                Add More Description
-              </Button>
             </div>
             <div className="w-[90%] flex justify-center items-center text-center mt-5 m-auto">
               <Button className="bg-main" type="submit" disabled={isLoading}>
