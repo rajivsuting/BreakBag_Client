@@ -185,7 +185,10 @@ const Travellers = () => {
                     </td>
                   </Link>
                   <td className="px-4 py-2 cursor-pointer">
-                    <div className="relative group">
+                    {
+                      user?.comments?.length == 0 ? <div className="relative group">
+                      Write you first comment
+                    </div> : <div className="relative group">
                       {
                         user?.comments?.[user?.comments?.length - 1]
                           ?.author?.name
@@ -201,6 +204,8 @@ const Travellers = () => {
                         </li>
                       </ul>
                     </div>
+                    }
+                    
                   </td>
                   <td
                     onClick={() => handleComment(user._id)}

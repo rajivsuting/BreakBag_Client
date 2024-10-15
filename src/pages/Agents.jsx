@@ -18,6 +18,7 @@ import axios from "axios";
 import Addagents from "../components/Addagents";
 import ToogleTeamLead from "../components/ToogleTeamLead";
 import { FiInfo } from "react-icons/fi";
+import Select from "react-select/base";
 
 const data = [
   {
@@ -43,17 +44,40 @@ const data = [
 const Agents = () => {
   const [isAddAgentsModal, setIsAddAgentsModal] = useState(false);
   const [data, setData] = useState([]);
-const [toogleLead, setToogleLead] = useState(false)
-const [selectedRole, setSelectedRole] = useState("Agent")
-  const getAllData = () => {
-    axios.get(`${serverUrl}/api/agent/all/?role=${selectedRole}`).then((res) => {
-      setData(res.data.data);
+  const [toogleLead, setToogleLead] = useState(false);
+  const [selectedRole, setSelectedRole] = useState("Agent");
+const [selectedAgent,setSelectedAgent] = useState("")
+  const [teamLeadAll, setteamLeadAll] = useState([]);
+  const [selectedTeamLead, setSelectedTeamLead] = useState(""); // null initially
+
+  const getAllDataTeamlead = () => {
+    axios.get(`${serverUrl}/api/agent/all/?role=${"Team Lead"}`).then((res) => {
+      setteamLeadAll(res.data.data);
     });
   };
+  const options = teamLeadAll.map((agent) => ({
+    value: agent._id,
+    label: agent.name,
+  }));
+  console.log(options);
+  useEffect(() => {
+    getAllDataTeamlead();
+    return () => {
+      console.log("Avoid errors");
+    };
+  }, []);
 
-  const handleToogle = ()=>{
-    setToogleLead(!toogleLead)
-  }
+  const getAllData = () => {
+    axios
+      .get(`${serverUrl}/api/agent/all/?role=${selectedRole}`)
+      .then((res) => {
+        setData(res.data.data);
+      });
+  };
+
+  const handleToogle = () => {
+    setToogleLead(!toogleLead);
+  };
 
   useEffect(() => {
     getAllData();
@@ -61,6 +85,21 @@ const [selectedRole, setSelectedRole] = useState("Agent")
       console.log("Avoid errors");
     };
   }, [selectedRole]);
+
+  useEffect(()=>{
+    if (selectedTeamLead){
+      axios.post(`${serverUrl}/api/agent/team-lead/${selectedTeamLead}/assign-agents`,[selectedAgent])
+      .then((res)=>{
+        alert("Team lead assigned")
+      }).catch((err)=>{
+        console.log(err)
+        alert("Something went wrong")
+      })
+    }
+  },[selectedTeamLead])
+
+  console.log(selectedTeamLead,
+    selectedAgent)
 
   return (
     <div className="flex gap-5 ">
@@ -139,19 +178,21 @@ const [selectedRole, setSelectedRole] = useState("Agent")
                         </select>
                       </div>
                     </div>
-                    <div>
-                      {/* Slightly dark background for the pagination select */}
-                      <div className="rounded-md p-2">
-                        <select
-                          className="border px-2 py-2 rounded-md text-black"
-                          value={selectedRole}
-                          onChange={(e)=>setSelectedRole(e.target.value)}
-                        >
-                          <option value="Agent">Agent</option>
-                          <option value="Team Lead">Team lead</option>
-                        </select>
+                    {localStorage.getItem("userRole") == "Team Lead" ? null : (
+                      <div>
+                        {/* Slightly dark background for the pagination select */}
+                        <div className="rounded-md p-2">
+                          <select
+                            className="border px-2 py-2 rounded-md text-black"
+                            value={selectedRole}
+                            onChange={(e) => setSelectedRole(e.target.value)}
+                          >
+                            <option value="Agent">Agent</option>
+                            <option value="Team Lead">Team lead</option>
+                          </select>
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -167,6 +208,8 @@ const [selectedRole, setSelectedRole] = useState("Agent")
                   <th className="px-4 py-2">Name</th>
                   <th className="px-4 py-2">Email</th>
                   <th className="px-4 py-2">Phone</th>
+                  {localStorage.getItem("userRole") == "Team Lead" || localStorage.getItem("userRole") == "Agent" ? null : 
+                  <th className="px-4 py-2">Assign to a team lead</th>}
                   <th className="px-4 py-2"></th>
                   <th className="px-4 py-2"></th>
                 </tr>
@@ -180,6 +223,18 @@ const [selectedRole, setSelectedRole] = useState("Agent")
                     <td className="px-4 py-2">{user.name}</td>
                     <td className="px-4 py-2">{user.email}</td>
                     <td className="px-4 py-2">{user.phone}</td>
+                    {localStorage.getItem("userRole") == "Team Lead" || localStorage.getItem("userRole") == "Agent" ? null : 
+                    <td className="px-4 py-2">
+                      <select
+                        value={selectedTeamLead}
+                        onChange={(e) => {setSelectedTeamLead(e.target.value);setSelectedAgent(user._id)}}
+                      >
+                        <option value="">Select a team lead</option>
+                        {teamLeadAll?.map((el) => {
+                          return <option value={el._id}>{el.name}</option>;
+                        })}
+                      </select>
+                      </td>}
                     {/* <td className=" px-4 py-2">
                       {user.isTeamlead ? (
                         <div className="w-[80px] flex justify-start items-center gap-1 text-emerald-700 px-1 w-[60px] rounded-[50px] text-center mt-2 font-semibold text-xs">
@@ -228,7 +283,7 @@ const [selectedRole, setSelectedRole] = useState("Agent")
       <Addagents
         isOpen={isAddAgentsModal}
         onClose={() => setIsAddAgentsModal(false)}
-        getAllData= {getAllData}
+        getAllData={getAllData}
       />
     </div>
   );

@@ -51,8 +51,8 @@ const CreateItinerary = () => {
   const [searchTermInclusion, setSearchTermInclusion] = useState("");
 
   const [data, setData] = useState([]);
-  const [adultPrice, setAdultPrice] = useState(0); // Default adult price
-  const [childPrice, setChildPrice] = useState(0); // Default child price
+  const [adultPrice, setAdultPrice] = useState(""); // Default adult price
+  const [childPrice, setChildPrice] = useState(""); // Default child price
   const [priceDetails, setPriceDetails] = useState([]); // To store the formatted data
 
   // State to manage travel summaries per day
@@ -87,11 +87,15 @@ const CreateItinerary = () => {
 
   const geocodePlace = async () => {
     const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${searchTermHotel}&key=AIzaSyBSDhdL2tinLiAKRk7w9JhDAv5gAQXFMIk`;
-
+  
     try {
-      const response = await axios.get(geocodeUrl);
+      // Override withCredentials for this specific request
+      const response = await axios.get(geocodeUrl, {
+        withCredentials: false // Disable withCredentials for this request
+      });
+  
       const results = response.data.results;
-
+  
       if (results.length > 0) {
         const { lat, lng } = results[0].geometry.location;
         setLocation(`${lat},${lng}`);
@@ -315,8 +319,8 @@ const CreateItinerary = () => {
         checkOutDate: "",
         mealPlan: "",
         numberOfGuest: "",
-        roomType: ""
-      }
+        roomType: "",
+      },
     ]);
     resetSearchHotel(); // Reset search
   };
@@ -521,7 +525,8 @@ const CreateItinerary = () => {
   //inclusoon extra
 
   const handleFinalSubmit = () => {
-    console.log({
+    // Send the POST request with your itinerary data
+    axios.post(`${serverUrl}/api/quote/itenerary/generate`, {
       travelSummaryPerDay,
       activityPerDay,
       priceDetails,
@@ -529,8 +534,38 @@ const CreateItinerary = () => {
       selectedExclusions,
       selectedOtherInformation,
       selectedTransfers,
+      selectedInclusions
+    }, {
+      responseType: 'blob' // Important: To receive the PDF as binary data (Blob)
+    }).then((res) => {
+      // Create a new Blob object using the response data (PDF binary)
+      const file = new Blob([res.data], { type: 'application/pdf' });
+  
+      // Create a temporary URL for the Blob
+      const fileURL = URL.createObjectURL(file);
+  
+      // Create an anchor element and set the href to the file URL
+      const link = document.createElement('a');
+      link.href = fileURL;
+  
+      // Set the file name for the download
+      link.download = 'itinerary.pdf';
+  
+      // Append the link to the body
+      document.body.appendChild(link);
+  
+      // Programmatically trigger the click to start downloading the PDF
+      link.click();
+  
+      // Remove the link after downloading
+      document.body.removeChild(link);
+    }).catch((error) => {
+      console.error('Error generating the PDF:', error);
     });
   };
+  
+
+  
 
   // console.log(singleTransfer);
 
@@ -951,82 +986,99 @@ const CreateItinerary = () => {
                   </div>
                 )}
 
-{selectedCategory === "Hotel details" && (
-  <>
-    <div className="mt-5 mb-5 text-lg font-normal">Hotel details</div>
-    <div className="flex flex-col w-full gap-5 p-2">
-      {selectedHotel.map((hotel, index) => {
-        return (
-          <div key={index} className="flex justify-between gap-4">
-            <div className="w-[95%]">
-              {/* Hotel Info */}
-              <div>
-                <div className="font-semibold">{hotel?.name}</div>
-                <div>{hotel?.vicinity}</div>
-                <div>{hotel?.rating}</div>
-              </div>
+                {selectedCategory === "Hotel details" && (
+                  <>
+                    <div className="mt-5 mb-5 text-lg font-normal">
+                      Hotel details
+                    </div>
+                    <div className="flex flex-col w-full gap-5 p-2">
+                      {selectedHotel.map((hotel, index) => {
+                        return (
+                          <div
+                            key={index}
+                            className="flex justify-between gap-4"
+                          >
+                            <div className="w-[95%]">
+                              {/* Hotel Info */}
+                              <div>
+                                <div className="font-semibold">
+                                  {hotel?.name}
+                                </div>
+                                <div>{hotel?.vicinity}</div>
+                                <div>{hotel?.rating}</div>
+                              </div>
 
-              {/* Input Fields */}
-              <div className="w-[100%] border flex justify-between items-center gap-5">
-                <div className="w-[20%]">
-                  <Input
-                    label={`Check-in`}
-                    type="date"
-                    name="checkInDate"
-                    value={hotel.checkInDate}
-                    onChange={(e) => handleInputChangeHotel(e, index)}
-                  />
-                </div>
-                <div className="w-[20%]">
-                  <Input
-                    label={`Check-out`}
-                    name="checkOutDate"
-                    type="date"
-                    value={hotel.checkOutDate}
-                    onChange={(e) => handleInputChangeHotel(e, index)}
-                  />
-                </div>
-                <div className="w-[20%]">
-                  <Input
-                    label={`Meal plan`}
-                    name="mealPlan"
-                    value={hotel.mealPlan}
-                    onChange={(e) => handleInputChangeHotel(e, index)}
-                  />
-                </div>
-              </div>
+                              {/* Input Fields */}
+                              <div className="w-[100%] border flex justify-between items-center gap-5">
+                                <div className="w-[20%]">
+                                  <Input
+                                    label={`Check-in`}
+                                    type="date"
+                                    name="checkInDate"
+                                    value={hotel.checkInDate}
+                                    onChange={(e) =>
+                                      handleInputChangeHotel(e, index)
+                                    }
+                                  />
+                                </div>
+                                <div className="w-[20%]">
+                                  <Input
+                                    label={`Check-out`}
+                                    name="checkOutDate"
+                                    type="date"
+                                    value={hotel.checkOutDate}
+                                    onChange={(e) =>
+                                      handleInputChangeHotel(e, index)
+                                    }
+                                  />
+                                </div>
+                                <div className="w-[20%]">
+                                  <Input
+                                    label={`Meal plan`}
+                                    name="mealPlan"
+                                    value={hotel.mealPlan}
+                                    onChange={(e) =>
+                                      handleInputChangeHotel(e, index)
+                                    }
+                                  />
+                                </div>
+                              </div>
 
-              <div className="flex justify-between items-center">
-                <Input
-                  label={`No. of guest`}
-                  name="numberOfGuest"
-                  value={hotel.numberOfGuest}
-                  onChange={(e) => handleInputChangeHotel(e, index)}
-                />
-                <Input
-                  label={`Room type`}
-                  name="roomType"
-                  value={hotel.roomType}
-                  onChange={(e) => handleInputChangeHotel(e, index)}
-                />
-              </div>
-            </div>
+                              <div className="flex justify-between items-center">
+                                <Input
+                                  label={`No. of guest`}
+                                  name="numberOfGuest"
+                                  value={hotel.numberOfGuest}
+                                  onChange={(e) =>
+                                    handleInputChangeHotel(e, index)
+                                  }
+                                />
+                                <Input
+                                  label={`Room type`}
+                                  name="roomType"
+                                  value={hotel.roomType}
+                                  onChange={(e) =>
+                                    handleInputChangeHotel(e, index)
+                                  }
+                                />
+                              </div>
+                            </div>
 
-            {/* Remove Button */}
-            <div className="w-[5%]">
-              <button
-                className="text-main"
-                onClick={() => handleRemoveHotel(index)}
-              >
-                <IoMdClose size={20} />
-              </button>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  </>
-)}
+                            {/* Remove Button */}
+                            <div className="w-[5%]">
+                              <button
+                                className="text-main"
+                                onClick={() => handleRemoveHotel(index)}
+                              >
+                                <IoMdClose size={20} />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
 
                 {selectedCategory === "Inclusion" && (
                   <>
@@ -1390,57 +1442,66 @@ const CreateItinerary = () => {
                 </div>
               )}
 
-{selectedCategory === "Hotel details" && (
-  <div className="w-[30%] h-[400px] bg-gray-100 p-4 rounded-lg shadow-md flex flex-col">
-    <form onSubmit={handleSearchHotel} className="mb-4 flex justify-between items-center gap-2">
-      <div className="relative w-[85%]">
-        <Input
-          label="Search hotel"
-          className="w-full"
-          value={searchTermHotel}
-          onChange={(e) => setSearchTermHotel(e.target.value)}
-          required
-        />
-        {searchTermHotel && (
-          <button
-            type="button"
-            onClick={resetSearchHotel}
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-600"
-          >
-            &times;
-          </button>
-        )}
-      </div>
-      <button
-        type="submit"
-        className="w-[15%] bg-main px-2 py-2 text-xl text-white cursor-pointer rounded flex justify-center items-center"
-      >
-        <IoMdSearch />
-      </button>
-    </form>
+              {selectedCategory === "Hotel details" && (
+                <div className="w-[30%] h-[400px] bg-gray-100 p-4 rounded-lg shadow-md flex flex-col">
+                  <form
+                    onSubmit={handleSearchHotel}
+                    className="mb-4 flex justify-between items-center gap-2"
+                  >
+                    <div className="relative w-[85%]">
+                      <Input
+                        label="Search hotel"
+                        className="w-full"
+                        value={searchTermHotel}
+                        onChange={(e) => setSearchTermHotel(e.target.value)}
+                        required
+                      />
+                      {searchTermHotel && (
+                        <button
+                          type="button"
+                          onClick={resetSearchHotel}
+                          className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-600"
+                        >
+                          &times;
+                        </button>
+                      )}
+                    </div>
+                    <button
+                      type="submit"
+                      className="w-[15%] bg-main px-2 py-2 text-xl text-white cursor-pointer rounded flex justify-center items-center"
+                    >
+                      <IoMdSearch />
+                    </button>
+                  </form>
 
-    {/* Hotel List */}
-    <div className="flex-1 overflow-y-auto sidebar">
-      <List className="border-t border-gray-300">
-        {allHotel?.length > 0 ? (
-          allHotel.map((summary, index) => (
-            <div
-              key={index}
-              className="py-2 px-2 hover:bg-gray-200 transition-colors cursor-pointer"
-              onClick={() => handleSelectHotel(summary)}
-            >
-              <div className="font-bold">{summary.name}</div>
-              <div className="text-gray-600">{summary.vicinity}</div>
-              <div className="text-gray-600">{summary.rating}</div>
-            </div>
-          ))
-        ) : (
-          <div className="px-4 py-2 text-gray-600">No results found</div>
-        )}
-      </List>
-    </div>
-  </div>
-)}
+                  {/* Hotel List */}
+                  <div className="flex-1 overflow-y-auto sidebar">
+                    <List className="border-t border-gray-300">
+                      {allHotel?.length > 0 ? (
+                        allHotel.map((summary, index) => (
+                          <div
+                            key={index}
+                            className="py-2 px-2 hover:bg-gray-200 transition-colors cursor-pointer"
+                            onClick={() => handleSelectHotel(summary)}
+                          >
+                            <div className="font-bold">{summary.name}</div>
+                            <div className="text-gray-600">
+                              {summary.vicinity}
+                            </div>
+                            <div className="text-gray-600">
+                              {summary.rating}
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="px-4 py-2 text-gray-600">
+                          No results found
+                        </div>
+                      )}
+                    </List>
+                  </div>
+                </div>
+              )}
 
               {selectedCategory === "Inclusion" && (
                 <div className="w-[30%] h-[400px] bg-gray-100 p-4 rounded-lg shadow-md flex flex-col">
@@ -1501,6 +1562,21 @@ const CreateItinerary = () => {
                   </div>
                 </div>
               )}
+              {/* <div className="mt-4 p-4 border">
+    <h2 className="text-xl font-bold">Submitted Data</h2>
+    <pre className="whitespace-pre-wrap bg-gray-100 p-2 rounded">
+      {JSON.stringify({
+      travelSummaryPerDay,
+      activityPerDay,
+      priceDetails,
+      selectedHotel,
+      selectedExclusions,
+      selectedOtherInformation,
+      selectedTransfers,
+      selectedInclusions
+    }, null, 2)}
+    </pre>
+  </div> */}
             </div>
           </CardBody>
         </Card>

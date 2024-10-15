@@ -16,6 +16,7 @@ import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 import { serverUrl } from "../api";
 import axios from "axios";
 import Addtraveller from "../components/Addtraveller";
+axios.defaults.withCredentials=true;
 
 const data = [
   {
@@ -44,6 +45,7 @@ const Travellers = () => {
 
   const getAlldata = () => {
     axios.get(`${serverUrl}/api/traveller/all`).then((res) => {
+      console.log(res)
       setData(res.data.travellers);
     });
   };

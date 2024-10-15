@@ -88,7 +88,7 @@ const App = () => {
         <Route 
           path="/agent" 
           element={
-            <ProtectedRoute role={role} allowedRoles={['Admin']}>
+            <ProtectedRoute role={role} allowedRoles={['Admin',"Team Lead"]}>
               <Agents />
             </ProtectedRoute>
           } 
@@ -104,7 +104,7 @@ const App = () => {
         <Route 
           path="/quote" 
           element={
-            <ProtectedRoute role={role} allowedRoles={['Admin','Agent']}>
+            <ProtectedRoute role={role} allowedRoles={['Admin','Agent',"Team Lead"]}>
               <Quote />
             </ProtectedRoute>
           } 
@@ -122,7 +122,7 @@ const App = () => {
         <Route 
           path="/add-quote" 
           element={
-            <ProtectedRoute role={role} allowedRoles={['Agent', 'Admin']}>
+            <ProtectedRoute role={role} allowedRoles={['Agent', 'Admin',"Team Lead"]}>
               <AddQuote />
             </ProtectedRoute>
           } 
@@ -130,7 +130,7 @@ const App = () => {
         <Route 
           path="/quote-detail/:tripid" 
           element={
-            <ProtectedRoute role={role} allowedRoles={['Agent', 'Admin']}>
+            <ProtectedRoute role={role} allowedRoles={['Agent', 'Admin',"Team Lead"]}>
               <QuoteDetail />
             </ProtectedRoute>
           } 
@@ -138,7 +138,7 @@ const App = () => {
         <Route 
           path="/create-intinary/:tripid" 
           element={
-            <ProtectedRoute role={role} allowedRoles={['Agent', 'Admin']}>
+            <ProtectedRoute role={role} allowedRoles={['Agent', 'Admin',"Team Lead"]}>
               <CreateItinary />
             </ProtectedRoute>
           } 

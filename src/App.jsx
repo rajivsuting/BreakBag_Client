@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { AccordionProvider } from "./context/AccordionContext";
 import AllRoutes from "./routes/AllRoutes";
 import axios from "axios";
-import NearbyHotels from "./components/Hotel";
+
 
 function App() {
 //   const [place, setPlace] = useState(""); // Store user's place input

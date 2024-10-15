@@ -52,7 +52,7 @@ const Sidebar = () => {
       <List className="sidebar overflow-y-scroll h-[100vh]">
         {/* Dashboard Accordion */}
 
-        {localStorage.getItem("userRole") == "Agent" ? null :
+        {localStorage.getItem("userRole") == "Agent" || localStorage.getItem("userRole") == "Team Lead" ? null :
         <Accordion open={openAccordion.includes("dashboard")}>
           <ListItem
             className="p-0"
@@ -130,7 +130,7 @@ const Sidebar = () => {
         </Accordion> }
 
         {/* Itinerary Library Accordion */}
-        {localStorage.getItem("userRole") == "Agent" ? null :
+        {localStorage.getItem("userRole") == "Agent" || localStorage.getItem("userRole") == "Team Lead"  ? null :
         <Accordion open={openAccordion.includes("itinerary")}>
           <ListItem
             className="p-0"
@@ -263,6 +263,15 @@ const Sidebar = () => {
           </ListItem>
         </NavLink> : null}
 
+        {localStorage.getItem("userRole") == "Team Lead" ? <NavLink to={"/agent"}>
+          <ListItem className={isActive("/agent") ? "text-red-500" : ""}>
+            <ListItemPrefix>
+              <UserCircleIcon className="h-5 w-5" />
+            </ListItemPrefix>
+            Agents
+          </ListItem>
+        </NavLink> : null}
+
 
         <NavLink to={"/quote"}>
           <ListItem className={isActive("/quote") ? "text-red-500" : ""}>
@@ -272,14 +281,7 @@ const Sidebar = () => {
             Quote
           </ListItem>
         </NavLink>
-        <NavLink to={"/contact"}>
-          <ListItem className={isActive("/contact") ? "text-red-500" : ""}>
-            <ListItemPrefix>
-              <InboxIcon className="h-5 w-5" />
-            </ListItemPrefix>
-            Contact
-          </ListItem>
-        </NavLink>
+        
         <NavLink to={"/logout"}>
           <ListItem className={isActive("/logout") ? "text-red-500" : ""}>
             <ListItemPrefix>
