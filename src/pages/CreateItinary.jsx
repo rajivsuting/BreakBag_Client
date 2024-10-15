@@ -19,7 +19,7 @@ import { useParams } from "react-router-dom";
 import Select from "react-select";
 import { AiOutlineClose, AiOutlinePlus } from "react-icons/ai";
 import { FiInfo } from "react-icons/fi";
-import { IoMdSearch } from "react-icons/io";
+import { IoMdClose, IoMdSearch } from "react-icons/io";
 
 const CreateItinerary = () => {
   const { tripid } = useParams();
@@ -28,13 +28,20 @@ const CreateItinerary = () => {
   const [originalTravelData, setOriginalTravelData] = useState([]);
   const [allExclusion, setAllExclusion] = useState([]);
   const [originalExclusion, setOriginalExclusion] = useState([]);
-  const [singleExclusion, setSingleExclusion] = useState({});
+  const [selectedExclusions, setSelectedExclusions] = useState([]); // Array for multiple exclusions
+
   const [allTransfer, setAllTransfer] = useState([]);
   const [originalTransfer, setOriginalTransfer] = useState([]);
-  const [singleTransfer, setSingleTransfer] = useState({});
+  const [selectedTransfers, setSelectedTransfer] = useState([]);
+
   const [allOtherInformation, setAllOtherInformation] = useState([]);
   const [originalOtherInformation, setOriginalOtherInformation] = useState([]);
-  const [singleOtherInformation, setSingleOtherInformation] = useState({});
+  const [selectedOtherInformation, setSelectedOtherInformation] = useState([]);
+
+  const [allHotel, setAllHotel] = useState([]);
+  const [originalHotel, setOriginalHotel] = useState([]);
+  const [selectedHotel, setSelectedHotel] = useState([]);
+
   const [allActivityData, setAllActivityData] = useState([]);
   const [originalActivityData, setOriginalActivityData] = useState([]);
   const [data, setData] = useState([]);
@@ -61,11 +68,36 @@ const CreateItinerary = () => {
   const [searchTermTransfer, setSearchTermTransfer] = useState("");
   const [searchTermOtherInformation, setSearchTermOtherInformation] =
     useState("");
+  const [searchTermHotel, setSearchTermHotel] = useState("");
   const [searchTermActivity, setSearchTermActivity] = useState("");
 
   // State for active day (the one that is being edited/viewed)
   const [activeDay, setActiveDay] = useState(1);
   const [activeDayActivity, setActiveDayActivity] = useState(1);
+
+  // const [place, setPlace] = useState(""); // Store user's place input
+  const [location, setLocation] = useState(null); // Store geocoded location
+  const [error, setError] = useState(null); // Handle errors
+
+  const geocodePlace = async () => {
+    const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${searchTermHotel}&key=AIzaSyBSDhdL2tinLiAKRk7w9JhDAv5gAQXFMIk`;
+
+    try {
+      const response = await axios.get(geocodeUrl);
+      const results = response.data.results;
+
+      if (results.length > 0) {
+        const { lat, lng } = results[0].geometry.location;
+        setLocation(`${lat},${lng}`);
+      } else {
+        setError("Place not found");
+      }
+    } catch (error) {
+      setError("Error geocoding place");
+    }
+  };
+
+  console.log(location);
 
   // Add a new travel summary day
   const addTravelSummaryDay = () => {
@@ -187,6 +219,20 @@ const CreateItinerary = () => {
     });
   }, []);
 
+  useEffect(() => {
+    if (location) {
+      axios
+        .get(`${serverUrl}/hotels?location=${location}`)
+        .then((response) => {
+          setAllHotel(response.data);
+          setOriginalHotel(response.data);
+        })
+        .catch((error) => {
+          setError("Error fetching hotels");
+        });
+    }
+  }, [location]);
+
   const categories = [
     "Travel Summary",
     "Hotel details",
@@ -237,9 +283,38 @@ const CreateItinerary = () => {
       });
   };
 
+  const handleSelectExclusion = (exclusion) => {
+    setSelectedExclusions((prev) => [...prev, exclusion]); // Add to array
+    resetSearchExclusion(); // Reset search
+  };
+
+  const handleSearchHotel = (e) => {
+    e.preventDefault();
+    if (searchTermHotel) {
+      geocodePlace(); // Convert place to lat/lng before fetching hotels
+    } else {
+      setError("Please enter a place name");
+    }
+    // if (location) {
+    //   axios
+    //     .get(`${serverUrl}/hotels?location=${location}`)
+    //     .then((response) => {
+    //       console.log(response)
+    //       setAllHotel(response.data);
+    //     })
+    //     .catch((error) => {
+    //       setError("Error fetching hotels");
+    //     });
+    // }
+  };
+
+  const handleSelectHotel = (exclusion) => {
+    setSelectedHotel((prev) => [...prev, exclusion]); // Add to array
+    resetSearchHotel(); // Reset search
+  };
+
   const handleSearchTransfer = (e) => {
     e.preventDefault();
-
     axios
       .get(`${serverUrl}/api/transfer/search/?keywords=${searchTermTransfer}`)
       .then((res) => {
@@ -250,9 +325,13 @@ const CreateItinerary = () => {
       });
   };
 
+  const handleSelectTransfer = (transfer) => {
+    setSelectedTransfer((prev) => [...prev, transfer]);
+    resetSearchTransfer(); // Reset search
+  };
+
   const handleSearchOtherInformation = (e) => {
     e.preventDefault();
-
     axios
       .get(
         `${serverUrl}/api/other-information/search/?keywords=${searchTermOtherInformation}`
@@ -265,28 +344,61 @@ const CreateItinerary = () => {
       });
   };
 
-  const handleInputChangeExclusion = (e) => {
-    const { name, value } = e.target;
-    setSingleExclusion((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const handleSelectOtherinformation = (transfer) => {
+    setSelectedOtherInformation((prev) => [...prev, transfer]);
+    resetSearchOtherinformation(); // Reset search
   };
 
-  const handleInputChangeTransfer = (e) => {
+  const handleInputChangeExclusion = (e, index) => {
     const { name, value } = e.target;
-    setSingleTransfer((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setSelectedExclusions((prev) =>
+      prev.map((exclusion, i) =>
+        i === index ? { ...exclusion, [name]: value } : exclusion
+      )
+    );
   };
 
-  const handleInputChangeOtherinformation = (e) => {
+  const handleRemoveExclusion = (index) => {
+    setSelectedExclusions((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleInputChangehotel = (e, index) => {
     const { name, value } = e.target;
-    setSingleOtherInformation((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setSelectedHotel((prev) =>
+      prev.map((hotel, i) =>
+        i === index ? { ...hotel, [name]: value } : hotel
+      )
+    );
+  };
+
+  const handleRemovehotel = (index) => {
+    setSelectedHotel((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleInputChangeTransfer = (e, index) => {
+    const { name, value } = e.target;
+    setSelectedTransfer((prev) =>
+      prev.map((transfer, i) =>
+        i === index ? { ...transfer, [name]: value } : transfer
+      )
+    );
+  };
+
+  const handleRemoveTransfer = (index) => {
+    setSelectedTransfer((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleInputChangeOtherinformation = (e, index) => {
+    const { name, value } = e.target;
+    setSelectedOtherInformation((prev) =>
+      prev.map((other, i) =>
+        i === index ? { ...other, [name]: value } : other
+      )
+    );
+  };
+
+  const handleRemoveOther = (index) => {
+    setSelectedOtherInformation((prev) => prev.filter((_, i) => i !== index));
   };
 
   const resetSearch = () => {
@@ -300,7 +412,7 @@ const CreateItinerary = () => {
   };
 
   const resetSearchExclusion = () => {
-    setSearchTermExclusion(""); // Clear the search term
+    setSearchTermExclusion(""); // Clear search term
     setAllExclusion(originalExclusion); // Reset to original data
   };
 
@@ -312,6 +424,11 @@ const CreateItinerary = () => {
   const resetSearchOtherinformation = () => {
     setSearchTermOtherInformation(""); // Clear the search term
     setAllOtherInformation(originalOtherInformation); // Reset to original data
+  };
+
+  const resetSearchHotel = () => {
+    setSearchTermHotel(""); // Clear the search term
+    setAllTravelData(originalHotel); // Reset to original data
   };
 
   const handleCategoryClick = (category) => {
@@ -363,8 +480,9 @@ const CreateItinerary = () => {
       travelSummaryPerDay,
       activityPerDay,
       priceDetails,
-      singleExclusion,
-      singleOtherInformation,
+      selectedHotel,
+      selectedExclusions,
+      selectedOtherInformation,
       singleTransfer,
     });
   };
@@ -596,19 +714,39 @@ const CreateItinerary = () => {
                       Exclusion details
                     </div>
                     <div className="flex flex-col w-full gap-5 p-2">
-                      <Input
-                        label={`Title`}
-                        value={singleExclusion?.title}
-                        name="title"
-                        onChange={handleInputChangeExclusion}
-                      />
-                      <Textarea
-                        label={`Description`}
-                        name="description"
-                        value={singleExclusion?.description}
-                        className="min-h-[50px] h-auto w-full" // Adjusted to 100% width
-                        onChange={handleInputChangeExclusion}
-                      />
+                      {selectedExclusions.map((exclusion, index) => (
+                        <div key={index} className="flex justify-between gap-4">
+                          <div className="w-[95%]">
+                            <Input
+                              label={`Title ${index + 1}`}
+                              name="title"
+                              value={exclusion.title}
+                              onChange={(e) =>
+                                handleInputChangeExclusion(e, index)
+                              }
+                            />
+                            <div className="mt-5">
+                              <Textarea
+                                label={`Description ${index + 1}`}
+                                name="description"
+                                value={exclusion.description}
+                                onChange={(e) =>
+                                  handleInputChangeExclusion(e, index)
+                                }
+                                className="min-h-[50px] h-auto w-full "
+                              />
+                            </div>
+                          </div>
+                          <div className="w-[5%]">
+                            <button
+                              className=" text-main"
+                              onClick={() => handleRemoveExclusion(index)}
+                            >
+                              <IoMdClose size={20} />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </>
                 )}
@@ -619,19 +757,39 @@ const CreateItinerary = () => {
                       Transfer details
                     </div>
                     <div className="flex flex-col w-full gap-5 p-2">
-                      <Input
-                        label={`Title`}
-                        value={singleTransfer?.title}
-                        name="title"
-                        onChange={handleInputChangeTransfer}
-                      />
-                      <Textarea
-                        label={`Description`}
-                        name="description"
-                        value={singleTransfer?.description}
-                        className="min-h-[50px] h-auto w-full" // Adjusted to 100% width
-                        onChange={handleInputChangeTransfer}
-                      />
+                      {selectedTransfers.map((trnsfer, index) => (
+                        <div key={index} className="flex justify-between gap-4">
+                          <div className="w-[95%]">
+                            <Input
+                              label={`Title ${index + 1}`}
+                              value={trnsfer.title}
+                              name="title"
+                              onChange={(e) =>
+                                handleInputChangeTransfer(e, index)
+                              }
+                            />
+                            <div className="mt-5">
+                              <Textarea
+                                label={`Description ${index + 1}`}
+                                name="description"
+                                value={trnsfer.description}
+                                className="min-h-[50px] h-auto w-full" // Adjusted to 100% width
+                                onChange={(e) =>
+                                  handleInputChangeTransfer(e, index)
+                                }
+                              />
+                            </div>
+                          </div>
+                          <div className="w-[5%]">
+                            <button
+                              className=" text-main"
+                              onClick={() => handleRemoveTransfer(index)}
+                            >
+                              <IoMdClose size={20} />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </>
                 )}
@@ -642,19 +800,44 @@ const CreateItinerary = () => {
                       Other information details
                     </div>
                     <div className="flex flex-col w-full gap-5 p-2">
-                      <Input
-                        label={`Title`}
-                        value={singleOtherInformation?.title}
-                        name="title"
-                        onChange={handleInputChangeOtherinformation}
-                      />
-                      <Textarea
-                        label={`Description`}
-                        name="description"
-                        value={singleOtherInformation?.description}
-                        className="min-h-[50px] h-auto w-full" // Adjusted to 100% width
-                        onChange={handleInputChangeOtherinformation}
-                      />
+                      {selectedOtherInformation.map((other, index) => {
+                        return (
+                          <div
+                            key={index}
+                            className="flex justify-between gap-4"
+                          >
+                            <div className="w-[95%]">
+                              <Input
+                                label={`Title ${index + 1}`}
+                                value={other?.title}
+                                name="title"
+                                onChange={(e) =>
+                                  handleInputChangeOtherinformation(e, index)
+                                }
+                              />
+                              <div className="mt-5">
+                                <Textarea
+                                  label={`Description ${index + 1}`}
+                                  name="description"
+                                  value={other?.description}
+                                  className="min-h-[50px] h-auto w-full" // Adjusted to 100% width
+                                  onChange={(e) =>
+                                    handleInputChangeOtherinformation(e, index)
+                                  }
+                                />
+                              </div>
+                            </div>
+                            <div className="w-[5%]">
+                              <button
+                                className=" text-main"
+                                onClick={() => handleRemoveOther(index)}
+                              >
+                                <IoMdClose size={20} />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </>
                 )}
@@ -721,6 +904,70 @@ const CreateItinerary = () => {
                       </Button>
                     </div>
                   </div>
+                )}
+
+                {selectedCategory === "Hotel details" && (
+                  <>
+                    <div className="mt-5 mb-5 text-lg font-normal">
+                      Hotel details
+                    </div>
+                    <div className="flex flex-col w-full gap-5 p-2">
+                      {selectedHotel.map((hotel, index) => {
+                        return (
+                          <div
+                            key={index}
+                            className="flex justify-between gap-4"
+                          >
+                            <div className="w-[95%]">
+                              <div>
+                                <div>{hotel?.name}</div>
+                                <div>{hotel?.vicinity}</div>
+                                <div>{hotel?.rating}</div>
+                              </div>
+                              {/* <Input
+                                label={`Name ${index + 1}`}
+                                value={hotel?.name}
+                                name="name"
+                                onChange={(e) =>
+                                  handleInputChangehotel(e, index)
+                                }
+                              />
+                              <div className="mt-5">
+                                <Input
+                                  label={`Address ${index + 1}`}
+                                  name="vicinity"
+                                  value={hotel?.vicinity}
+                                  className="min-h-[50px] h-auto w-full" // Adjusted to 100% width
+                                  onChange={(e) =>
+                                    handleInputChangehotel(e, index)
+                                  }
+                                />
+                              </div>
+                              <div className="mt-5">
+                                <Input
+                                  label={`Rating ${index + 1}`}
+                                  name="rating"
+                                  value={hotel?.rating}
+                                  className="min-h-[50px] h-auto w-full" // Adjusted to 100% width
+                                  onChange={(e) =>
+                                    handleInputChangehotel(e, index)
+                                  }
+                                />
+                              </div> */}
+                            </div>
+                            <div className="w-[5%]">
+                              <button
+                                className=" text-main"
+                                onClick={() => handleRemovehotel(index)}
+                              >
+                                <IoMdClose size={20} />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </>
                 )}
               </div>
 
@@ -863,7 +1110,8 @@ const CreateItinerary = () => {
               )}
 
               {selectedCategory === "Exclusion" && (
-                <div className="w-[30%] h-[400px]  bg-gray-100 p-4 rounded-lg shadow-md flex flex-col">
+                <div className="w-[30%] h-[400px] bg-gray-100 p-4 rounded-lg shadow-md flex flex-col">
+                  {/* Search Form */}
                   <form
                     onSubmit={handleSearchExclusion}
                     className="mb-4 flex justify-between items-center gap-2"
@@ -883,7 +1131,7 @@ const CreateItinerary = () => {
                           onClick={resetSearchExclusion}
                           className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-600"
                         >
-                          &times;{" "}
+                          &times;
                         </button>
                       )}
                     </div>
@@ -895,6 +1143,7 @@ const CreateItinerary = () => {
                     </button>
                   </form>
 
+                  {/* Exclusion List */}
                   <div className="flex-1 overflow-y-auto sidebar">
                     <List className="border-t border-gray-300">
                       {allExclusion?.length > 0 ? (
@@ -902,10 +1151,7 @@ const CreateItinerary = () => {
                           <div
                             key={index}
                             className="py-2 px-2 hover:bg-gray-200 transition-colors cursor-pointer"
-                            onClick={() => {
-                              setSingleExclusion(summary);
-                              resetSearchExclusion();
-                            }}
+                            onClick={() => handleSelectExclusion(summary)} // Add to multiple selections
                           >
                             <div className="font-bold">{summary.title}</div>
                             <div className="text-gray-600">
@@ -963,10 +1209,7 @@ const CreateItinerary = () => {
                           <div
                             key={index}
                             className="py-2 px-2 hover:bg-gray-200 transition-colors cursor-pointer"
-                            onClick={() => {
-                              setSingleTransfer(summary);
-                              resetSearchTransfer();
-                            }}
+                            onClick={() => handleSelectTransfer(summary)}
                           >
                             <div className="font-bold">{summary.title}</div>
                             <div className="text-gray-600">
@@ -1026,14 +1269,74 @@ const CreateItinerary = () => {
                           <div
                             key={index}
                             className="py-2 px-2 hover:bg-gray-200 transition-colors cursor-pointer"
-                            onClick={() => {
-                              setSingleOtherInformation(summary);
-                              resetSearchOtherinformation();
-                            }}
+                            onClick={() =>
+                              handleSelectOtherinformation(summary)
+                            }
                           >
                             <div className="font-bold">{summary.title}</div>
                             <div className="text-gray-600">
                               {summary.description}
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="px-4 py-2 text-gray-600">
+                          No results found
+                        </div>
+                      )}
+                    </List>
+                  </div>
+                </div>
+              )}
+
+              {selectedCategory === "Hotel details" && (
+                <div className="w-[30%] h-[400px]  bg-gray-100 p-4 rounded-lg shadow-md flex flex-col">
+                  <form
+                    onSubmit={handleSearchHotel}
+                    className="mb-4 flex justify-between items-center gap-2"
+                  >
+                    <div className="relative w-[85%]">
+                      <Input
+                        label="Search hotel"
+                        className="w-full"
+                        value={searchTermHotel}
+                        onChange={(e) => setSearchTermHotel(e.target.value)}
+                        required
+                      />
+                      {/* Cross icon to clear the search */}
+                      {searchTermHotel && (
+                        <button
+                          type="button"
+                          onClick={resetSearchHotel}
+                          className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-600"
+                        >
+                          &times;{" "}
+                        </button>
+                      )}
+                    </div>
+                    <button
+                      type="submit"
+                      className="w-[15%] bg-main px-2 py-2 text-xl text-white cursor-pointer rounded flex justify-center items-center"
+                    >
+                      <IoMdSearch />
+                    </button>
+                  </form>
+
+                  <div className="flex-1 overflow-y-auto sidebar">
+                    <List className="border-t border-gray-300">
+                      {allHotel?.length > 0 ? (
+                        allHotel.map((summary, index) => (
+                          <div
+                            key={index}
+                            className="py-2 px-2 hover:bg-gray-200 transition-colors cursor-pointer"
+                            onClick={() => handleSelectHotel(summary)}
+                          >
+                            <div className="font-bold">{summary.name}</div>
+                            <div className="text-gray-600">
+                              {summary.vicinity}
+                            </div>
+                            <div className="text-gray-600">
+                              {summary.rating}
                             </div>
                           </div>
                         ))
