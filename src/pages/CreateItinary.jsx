@@ -44,6 +44,12 @@ const CreateItinerary = () => {
 
   const [allActivityData, setAllActivityData] = useState([]);
   const [originalActivityData, setOriginalActivityData] = useState([]);
+
+  const [allInclusion, setAllInclusion] = useState([]);
+  const [originalInclusion, setOriginalInclusion] = useState([]);
+  const [selectedInclusions, setSelectedInclusions] = useState([]);
+  const [searchTermInclusion, setSearchTermInclusion] = useState("");
+
   const [data, setData] = useState([]);
   const [adultPrice, setAdultPrice] = useState(0); // Default adult price
   const [childPrice, setChildPrice] = useState(0); // Default child price
@@ -96,8 +102,6 @@ const CreateItinerary = () => {
       setError("Error geocoding place");
     }
   };
-
-  console.log(location);
 
   // Add a new travel summary day
   const addTravelSummaryDay = () => {
@@ -205,6 +209,11 @@ const CreateItinerary = () => {
       setOriginalTransfer(res.data.data); // Store original data
     });
 
+    axios.get(`${serverUrl}/api/inclusion/inclusions/`).then((res) => {
+      setAllInclusion(res.data.data);
+      setOriginalInclusion(res.data.data); // Store original data
+    });
+
     axios
       .get(`${serverUrl}/api/other-information/other-information/`)
       .then((res) => {
@@ -295,21 +304,20 @@ const CreateItinerary = () => {
     } else {
       setError("Please enter a place name");
     }
-    // if (location) {
-    //   axios
-    //     .get(`${serverUrl}/hotels?location=${location}`)
-    //     .then((response) => {
-    //       console.log(response)
-    //       setAllHotel(response.data);
-    //     })
-    //     .catch((error) => {
-    //       setError("Error fetching hotels");
-    //     });
-    // }
   };
 
-  const handleSelectHotel = (exclusion) => {
-    setSelectedHotel((prev) => [...prev, exclusion]); // Add to array
+  const handleSelectHotel = (hotel) => {
+    setSelectedHotel((prev) => [
+      ...prev,
+      {
+        ...hotel, // Add hotel details (name, vicinity, rating)
+        checkInDate: "", // Initialize input fields
+        checkOutDate: "",
+        mealPlan: "",
+        numberOfGuest: "",
+        roomType: ""
+      }
+    ]);
     resetSearchHotel(); // Reset search
   };
 
@@ -362,7 +370,7 @@ const CreateItinerary = () => {
     setSelectedExclusions((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleInputChangehotel = (e, index) => {
+  const handleInputChangeHotel = (e, index) => {
     const { name, value } = e.target;
     setSelectedHotel((prev) =>
       prev.map((hotel, i) =>
@@ -371,7 +379,7 @@ const CreateItinerary = () => {
     );
   };
 
-  const handleRemovehotel = (index) => {
+  const handleRemoveHotel = (index) => {
     setSelectedHotel((prev) => prev.filter((_, i) => i !== index));
   };
 
@@ -428,7 +436,7 @@ const CreateItinerary = () => {
 
   const resetSearchHotel = () => {
     setSearchTermHotel(""); // Clear the search term
-    setAllTravelData(originalHotel); // Reset to original data
+    setAllHotel(originalHotel); // Reset to original data
   };
 
   const handleCategoryClick = (category) => {
@@ -475,6 +483,43 @@ const CreateItinerary = () => {
   useEffect(() => {
     updatePriceDetails();
   }, [adultPrice, childPrice, data]);
+
+  // inclusion extra --------------
+
+  const handleSearchInclusion = (e) => {
+    e.preventDefault();
+    axios
+      .get(`${serverUrl}/api/inclusion/search/?keywords=${searchTermInclusion}`)
+      .then((res) => {
+        setAllInclusion(res.data.data);
+      })
+      .catch((err) => {
+        alert(err.response.data.message);
+      });
+  };
+
+  const handleSelectInclusion = (inclusion) => {
+    setSelectedInclusions((prev) => [...prev, inclusion]); // Add to array
+    resetSearchInclusion(); // Reset search
+  };
+  const handleInputChangeInclusion = (e, index) => {
+    const { name, value } = e.target;
+    setSelectedInclusions((prev) =>
+      prev.map((inclusion, i) =>
+        i === index ? { ...inclusion, [name]: value } : inclusion
+      )
+    );
+  };
+  const handleRemoveInclusion = (index) => {
+    setSelectedInclusions((prev) => prev.filter((_, i) => i !== index));
+  };
+  const resetSearchInclusion = () => {
+    setSearchTermInclusion(""); // Clear search term
+    setAllInclusion(originalInclusion); // Reset to original data
+  };
+
+  //inclusoon extra
+
   const handleFinalSubmit = () => {
     console.log({
       travelSummaryPerDay,
@@ -483,7 +528,7 @@ const CreateItinerary = () => {
       selectedHotel,
       selectedExclusions,
       selectedOtherInformation,
-      singleTransfer,
+      selectedTransfers,
     });
   };
 
@@ -906,66 +951,122 @@ const CreateItinerary = () => {
                   </div>
                 )}
 
-                {selectedCategory === "Hotel details" && (
+{selectedCategory === "Hotel details" && (
+  <>
+    <div className="mt-5 mb-5 text-lg font-normal">Hotel details</div>
+    <div className="flex flex-col w-full gap-5 p-2">
+      {selectedHotel.map((hotel, index) => {
+        return (
+          <div key={index} className="flex justify-between gap-4">
+            <div className="w-[95%]">
+              {/* Hotel Info */}
+              <div>
+                <div className="font-semibold">{hotel?.name}</div>
+                <div>{hotel?.vicinity}</div>
+                <div>{hotel?.rating}</div>
+              </div>
+
+              {/* Input Fields */}
+              <div className="w-[100%] border flex justify-between items-center gap-5">
+                <div className="w-[20%]">
+                  <Input
+                    label={`Check-in`}
+                    type="date"
+                    name="checkInDate"
+                    value={hotel.checkInDate}
+                    onChange={(e) => handleInputChangeHotel(e, index)}
+                  />
+                </div>
+                <div className="w-[20%]">
+                  <Input
+                    label={`Check-out`}
+                    name="checkOutDate"
+                    type="date"
+                    value={hotel.checkOutDate}
+                    onChange={(e) => handleInputChangeHotel(e, index)}
+                  />
+                </div>
+                <div className="w-[20%]">
+                  <Input
+                    label={`Meal plan`}
+                    name="mealPlan"
+                    value={hotel.mealPlan}
+                    onChange={(e) => handleInputChangeHotel(e, index)}
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center">
+                <Input
+                  label={`No. of guest`}
+                  name="numberOfGuest"
+                  value={hotel.numberOfGuest}
+                  onChange={(e) => handleInputChangeHotel(e, index)}
+                />
+                <Input
+                  label={`Room type`}
+                  name="roomType"
+                  value={hotel.roomType}
+                  onChange={(e) => handleInputChangeHotel(e, index)}
+                />
+              </div>
+            </div>
+
+            {/* Remove Button */}
+            <div className="w-[5%]">
+              <button
+                className="text-main"
+                onClick={() => handleRemoveHotel(index)}
+              >
+                <IoMdClose size={20} />
+              </button>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </>
+)}
+
+                {selectedCategory === "Inclusion" && (
                   <>
                     <div className="mt-5 mb-5 text-lg font-normal">
-                      Hotel details
+                      Inclusion details
                     </div>
                     <div className="flex flex-col w-full gap-5 p-2">
-                      {selectedHotel.map((hotel, index) => {
-                        return (
-                          <div
-                            key={index}
-                            className="flex justify-between gap-4"
-                          >
-                            <div className="w-[95%]">
-                              <div>
-                                <div>{hotel?.name}</div>
-                                <div>{hotel?.vicinity}</div>
-                                <div>{hotel?.rating}</div>
-                              </div>
-                              {/* <Input
-                                label={`Name ${index + 1}`}
-                                value={hotel?.name}
-                                name="name"
+                      {selectedInclusions.map((inclusion, index) => (
+                        <div key={index} className="flex justify-between gap-4">
+                          <div className="w-[95%]">
+                            <Input
+                              label={`Title ${index + 1}`}
+                              name="title"
+                              value={inclusion.title}
+                              onChange={(e) =>
+                                handleInputChangeInclusion(e, index)
+                              }
+                            />
+                            <div className="mt-5">
+                              <Textarea
+                                label={`Description ${index + 1}`}
+                                name="description"
+                                value={inclusion.description}
                                 onChange={(e) =>
-                                  handleInputChangehotel(e, index)
+                                  handleInputChangeInclusion(e, index)
                                 }
+                                className="min-h-[50px] h-auto w-full "
                               />
-                              <div className="mt-5">
-                                <Input
-                                  label={`Address ${index + 1}`}
-                                  name="vicinity"
-                                  value={hotel?.vicinity}
-                                  className="min-h-[50px] h-auto w-full" // Adjusted to 100% width
-                                  onChange={(e) =>
-                                    handleInputChangehotel(e, index)
-                                  }
-                                />
-                              </div>
-                              <div className="mt-5">
-                                <Input
-                                  label={`Rating ${index + 1}`}
-                                  name="rating"
-                                  value={hotel?.rating}
-                                  className="min-h-[50px] h-auto w-full" // Adjusted to 100% width
-                                  onChange={(e) =>
-                                    handleInputChangehotel(e, index)
-                                  }
-                                />
-                              </div> */}
-                            </div>
-                            <div className="w-[5%]">
-                              <button
-                                className=" text-main"
-                                onClick={() => handleRemovehotel(index)}
-                              >
-                                <IoMdClose size={20} />
-                              </button>
                             </div>
                           </div>
-                        );
-                      })}
+                          <div className="w-[5%]">
+                            <button
+                              className=" text-main"
+                              onClick={() => handleRemoveInclusion(index)}
+                            >
+                              <IoMdClose size={20} />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </>
                 )}
@@ -1289,28 +1390,81 @@ const CreateItinerary = () => {
                 </div>
               )}
 
-              {selectedCategory === "Hotel details" && (
-                <div className="w-[30%] h-[400px]  bg-gray-100 p-4 rounded-lg shadow-md flex flex-col">
+{selectedCategory === "Hotel details" && (
+  <div className="w-[30%] h-[400px] bg-gray-100 p-4 rounded-lg shadow-md flex flex-col">
+    <form onSubmit={handleSearchHotel} className="mb-4 flex justify-between items-center gap-2">
+      <div className="relative w-[85%]">
+        <Input
+          label="Search hotel"
+          className="w-full"
+          value={searchTermHotel}
+          onChange={(e) => setSearchTermHotel(e.target.value)}
+          required
+        />
+        {searchTermHotel && (
+          <button
+            type="button"
+            onClick={resetSearchHotel}
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-600"
+          >
+            &times;
+          </button>
+        )}
+      </div>
+      <button
+        type="submit"
+        className="w-[15%] bg-main px-2 py-2 text-xl text-white cursor-pointer rounded flex justify-center items-center"
+      >
+        <IoMdSearch />
+      </button>
+    </form>
+
+    {/* Hotel List */}
+    <div className="flex-1 overflow-y-auto sidebar">
+      <List className="border-t border-gray-300">
+        {allHotel?.length > 0 ? (
+          allHotel.map((summary, index) => (
+            <div
+              key={index}
+              className="py-2 px-2 hover:bg-gray-200 transition-colors cursor-pointer"
+              onClick={() => handleSelectHotel(summary)}
+            >
+              <div className="font-bold">{summary.name}</div>
+              <div className="text-gray-600">{summary.vicinity}</div>
+              <div className="text-gray-600">{summary.rating}</div>
+            </div>
+          ))
+        ) : (
+          <div className="px-4 py-2 text-gray-600">No results found</div>
+        )}
+      </List>
+    </div>
+  </div>
+)}
+
+              {selectedCategory === "Inclusion" && (
+                <div className="w-[30%] h-[400px] bg-gray-100 p-4 rounded-lg shadow-md flex flex-col">
+                  {/* Search Form */}
                   <form
-                    onSubmit={handleSearchHotel}
+                    onSubmit={handleSearchInclusion}
                     className="mb-4 flex justify-between items-center gap-2"
                   >
                     <div className="relative w-[85%]">
                       <Input
-                        label="Search hotel"
+                        label="Search inclusions"
                         className="w-full"
-                        value={searchTermHotel}
-                        onChange={(e) => setSearchTermHotel(e.target.value)}
+                        value={searchTermInclusion}
+                        onChange={(e) => setSearchTermInclusion(e.target.value)}
                         required
                       />
                       {/* Cross icon to clear the search */}
-                      {searchTermHotel && (
+                      {searchTermInclusion && (
                         <button
                           type="button"
-                          onClick={resetSearchHotel}
+                          onClick={resetSearchInclusion}
                           className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-600"
                         >
-                          &times;{" "}
+                          &times;
                         </button>
                       )}
                     </div>
@@ -1322,21 +1476,19 @@ const CreateItinerary = () => {
                     </button>
                   </form>
 
+                  {/* Inclusion List */}
                   <div className="flex-1 overflow-y-auto sidebar">
                     <List className="border-t border-gray-300">
-                      {allHotel?.length > 0 ? (
-                        allHotel.map((summary, index) => (
+                      {allInclusion?.length > 0 ? (
+                        allInclusion.map((summary, index) => (
                           <div
                             key={index}
                             className="py-2 px-2 hover:bg-gray-200 transition-colors cursor-pointer"
-                            onClick={() => handleSelectHotel(summary)}
+                            onClick={() => handleSelectInclusion(summary)} // Add to multiple selections
                           >
-                            <div className="font-bold">{summary.name}</div>
+                            <div className="font-bold">{summary.title}</div>
                             <div className="text-gray-600">
-                              {summary.vicinity}
-                            </div>
-                            <div className="text-gray-600">
-                              {summary.rating}
+                              {summary.description}
                             </div>
                           </div>
                         ))

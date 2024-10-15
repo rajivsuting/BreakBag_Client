@@ -44,8 +44,9 @@ const Agents = () => {
   const [isAddAgentsModal, setIsAddAgentsModal] = useState(false);
   const [data, setData] = useState([]);
 const [toogleLead, setToogleLead] = useState(false)
+const [selectedRole, setSelectedRole] = useState("Agent")
   const getAllData = () => {
-    axios.get(`${serverUrl}/api/agent/all`).then((res) => {
+    axios.get(`${serverUrl}/api/agent/all/?role=${selectedRole}`).then((res) => {
       setData(res.data.data);
     });
   };
@@ -59,7 +60,7 @@ const [toogleLead, setToogleLead] = useState(false)
     return () => {
       console.log("Avoid errors");
     };
-  }, [toogleLead]);
+  }, [selectedRole]);
 
   return (
     <div className="flex gap-5 ">
@@ -138,6 +139,19 @@ const [toogleLead, setToogleLead] = useState(false)
                         </select>
                       </div>
                     </div>
+                    <div>
+                      {/* Slightly dark background for the pagination select */}
+                      <div className="rounded-md p-2">
+                        <select
+                          className="border px-2 py-2 rounded-md text-black"
+                          value={selectedRole}
+                          onChange={(e)=>setSelectedRole(e.target.value)}
+                        >
+                          <option value="Agent">Agent</option>
+                          <option value="Team Lead">Team lead</option>
+                        </select>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -153,7 +167,6 @@ const [toogleLead, setToogleLead] = useState(false)
                   <th className="px-4 py-2">Name</th>
                   <th className="px-4 py-2">Email</th>
                   <th className="px-4 py-2">Phone</th>
-   
                   <th className="px-4 py-2"></th>
                   <th className="px-4 py-2"></th>
                 </tr>

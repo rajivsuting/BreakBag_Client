@@ -101,19 +101,10 @@ const Sidebar = () => {
                   <ListItemPrefix>
                     <MdChevronLeft className="h-5 w-5" />
                   </ListItemPrefix>
-                  Agents
+                  Agents & Team leads
                 </ListItem>
               </NavLink>
-              <NavLink to={"/team-lead"}>
-                <ListItem
-                  className={isActive("/travellers") ? "text-red-500" : ""}
-                >
-                  <ListItemPrefix>
-                    <MdChevronLeft className="h-5 w-5" />
-                  </ListItemPrefix>
-                  Team lead
-                </ListItem>
-              </NavLink>
+              
               <NavLink to={"/destination"}>
                 <ListItem
                   className={isActive("/destination") ? "text-red-500" : ""}

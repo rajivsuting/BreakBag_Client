@@ -207,12 +207,6 @@ const AddActivities = ({ isOpen, onClose, getAlldata }) => {
                         onClick={handleAddDescription}
                       />
                     </div>
-                    // <Button
-                    //   className="bg-green-500"
-                    //   onClick={handleAddDescription}
-                    // >
-                    //   Add More Description
-                    // </Button>
                   )}
                 </div>
               ))}

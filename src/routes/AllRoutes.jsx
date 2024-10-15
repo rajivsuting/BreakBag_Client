@@ -27,12 +27,7 @@ const App = () => {
       <Routes>
         {/* Public Route */}
         <Route path="/signin" element={<SignIn />} />
-        <Route 
-          path="/team-lead" 
-          element={
-            <TeamLead />
-          } 
-        />
+        
         {/* Admin Routes */}
         <Route 
           path="/" 
