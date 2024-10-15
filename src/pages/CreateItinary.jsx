@@ -35,6 +35,8 @@ const CreateItinerary = () => {
   const [allOtherInformation, setAllOtherInformation] = useState([]);
   const [originalOtherInformation, setOriginalOtherInformation] = useState([]);
   const [singleOtherInformation, setSingleOtherInformation] = useState({});
+  const [allActivityData, setAllActivityData] = useState([]);
+  const [originalActivityData, setOriginalActivityData] = useState([]);
   const [data, setData] = useState([]);
   const [adultPrice, setAdultPrice] = useState(0); // Default adult price
   const [childPrice, setChildPrice] = useState(0); // Default child price
@@ -45,14 +47,25 @@ const CreateItinerary = () => {
     { day: 1, summaryDetails: { title: "", description: "" }, isSaved: false },
   ]);
 
+  const [activityPerDay, setActivityPerDay] = useState([
+    {
+      day: 1,
+      summaryDetails: { title: "", description: [""] },
+      isSaved: false,
+    },
+  ]);
+
   // State for managing search
   const [searchTerm, setSearchTerm] = useState("");
   const [searchTermExclusion, setSearchTermExclusion] = useState("");
   const [searchTermTransfer, setSearchTermTransfer] = useState("");
-  const [searchTermOtherInformation, setSearchTermOtherInformation] = useState("");
+  const [searchTermOtherInformation, setSearchTermOtherInformation] =
+    useState("");
+  const [searchTermActivity, setSearchTermActivity] = useState("");
 
   // State for active day (the one that is being edited/viewed)
   const [activeDay, setActiveDay] = useState(1);
+  const [activeDayActivity, setActiveDayActivity] = useState(1);
 
   // Add a new travel summary day
   const addTravelSummaryDay = () => {
@@ -68,12 +81,39 @@ const CreateItinerary = () => {
     setActiveDay(newDay);
   };
 
+  const addActivityDay = () => {
+    const newDay = activityPerDay.length + 1;
+    setActivityPerDay([
+      ...activityPerDay,
+      {
+        day: newDay,
+        summaryDetails: { title: "", description: [""] },
+        isSaved: false,
+      },
+    ]);
+    setActiveDayActivity(newDay);
+  };
+
   // Handle selecting a travel summary from the list
   const handleSelectSummary = (summary) => {
     const updatedSummaries = [...travelSummaryPerDay];
     const dayIndex = activeDay - 1; // Correct day index for updating the specific day
     updatedSummaries[dayIndex].summaryDetails = summary;
     setTravelSummaryPerDay(updatedSummaries);
+  };
+
+  const handleSelectActivity = (summary) => {
+    const updatedActivities = [...activityPerDay];
+    const dayIndex = activeDayActivity - 1; // Get current active day
+
+    // Update the selected day's summary with the new summary from the API
+    updatedActivities[dayIndex].summaryDetails = {
+      ...updatedActivities[dayIndex].summaryDetails,
+      title: summary.title,
+      description: summary.description, // Array of descriptions
+    };
+
+    setActivityPerDay(updatedActivities);
   };
 
   const deleteTravelSummaryDay = (dayIndex) => {
@@ -91,6 +131,25 @@ const CreateItinerary = () => {
 
     // Set the active day to a valid day after deletion, default to day 1
     setActiveDay(reindexedSummaries.length > 0 ? reindexedSummaries[0].day : 1);
+  };
+
+  const deleteActivityDay = (dayIndex) => {
+    const updatedActivity = activityPerDay.filter(
+      (summary, index) => index !== dayIndex
+    );
+
+    // Update the day values for each remaining summary
+    const reindexedActivities = updatedActivity.map((summary, index) => ({
+      ...summary,
+      day: index + 1, // Reassign day number sequentially
+    }));
+
+    setActivityPerDay(reindexedActivities);
+
+    // Set the active day to a valid day after deletion, default to day 1
+    setActiveDay(
+      reindexedActivities.length > 0 ? reindexedActivities[0].day : 1
+    );
   };
 
   useEffect(() => {
@@ -114,10 +173,17 @@ const CreateItinerary = () => {
       setOriginalTransfer(res.data.data); // Store original data
     });
 
-    axios.get(`${serverUrl}/api/other-information/other-information/`).then((res) => {
-      // console.log(res)
-      setAllOtherInformation(res.data.data);
-      setOriginalOtherInformation(res.data.data); // Store original data
+    axios
+      .get(`${serverUrl}/api/other-information/other-information/`)
+      .then((res) => {
+        // console.log(res)
+        setAllOtherInformation(res.data.data);
+        setOriginalOtherInformation(res.data.data); // Store original data
+      });
+
+    axios.get(`${serverUrl}/api/activity/all`).then((res) => {
+      setAllActivityData(res.data.data);
+      setOriginalActivityData(res.data.data); // Store original data
     });
   }, []);
 
@@ -146,9 +212,21 @@ const CreateItinerary = () => {
       });
   };
 
+  const handleSearchActivity = (e) => {
+    e.preventDefault();
+    axios
+      .get(`${serverUrl}/api/activity/search/?keyword=${searchTermActivity}`)
+      .then((res) => {
+        console.log(res);
+        setAllActivityData(res.data.data);
+      })
+      .catch((err) => {
+        alert(err.response.data.message);
+      });
+  };
+
   const handleSearchExclusion = (e) => {
     e.preventDefault();
-
     axios
       .get(`${serverUrl}/api/exclusion/search/?keywords=${searchTermExclusion}`)
       .then((res) => {
@@ -176,7 +254,9 @@ const CreateItinerary = () => {
     e.preventDefault();
 
     axios
-      .get(`${serverUrl}/api/other-information/search/?keywords=${searchTermOtherInformation}`)
+      .get(
+        `${serverUrl}/api/other-information/search/?keywords=${searchTermOtherInformation}`
+      )
       .then((res) => {
         setAllOtherInformation(res.data.data);
       })
@@ -214,6 +294,11 @@ const CreateItinerary = () => {
     setAllTravelData(originalTravelData); // Reset to original data
   };
 
+  const resetSearchActivity = () => {
+    setSearchTermActivity(""); // Clear the search term
+    setAllActivityData(originalActivityData); // Reset to original data
+  };
+
   const resetSearchExclusion = () => {
     setSearchTermExclusion(""); // Clear the search term
     setAllExclusion(originalExclusion); // Reset to original data
@@ -223,7 +308,6 @@ const CreateItinerary = () => {
     setSearchTermTransfer(""); // Clear the search term
     setAllTransfer(originalTransfer); // Reset to original data
   };
-
 
   const resetSearchOtherinformation = () => {
     setSearchTermOtherInformation(""); // Clear the search term
@@ -275,18 +359,17 @@ const CreateItinerary = () => {
     updatePriceDetails();
   }, [adultPrice, childPrice, data]);
   const handleFinalSubmit = () => {
-    // console.log({
-    //   travelSummaryPerDay,
-    //   activityPerDay,
-    //   otherinformation,
-    //   priceDetails,
-    //   inclusionAll,
-    //   exclusionAll,
-    //   transfer,
-    // });
+    console.log({
+      travelSummaryPerDay,
+      activityPerDay,
+      priceDetails,
+      singleExclusion,
+      singleOtherInformation,
+      singleTransfer,
+    });
   };
 
-  console.log(singleTransfer)
+  // console.log(singleTransfer);
 
   return (
     <div className="flex gap-5">
@@ -325,7 +408,13 @@ const CreateItinerary = () => {
                   </div>
                 ))}
               </div>
-              <div className="w-[50%] bg-white p-4 rounded-lg col-span-2">
+              <div
+                className={`${
+                  selectedCategory === "Cost (Adult, child)"
+                    ? "w-[80%]"
+                    : "w-[50%]"
+                }  bg-white p-4 rounded-lg col-span-2`}
+              >
                 {selectedCategory === "Travel Summary" && (
                   <>
                     <div className="flex justify-between bg-white rounded-lg gap-5">
@@ -410,6 +499,97 @@ const CreateItinerary = () => {
                   </>
                 )}
 
+                {selectedCategory === "Activity" && (
+                  <>
+                    <div className="flex justify-between bg-white rounded-lg gap-5">
+                      <div className="w-[90%] grid grid-cols-5 gap-2 border-gray-300">
+                        {activityPerDay?.map((daySummary, index) => (
+                          <div
+                            key={index}
+                            className={`w-[80px] h-[30px] flex justify-between items-center rounded cursor-pointer text-center py-1 px-2 text-sm ${
+                              activeDayActivity === daySummary.day
+                                ? "border border-main bg-main text-white"
+                                : "border border-main text-main"
+                            }`}
+                            onClick={() => setActiveDayActivity(daySummary.day)}
+                          >
+                            Day {daySummary.day}{" "}
+                            <AiOutlineClose
+                              className={`cursor-pointer text-sm hover:bg-main hover:text-white rounded-[50%] p-1 ${
+                                activeDayActivity === daySummary.day
+                                  ? "text-white"
+                                  : "text-main"
+                              }`}
+                              size={16}
+                              onClick={() => deleteActivityDay(index)}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                      <div className="w-[5%] relative group">
+                        <AiOutlinePlus
+                          className="cursor-pointer text-green-500 hover:bg-green-500 hover:text-white rounded-[50%] p-1 "
+                          size={24}
+                          onClick={addActivityDay}
+                        />
+
+                        <ul className="w-[150px] absolute right-0 shadow text-center hidden bg-white border rounded p-2 text-gray-700 group-hover:block z-10">
+                          <li className="flex justify-center items-center gap-2 w-full text-xs font-semibold">
+                            <FiInfo className="font-bold" /> Add new date
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    {activityPerDay.map((daySummary, index) =>
+                      activeDayActivity === daySummary.day ? (
+                        <div key={index} className="mb-4">
+                          <div className="mt-5 mb-5 text-lg font-normal">
+                            Day {daySummary.day}
+                          </div>
+
+                          <div className="flex flex-col gap-4 mt-4">
+                            {/* Title Input */}
+                            <Input
+                              label={`Title`}
+                              value={daySummary.summaryDetails.title}
+                              placeholder="Edit travel summary title"
+                              onChange={(e) => {
+                                const updatedSummaries = [...activityPerDay];
+                                updatedSummaries[index].summaryDetails.title =
+                                  e.target.value;
+                                setActivityPerDay(updatedSummaries);
+                              }}
+                            />
+
+                            {/* Dynamically Render Input Boxes for Each Description */}
+                            {daySummary.summaryDetails.description.map(
+                              (desc, descIndex) => (
+                                <Textarea
+                                  key={descIndex}
+                                  label={`Description ${descIndex + 1}`}
+                                  value={desc}
+                                  className="min-h-[50px] h-auto"
+                                  onChange={(e) => {
+                                    const updatedSummaries = [
+                                      ...activityPerDay,
+                                    ];
+                                    updatedSummaries[
+                                      index
+                                    ].summaryDetails.description[descIndex] =
+                                      e.target.value; // Update specific description
+                                    setActivityPerDay(updatedSummaries);
+                                  }}
+                                />
+                              )
+                            )}
+                          </div>
+                        </div>
+                      ) : null
+                    )}
+                  </>
+                )}
+
                 {selectedCategory === "Exclusion" && (
                   <>
                     <div className="mt-5 mb-5 text-lg font-normal">
@@ -456,8 +636,7 @@ const CreateItinerary = () => {
                   </>
                 )}
 
-
-{selectedCategory === "Other Information" && (
+                {selectedCategory === "Other Information" && (
                   <>
                     <div className="mt-5 mb-5 text-lg font-normal">
                       Other information details
@@ -479,9 +658,71 @@ const CreateItinerary = () => {
                     </div>
                   </>
                 )}
-              </div>
 
-              
+                {selectedCategory === "Cost (Adult, child)" && (
+                  <div className="mt-2 mb-2 text-lg font-normal">
+                    Cost (Adult, child) details
+                    <div className="p-5">
+                      <h2 className="text-lg font-bold mb-4">
+                        {
+                          data?.travellers?.filter(
+                            (el) => el.userType === "Adult"
+                          )?.length
+                        }{" "}
+                        Adults and{" "}
+                        {
+                          data?.travellers?.filter(
+                            (el) => el.userType === "Child"
+                          )?.length
+                        }{" "}
+                        Child
+                      </h2>
+
+                      <div className="flex justify-between items-center mb-2 gap-5">
+                        <label className="w-[50%] block mb-2">
+                          Adult Price:
+                        </label>
+                        <label className="w-[50%] block mb-2">
+                          Child Price:
+                        </label>
+                      </div>
+
+                      <div className="flex justify-between items-center mb-2 gap-5">
+                        <Input
+                          type="number"
+                          value={adultPrice}
+                          onChange={(e) =>
+                            setAdultPrice(Number(e.target.value))
+                          }
+                          placeholder="Set adult price"
+                        />
+                        <Input
+                          type="number"
+                          value={childPrice}
+                          onChange={(e) =>
+                            setChildPrice(Number(e.target.value))
+                          }
+                          placeholder="Set child price"
+                        />
+                      </div>
+
+                      <div className="border border-gray-300 p-4 rounded-md mt-4">
+                        <h3 className="font-semibold">Total Cost:</h3>
+                        <p className="text-xl font-bold">
+                          Rs. {calculateTotal()}
+                        </p>
+                      </div>
+
+                      <Button
+                        className="bg-main m-auto mt-5"
+                        onClick={handleFinalSubmit}
+                      >
+                        Final Submit
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {selectedCategory === "Travel Summary" && (
                 <div className="w-[30%] h-[400px]  bg-gray-100 p-4 rounded-lg shadow-md flex flex-col">
@@ -531,6 +772,83 @@ const CreateItinerary = () => {
                             <div className="font-bold">{summary.title}</div>
                             <div className="text-gray-600">
                               {summary.description}
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="px-4 py-2 text-gray-600">
+                          No results found
+                        </div>
+                      )}
+                    </List>
+                  </div>
+                </div>
+              )}
+
+              {selectedCategory === "Activity" && (
+                <div className="w-[30%] h-[400px]  bg-gray-100 p-4 rounded-lg shadow-md flex flex-col">
+                  <form
+                    onSubmit={handleSearchActivity}
+                    className="mb-4 flex justify-between items-center gap-2"
+                  >
+                    <div className="relative w-[85%]">
+                      <Input
+                        label="Search activities"
+                        className="w-full"
+                        value={searchTermActivity}
+                        onChange={(e) => setSearchTermActivity(e.target.value)}
+                        required
+                      />
+                      {/* Cross icon to clear the search */}
+                      {searchTermActivity && (
+                        <button
+                          type="button"
+                          onClick={resetSearchActivity}
+                          className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-600"
+                        >
+                          &times;{" "}
+                        </button>
+                      )}
+                    </div>
+                    <button
+                      type="submit"
+                      className="w-[15%] bg-main px-2 py-2 text-xl text-white cursor-pointer rounded flex justify-center items-center"
+                    >
+                      <IoMdSearch />
+                    </button>
+                  </form>
+
+                  <div className="flex-1 overflow-y-auto sidebar">
+                    <List className="border-t border-gray-300">
+                      {allActivityData?.length > 0 ? (
+                        allActivityData.map((summary, index) => (
+                          <div
+                            key={index}
+                            className="py-2 px-2 hover:bg-gray-200 transition-colors cursor-pointer"
+                            onClick={() => {
+                              handleSelectActivity(summary, 0);
+                              resetSearchActivity();
+                            }}
+                          >
+                            <div className="font-bold">{summary.title}</div>
+                            <div className="text-gray-600">
+                              {summary?.description
+                                ?.slice(0, 2)
+                                .map((el, index) => (
+                                  <span key={index}>
+                                    {el}
+                                    {index < 1 &&
+                                    summary?.description?.length >= 2
+                                      ? ", "
+                                      : ""}
+                                  </span>
+                                ))}
+                              {summary?.description?.length > 2 && (
+                                <span>
+                                  {" "}
+                                  and {summary?.description?.length - 2} more
+                                </span>
+                              )}
                             </div>
                           </div>
                         ))
@@ -666,9 +984,7 @@ const CreateItinerary = () => {
                 </div>
               )}
 
-
-
-{selectedCategory === "Other Information" && (
+              {selectedCategory === "Other Information" && (
                 <div className="w-[30%] h-[400px]  bg-gray-100 p-4 rounded-lg shadow-md flex flex-col">
                   <form
                     onSubmit={handleSearchOtherInformation}
@@ -679,7 +995,9 @@ const CreateItinerary = () => {
                         label="Search other ifnormation"
                         className="w-full"
                         value={searchTermOtherInformation}
-                        onChange={(e) => setSearchTermOtherInformation(e.target.value)}
+                        onChange={(e) =>
+                          setSearchTermOtherInformation(e.target.value)
+                        }
                         required
                       />
                       {/* Cross icon to clear the search */}
@@ -936,67 +1254,6 @@ export default CreateItinerary;
                           </div>
                         )
                       )}
-                    </div>
-                  </div>
-                )} */
-}
-
-{
-  /* {selectedCategory === "Cost (Adult, child)" && (
-                  <div className="mt-2 mb-2 text-lg font-normal">
-                    Cost (Adult, child) details
-                    <div className="p-5">
-                      <h2 className="text-lg font-bold mb-4">
-                        {
-                          data?.travellers?.filter(
-                            (el) => el.userType === "Adult"
-                          )?.length
-                        }{" "}
-                        Adults and{" "}
-                        {
-                          data?.travellers?.filter(
-                            (el) => el.userType === "Child"
-                          )?.length
-                        }{" "}
-                        Child
-                      </h2>
-
-                      <div className="flex justify-between items-center mb-2 gap-5">
-                        <label className="w-[50%] block mb-2">
-                          Adult Price:
-                        </label>
-                        <label className="w-[50%] block mb-2">
-                          Child Price:
-                        </label>
-                      </div>
-
-                
-                      <div className="flex justify-between items-center mb-2 gap-5">
-                        <Input
-                          type="number"
-                          value={adultPrice}
-                          onChange={(e) =>
-                            setAdultPrice(Number(e.target.value))
-                          }
-                          placeholder="Set adult price"
-                        />
-                        <Input
-                          type="number"
-                          value={childPrice}
-                          onChange={(e) =>
-                            setChildPrice(Number(e.target.value))
-                          }
-                          placeholder="Set child price"
-                        />
-                      </div>
-
-            
-                      <div className="border border-gray-300 p-4 rounded-md mt-4">
-                        <h3 className="font-semibold">Total Cost:</h3>
-                        <p className="text-xl font-bold">
-                          Rs. {calculateTotal()}
-                        </p>
-                      </div>
                     </div>
                   </div>
                 )} */

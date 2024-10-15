@@ -153,8 +153,7 @@ const [toogleLead, setToogleLead] = useState(false)
                   <th className="px-4 py-2">Name</th>
                   <th className="px-4 py-2">Email</th>
                   <th className="px-4 py-2">Phone</th>
-                  <th className="px-4 py-2">Position</th>
-                  <th className="px-4 py-2"></th>
+   
                   <th className="px-4 py-2"></th>
                   <th className="px-4 py-2"></th>
                 </tr>
@@ -168,7 +167,7 @@ const [toogleLead, setToogleLead] = useState(false)
                     <td className="px-4 py-2">{user.name}</td>
                     <td className="px-4 py-2">{user.email}</td>
                     <td className="px-4 py-2">{user.phone}</td>
-                    <td className=" px-4 py-2">
+                    {/* <td className=" px-4 py-2">
                       {user.isTeamlead ? (
                         <div className="w-[80px] flex justify-start items-center gap-1 text-emerald-700 px-1 w-[60px] rounded-[50px] text-center mt-2 font-semibold text-xs">
                           <span
@@ -184,8 +183,8 @@ const [toogleLead, setToogleLead] = useState(false)
                           Agent
                         </div>
                       )}
-                    </td>
-                    <td className="px-4 py-2 cursor-pointer relative group">
+                    </td> */}
+                    {/* <td className="px-4 py-2 cursor-pointer relative group">
                       <div onClick={handleToogle}>
                         <ToogleTeamLead
                           active={user.isTeamlead}
@@ -198,7 +197,7 @@ const [toogleLead, setToogleLead] = useState(false)
                           {user.isTeamlead ? "Agent " : "Team lead"}
                         </li>
                       </ul>
-                    </td>
+                    </td> */}
 
                     <td className="px-4 py-2">
                       <MdEdit className="h-5 w-5 text-maincolor2 cursor-pointer" />

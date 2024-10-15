@@ -16,6 +16,7 @@ import AddQuote from '../components/AddQuote';
 import QuoteDetail from '../pages/QuoteDetail';
 import CreateItinary from '../pages/CreateItinary';
 import { useState } from "react";
+import TeamLead from "../pages/TeamLead";
 
 // Assuming role is stored in state after sign-in
 const App = () => {
@@ -26,7 +27,12 @@ const App = () => {
       <Routes>
         {/* Public Route */}
         <Route path="/signin" element={<SignIn />} />
-
+        <Route 
+          path="/team-lead" 
+          element={
+            <TeamLead />
+          } 
+        />
         {/* Admin Routes */}
         <Route 
           path="/" 
@@ -142,6 +148,7 @@ const App = () => {
             </ProtectedRoute>
           } 
         />
+        
       </Routes>
     </Router>
   );
