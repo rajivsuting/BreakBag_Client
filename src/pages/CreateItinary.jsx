@@ -144,6 +144,7 @@ const CreateItinerary = () => {
 
   const handleSelectActivity = (summary) => {
     const updatedActivities = [...activityPerDay];
+    console.log(summary)
     const dayIndex = activeDayActivity - 1; // Get current active day
 
     // Update the selected day's summary with the new summary from the API
@@ -151,6 +152,7 @@ const CreateItinerary = () => {
       ...updatedActivities[dayIndex].summaryDetails,
       title: summary.title,
       description: summary.description, // Array of descriptions
+      images:summary.images
     };
 
     setActivityPerDay(updatedActivities);
