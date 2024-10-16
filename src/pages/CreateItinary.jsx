@@ -144,7 +144,7 @@ const CreateItinerary = () => {
 
   const handleSelectActivity = (summary) => {
     const updatedActivities = [...activityPerDay];
-    console.log(summary)
+    console.log(summary);
     const dayIndex = activeDayActivity - 1; // Get current active day
 
     // Update the selected day's summary with the new summary from the API
@@ -152,7 +152,7 @@ const CreateItinerary = () => {
       ...updatedActivities[dayIndex].summaryDetails,
       title: summary.title,
       description: summary.description, // Array of descriptions
-      images:summary.images
+      images: summary.images,
     };
 
     setActivityPerDay(updatedActivities);
@@ -622,7 +622,7 @@ const CreateItinerary = () => {
                 {selectedCategory === "Travel Summary" && (
                   <>
                     <div className="flex justify-between bg-white rounded-lg gap-5">
-                      <div className="w-[90%] grid grid-cols-5 gap-2 border-gray-300">
+                      <div className="w-[80%] grid grid-cols-4 gap-2 border-gray-300">
                         {travelSummaryPerDay.map((daySummary, index) => (
                           <div
                             key={index}
@@ -647,20 +647,17 @@ const CreateItinerary = () => {
                         ))}
                       </div>
                       {travelSummaryPerDay?.length < data?.duration ? (
-                        <div className="w-[5%] relative group">
-                          <AiOutlinePlus
-                            className="cursor-pointer text-green-500 hover:bg-green-500 hover:text-white rounded-[50%] p-1 "
-                            size={24}
-                            onClick={addTravelSummaryDay}
-                          />
-
-                          <ul className="w-[150px] absolute right-0 shadow text-center hidden bg-white border rounded p-2 text-gray-700 group-hover:block z-10">
+                        <div className="w-[20%]">
+                          <div  onClick={addTravelSummaryDay} className="cursor-pointer text-center border border-green-500 text-green-500 hover:bg-green-500 hover:text-white px-2 py-1 rounded ">
+                            New date
+                          </div>
+                          {/* <ul className="w-[150px] absolute right-0 shadow text-center hidden bg-white border rounded p-2 text-gray-700 group-hover:block z-10">
                             <li className="flex justify-center items-center gap-2 w-full text-xs font-semibold">
                               <FiInfo className="font-bold" /> Add new date
                             </li>
-                          </ul>
-                        </div>
-                      ) : null}
+                          </ul> */}
+                        </div> )
+                      : null}
                     </div>
 
                     {travelSummaryPerDay.map((daySummary, index) =>
@@ -708,7 +705,7 @@ const CreateItinerary = () => {
                 {selectedCategory === "Activity" && (
                   <>
                     <div className="flex justify-between bg-white rounded-lg gap-5">
-                      <div className="w-[90%] grid grid-cols-5 gap-2 border-gray-300">
+                      <div className="w-[80%] grid grid-cols-4 gap-2 border-gray-300">
                         {activityPerDay?.map((daySummary, index) => (
                           <div
                             key={index}
@@ -733,18 +730,10 @@ const CreateItinerary = () => {
                         ))}
                       </div>
                       {activityPerDay?.length < data?.duration ? (
-                        <div className="w-[5%] relative group">
-                          <AiOutlinePlus
-                            className="cursor-pointer text-green-500 hover:bg-green-500 hover:text-white rounded-[50%] p-1 "
-                            size={24}
-                            onClick={addActivityDay}
-                          />
-
-                          <ul className="w-[150px] absolute right-0 shadow text-center hidden bg-white border rounded p-2 text-gray-700 group-hover:block z-10">
-                            <li className="flex justify-center items-center gap-2 w-full text-xs font-semibold">
-                              <FiInfo className="font-bold" /> Add new date
-                            </li>
-                          </ul>
+                        <div className="w-[20%]">
+                        <div  onClick={addActivityDay} className="cursor-pointer text-center border border-green-500 text-green-500 hover:bg-green-500 hover:text-white px-2 py-1 rounded ">
+                          New date
+                        </div>
                         </div>
                       ) : null}
                     </div>
@@ -1062,9 +1051,9 @@ const CreateItinerary = () => {
                                   onChange={(e) =>
                                     handleInputChangeHotel(e, index)
                                   }
-                                    className="w-[48%] px-4 py-2 border rounded-md"
-                                      placeholder="No. of guest"
-                                      type="number"
+                                  className="w-[48%] px-4 py-2 border rounded-md"
+                                  placeholder="No. of guest"
+                                  type="number"
                                 />
                                 <input
                                   label={`Room type`}
@@ -1073,8 +1062,8 @@ const CreateItinerary = () => {
                                   onChange={(e) =>
                                     handleInputChangeHotel(e, index)
                                   }
-                                    className="w-[48%] px-4 py-2 border rounded-md"
-                                       placeholder="Room type"
+                                  className="w-[48%] px-4 py-2 border rounded-md"
+                                  placeholder="Room type"
                                 />
                               </div>
                             </div>
