@@ -34,30 +34,26 @@ const SignIn = () => {
     e.preventDefault();
   
     try {
-      const response = await axios.post(
-        `${serverUrl}/api/auth/verify-otp`,
-        {
-          email,
-          otp,
-        }
-      );
-  
+      const response = await axios.post(`${serverUrl}/api/auth/verify-otp`, {
+        email,
+        otp,
+      });
+      console.log("Role:", response.data.role);
       setMessage(response.data.message);
-      console.log(response)
-      // Store the user's role in localStorage for later use
-      localStorage.setItem('userRole', response.data.role); 
-      localStorage.setItem('token', response.data.token); 
+      console.log(response);
+      localStorage.setItem("userRole", response.data.role);
+      localStorage.setItem("token", response.data.token);
   
-      // Navigate to dashboard after successful login
-      if (response.data.role == "Admin"){
-        console.log("yes")
-       setTimeout(() => {
+      // Ensure role is being correctly checked
+      if (response.data.role === "Admin") {
+        console.log("Navigating to Admin dashboard");
         navigate("/travel-summery");
-       }, 1000);
-      }else {
-        setTimeout(() => {
-          navigate("/travellers");
-         }, 1000);
+      } else if (response.data.role === "Agent") {
+        console.log("Navigating to Agent page");
+        navigate("/travellers");
+      } else if (response.data.role === "Team Lead") {
+        console.log("Navigating to Team Lead page");
+        navigate("/agent");
       }
     } catch (error) {
       console.error("Error during login:", error);
@@ -134,7 +130,7 @@ const SignIn = () => {
                   />
                 </div>
                 <Button
-                  type="button"
+                  type="submit"
                   onClick={handleLogin}
                   className="w-full mb-4 bg-main text-white hover:bg-opacity-80"
                 >

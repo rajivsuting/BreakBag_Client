@@ -95,7 +95,7 @@ console.log(formData);
 
       //   console.log("Response:", response.data);
 
-      alert("Travel summery submited");
+      alert("Traveller summery submited");
       getAlldata();
       // Clear the form
       setFormData({

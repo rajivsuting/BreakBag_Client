@@ -87,15 +87,15 @@ const CreateItinerary = () => {
 
   const geocodePlace = async () => {
     const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${searchTermHotel}&key=AIzaSyBSDhdL2tinLiAKRk7w9JhDAv5gAQXFMIk`;
-  
+
     try {
       // Override withCredentials for this specific request
       const response = await axios.get(geocodeUrl, {
-        withCredentials: false // Disable withCredentials for this request
+        withCredentials: false, // Disable withCredentials for this request
       });
-  
+
       const results = response.data.results;
-  
+
       if (results.length > 0) {
         const { lat, lng } = results[0].geometry.location;
         setLocation(`${lat},${lng}`);
@@ -526,46 +526,50 @@ const CreateItinerary = () => {
 
   const handleFinalSubmit = () => {
     // Send the POST request with your itinerary data
-    axios.post(`${serverUrl}/api/quote/itenerary/generate`, {
-      travelSummaryPerDay,
-      activityPerDay,
-      priceDetails,
-      selectedHotel,
-      selectedExclusions,
-      selectedOtherInformation,
-      selectedTransfers,
-      selectedInclusions
-    }, {
-      responseType: 'blob' // Important: To receive the PDF as binary data (Blob)
-    }).then((res) => {
-      // Create a new Blob object using the response data (PDF binary)
-      const file = new Blob([res.data], { type: 'application/pdf' });
-  
-      // Create a temporary URL for the Blob
-      const fileURL = URL.createObjectURL(file);
-  
-      // Create an anchor element and set the href to the file URL
-      const link = document.createElement('a');
-      link.href = fileURL;
-  
-      // Set the file name for the download
-      link.download = 'itinerary.pdf';
-  
-      // Append the link to the body
-      document.body.appendChild(link);
-  
-      // Programmatically trigger the click to start downloading the PDF
-      link.click();
-  
-      // Remove the link after downloading
-      document.body.removeChild(link);
-    }).catch((error) => {
-      console.error('Error generating the PDF:', error);
-    });
-  };
-  
+    axios
+      .post(
+        `${serverUrl}/api/quote/itenerary/generate`,
+        {
+          travelSummaryPerDay,
+          activityPerDay,
+          priceDetails,
+          selectedHotel,
+          selectedExclusions,
+          selectedOtherInformation,
+          selectedTransfers,
+          selectedInclusions,
+        },
+        {
+          responseType: "blob", // Important: To receive the PDF as binary data (Blob)
+        }
+      )
+      .then((res) => {
+        // Create a new Blob object using the response data (PDF binary)
+        const file = new Blob([res.data], { type: "application/pdf" });
 
-  
+        // Create a temporary URL for the Blob
+        const fileURL = URL.createObjectURL(file);
+
+        // Create an anchor element and set the href to the file URL
+        const link = document.createElement("a");
+        link.href = fileURL;
+
+        // Set the file name for the download
+        link.download = "itinerary.pdf";
+
+        // Append the link to the body
+        document.body.appendChild(link);
+
+        // Programmatically trigger the click to start downloading the PDF
+        link.click();
+
+        // Remove the link after downloading
+        document.body.removeChild(link);
+      })
+      .catch((error) => {
+        console.error("Error generating the PDF:", error);
+      });
+  };
 
   // console.log(singleTransfer);
 
@@ -640,19 +644,21 @@ const CreateItinerary = () => {
                           </div>
                         ))}
                       </div>
-                      <div className="w-[5%] relative group">
-                        <AiOutlinePlus
-                          className="cursor-pointer text-green-500 hover:bg-green-500 hover:text-white rounded-[50%] p-1 "
-                          size={24}
-                          onClick={addTravelSummaryDay}
-                        />
+                      {travelSummaryPerDay?.length < data?.duration ? (
+                        <div className="w-[5%] relative group">
+                          <AiOutlinePlus
+                            className="cursor-pointer text-green-500 hover:bg-green-500 hover:text-white rounded-[50%] p-1 "
+                            size={24}
+                            onClick={addTravelSummaryDay}
+                          />
 
-                        <ul className="w-[150px] absolute right-0 shadow text-center hidden bg-white border rounded p-2 text-gray-700 group-hover:block z-10">
-                          <li className="flex justify-center items-center gap-2 w-full text-xs font-semibold">
-                            <FiInfo className="font-bold" /> Add new date
-                          </li>
-                        </ul>
-                      </div>
+                          <ul className="w-[150px] absolute right-0 shadow text-center hidden bg-white border rounded p-2 text-gray-700 group-hover:block z-10">
+                            <li className="flex justify-center items-center gap-2 w-full text-xs font-semibold">
+                              <FiInfo className="font-bold" /> Add new date
+                            </li>
+                          </ul>
+                        </div>
+                      ) : null}
                     </div>
 
                     {travelSummaryPerDay.map((daySummary, index) =>
@@ -724,19 +730,21 @@ const CreateItinerary = () => {
                           </div>
                         ))}
                       </div>
-                      <div className="w-[5%] relative group">
-                        <AiOutlinePlus
-                          className="cursor-pointer text-green-500 hover:bg-green-500 hover:text-white rounded-[50%] p-1 "
-                          size={24}
-                          onClick={addActivityDay}
-                        />
+                      {activityPerDay?.length < data?.duration ? (
+                        <div className="w-[5%] relative group">
+                          <AiOutlinePlus
+                            className="cursor-pointer text-green-500 hover:bg-green-500 hover:text-white rounded-[50%] p-1 "
+                            size={24}
+                            onClick={addActivityDay}
+                          />
 
-                        <ul className="w-[150px] absolute right-0 shadow text-center hidden bg-white border rounded p-2 text-gray-700 group-hover:block z-10">
-                          <li className="flex justify-center items-center gap-2 w-full text-xs font-semibold">
-                            <FiInfo className="font-bold" /> Add new date
-                          </li>
-                        </ul>
-                      </div>
+                          <ul className="w-[150px] absolute right-0 shadow text-center hidden bg-white border rounded p-2 text-gray-700 group-hover:block z-10">
+                            <li className="flex justify-center items-center gap-2 w-full text-xs font-semibold">
+                              <FiInfo className="font-bold" /> Add new date
+                            </li>
+                          </ul>
+                        </div>
+                      ) : null}
                     </div>
 
                     {activityPerDay.map((daySummary, index) =>
@@ -996,7 +1004,7 @@ const CreateItinerary = () => {
                         return (
                           <div
                             key={index}
-                            className="flex justify-between gap-4"
+                            className="flex justify-between gap-4 mb-5"
                           >
                             <div className="w-[95%]">
                               {/* Hotel Info */}
@@ -1009,57 +1017,62 @@ const CreateItinerary = () => {
                               </div>
 
                               {/* Input Fields */}
-                              <div className="w-[100%] border flex justify-between items-center gap-5">
-                                <div className="w-[20%]">
-                                  <Input
-                                    label={`Check-in`}
-                                    type="date"
-                                    name="checkInDate"
-                                    value={hotel.checkInDate}
-                                    onChange={(e) =>
-                                      handleInputChangeHotel(e, index)
-                                    }
-                                  />
-                                </div>
-                                <div className="w-[20%]">
-                                  <Input
-                                    label={`Check-out`}
-                                    name="checkOutDate"
-                                    type="date"
-                                    value={hotel.checkOutDate}
-                                    onChange={(e) =>
-                                      handleInputChangeHotel(e, index)
-                                    }
-                                  />
-                                </div>
-                                <div className="w-[20%]">
-                                  <Input
-                                    label={`Meal plan`}
-                                    name="mealPlan"
-                                    value={hotel.mealPlan}
-                                    onChange={(e) =>
-                                      handleInputChangeHotel(e, index)
-                                    }
-                                  />
-                                </div>
+                              <div className="w-[100%] flex justify-between items-center gap-3 mt-5">
+                                <input
+                                  label="Check-in"
+                                  type="date"
+                                  name="checkInDate"
+                                  value={hotel.checkInDate}
+                                  onChange={(e) =>
+                                    handleInputChangeHotel(e, index)
+                                  }
+                                  className="w-[30%] px-4 py-2 border rounded-md"
+                                />
+
+                                <input
+                                  label="Check-out"
+                                  type="date"
+                                  name="checkOutDate"
+                                  value={hotel.checkOutDate}
+                                  onChange={(e) =>
+                                    handleInputChangeHotel(e, index)
+                                  }
+                                  className="w-[30%] px-4 py-2 border rounded-md"
+                                />
+
+                                <input
+                                  label="Meal plan"
+                                  name="mealPlan"
+                                  value={hotel.mealPlan}
+                                  onChange={(e) =>
+                                    handleInputChangeHotel(e, index)
+                                  }
+                                  className="w-[30%] px-4 py-2 border rounded-md"
+                                  placeholder="Meal plan"
+                                />
                               </div>
 
-                              <div className="flex justify-between items-center">
-                                <Input
+                              <div className="flex justify-between items-center mt-5">
+                                <input
                                   label={`No. of guest`}
                                   name="numberOfGuest"
                                   value={hotel.numberOfGuest}
                                   onChange={(e) =>
                                     handleInputChangeHotel(e, index)
                                   }
+                                    className="w-[48%] px-4 py-2 border rounded-md"
+                                      placeholder="No. of guest"
+                                      type="number"
                                 />
-                                <Input
+                                <input
                                   label={`Room type`}
                                   name="roomType"
                                   value={hotel.roomType}
                                   onChange={(e) =>
                                     handleInputChangeHotel(e, index)
                                   }
+                                    className="w-[48%] px-4 py-2 border rounded-md"
+                                       placeholder="Room type"
                                 />
                               </div>
                             </div>

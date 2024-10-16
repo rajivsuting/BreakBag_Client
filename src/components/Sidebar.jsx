@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import {
   Card,
   Typography,
@@ -27,16 +27,19 @@ const Sidebar = () => {
   const location = useLocation();
 
   // Function to toggle accordion open state
-  const toggleAccordion = (value) => {
+  const toggleAccordion = useCallback((value) => {
     setOpenAccordion((prev) =>
       prev.includes(value)
         ? prev.filter((item) => item !== value)
         : [...prev, value]
     );
-  };
+  }, [setOpenAccordion]);
 
   // Function to check if the link is active
-  const isActive = (path) => location.pathname === path;
+  const isActive = useCallback(
+    (path) => location.pathname === path,
+    [location.pathname]
+  );
 
   return (
     <div className="fixed top-0 left-0 h-screen w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5">
