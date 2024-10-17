@@ -11,7 +11,7 @@ const Addcomment = ({ isOpen, onClose, getAlldata }) => {
 //   console.log(searchparam.get("quote"))
   const [isLoading, setIsLoading] = useState(false);
   const [comment, setComment] = useState("");
-
+console.log(localStorage.getItem("token"))
   const handleSubmit = (e) => {
     e.preventDefault();
     axios.post(

@@ -158,7 +158,7 @@ const QuoteDetail = () => {
                     {data?.travellers?.slice(0, 2).map((participant, index) => (
                       <span key={index}>
                         {participant.name}
-                        {index < 1 && data?.travellers?.length > 2 ? ", " : ""}
+                        {index < 1 && data?.travellers?.length >= 2 ? ", " : ""}
                       </span>
                     ))}
                     {data?.travellers?.length > 2 && (
@@ -166,6 +166,27 @@ const QuoteDetail = () => {
                     )}
                   </div>
                 </div>
+              </div>
+              <div className="flex justify-between mt-5">
+                <div className="text-start w-[30%]">
+                  <div className="text-gray-400">Created by</div>
+                  <div>{data?.createdBy?.name}</div>
+                </div>
+                {/* <div className="text-start w-[30%]">
+                  <div className="text-gray-400">Travellers</div>
+                  <div>
+                    {" "}
+                    {data?.travellers?.slice(0, 2).map((participant, index) => (
+                      <span key={index}>
+                        {participant.name}
+                        {index < 1 && data?.travellers?.length >= 2 ? ", " : ""}
+                      </span>
+                    ))}
+                    {data?.travellers?.length > 2 && (
+                      <span> and {data?.travellers?.length - 2} more</span>
+                    )}
+                  </div>
+                </div> */}
               </div>
             </div>
           </CardBody>

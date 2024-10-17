@@ -45,16 +45,9 @@ const SignIn = () => {
       localStorage.setItem("token", response.data.token);
   
       // Ensure role is being correctly checked
-      navigate("/quote");
-      // if (response.data.role === "Admin") {
-      //   console.log("Navigating to Admin dashboard");
-      // } else if (response.data.role === "Agent") {
-      //   console.log("Navigating to Agent page");
-      //   navigate("/travellers");
-      // } else if (response.data.role === "Team Lead") {
-      //   console.log("Navigating to Team Lead page");
-      //   navigate("/agent");
-      // }
+      setTimeout(() => {
+        navigate("/quote");
+      }, 1000);
     } catch (error) {
       console.error("Error during login:", error);
       setMessage("Failed to login. Please try again.");

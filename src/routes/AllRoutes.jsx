@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from '../context/ProtectedRoute'; // The component we just created
 import SignIn from '../pages/Signin';
 import AdminDashboard from '../pages/admin/AdminDashboard';
@@ -18,25 +18,23 @@ import CreateItinary from '../pages/CreateItinary';
 import { useState } from "react";
 import TeamLead from "../pages/TeamLead";
 
-// Assuming role is stored in state after sign-in
 const App = () => {
   const [role, setRole] = useState(localStorage.getItem('userRole') || ''); // Get role from storage after login
+  const isAuthenticated = !!role; // Check if user is authenticated (role is set)
 
   return (
     <Router>
       <Routes>
         {/* Public Route */}
         <Route path="/signin" element={<SignIn />} />
-        
-        {/* Admin Routes */}
+
+        {/* Redirect base URL to /signin if not logged in */}
         <Route 
           path="/" 
-          element={
-            <ProtectedRoute role={role} allowedRoles={['Admin']}>
-              <AdminDashboard />
-            </ProtectedRoute>
-          } 
+          element={isAuthenticated ? <Navigate to="/quote" /> : <Navigate to="/signin" />} 
         />
+
+        {/* Protected Routes */}
         <Route 
           path="/travel-summery" 
           element={
@@ -88,7 +86,7 @@ const App = () => {
         <Route 
           path="/agent" 
           element={
-            <ProtectedRoute role={role} allowedRoles={['Admin',"Team Lead"]}>
+            <ProtectedRoute role={role} allowedRoles={['Admin', "Team Lead"]}>
               <Agents />
             </ProtectedRoute>
           } 
@@ -101,10 +99,12 @@ const App = () => {
             </ProtectedRoute>
           } 
         />
+
+        {/* Default Route */}
         <Route 
           path="/quote" 
           element={
-            <ProtectedRoute role={role} allowedRoles={['Admin','Agent',"Team Lead"]}>
+            <ProtectedRoute role={role} allowedRoles={['Admin', 'Agent', "Team Lead"]}>
               <Quote />
             </ProtectedRoute>
           } 
@@ -122,7 +122,7 @@ const App = () => {
         <Route 
           path="/add-quote" 
           element={
-            <ProtectedRoute role={role} allowedRoles={['Agent', 'Admin',"Team Lead"]}>
+            <ProtectedRoute role={role} allowedRoles={['Agent', 'Admin', "Team Lead"]}>
               <AddQuote />
             </ProtectedRoute>
           } 
@@ -130,7 +130,7 @@ const App = () => {
         <Route 
           path="/quote-detail/:tripid" 
           element={
-            <ProtectedRoute role={role} allowedRoles={['Agent', 'Admin',"Team Lead"]}>
+            <ProtectedRoute role={role} allowedRoles={['Agent', 'Admin', "Team Lead"]}>
               <QuoteDetail />
             </ProtectedRoute>
           } 
@@ -138,12 +138,11 @@ const App = () => {
         <Route 
           path="/create-intinary/:tripid" 
           element={
-            <ProtectedRoute role={role} allowedRoles={['Agent', 'Admin',"Team Lead"]}>
+            <ProtectedRoute role={role} allowedRoles={['Agent', 'Admin', "Team Lead"]}>
               <CreateItinary />
             </ProtectedRoute>
           } 
         />
-        
       </Routes>
     </Router>
   );

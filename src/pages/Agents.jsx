@@ -46,7 +46,7 @@ const Agents = () => {
   const [data, setData] = useState([]);
   const [toogleLead, setToogleLead] = useState(false);
   const [selectedRole, setSelectedRole] = useState("Agent");
-const [selectedAgent,setSelectedAgent] = useState("")
+  const [selectedAgent, setSelectedAgent] = useState("");
   const [teamLeadAll, setteamLeadAll] = useState([]);
   const [selectedTeamLead, setSelectedTeamLead] = useState(""); // null initially
 
@@ -86,20 +86,25 @@ const [selectedAgent,setSelectedAgent] = useState("")
     };
   }, [selectedRole]);
 
-  useEffect(()=>{
-    if (selectedTeamLead){
-      axios.post(`${serverUrl}/api/agent/team-lead/${selectedTeamLead}/assign-agents`,[selectedAgent])
-      .then((res)=>{
-        alert("Team lead assigned")
-      }).catch((err)=>{
-        console.log(err)
-        alert("Something went wrong")
-      })
+  useEffect(() => {
+    if (selectedTeamLead) {
+      axios
+        .post(
+          `${serverUrl}/api/agent/team-lead/${selectedTeamLead}/assign-agents`,
+          [selectedAgent]
+        )
+        .then((res) => {
+          alert("Team lead assigned");
+        })
+        .catch((err) => {
+          console.log(err);
+          alert("Something went wrong");
+        });
     }
-  },[selectedTeamLead])
+  }, [selectedTeamLead]);
 
-  console.log(selectedTeamLead,
-    selectedAgent)
+  // console.log(selectedTeamLead,
+  //   selectedAgent)
 
   return (
     <div className="flex gap-5 ">
@@ -208,8 +213,11 @@ const [selectedAgent,setSelectedAgent] = useState("")
                   <th className="px-4 py-2">Name</th>
                   <th className="px-4 py-2">Email</th>
                   <th className="px-4 py-2">Phone</th>
-                  {localStorage.getItem("userRole") == "Team Lead" || localStorage.getItem("userRole") == "Agent" ? null : 
-                  <th className="px-4 py-2">Assign to a team lead</th>}
+                  {selectedRole == "Team Lead" ||
+                  localStorage.getItem("userRole") == "Team Lead" ||
+                  localStorage.getItem("userRole") == "Agent" ? null : (
+                    <th className="px-4 py-2">Assign to a team lead</th>
+                  )}
                   <th className="px-4 py-2"></th>
                   <th className="px-4 py-2"></th>
                 </tr>
@@ -223,18 +231,24 @@ const [selectedAgent,setSelectedAgent] = useState("")
                     <td className="px-4 py-2">{user.name}</td>
                     <td className="px-4 py-2">{user.email}</td>
                     <td className="px-4 py-2">{user.phone}</td>
-                    {localStorage.getItem("userRole") == "Team Lead" || localStorage.getItem("userRole") == "Agent" ? null : 
-                    <td className="px-4 py-2">
-                      <select
-                        value={selectedTeamLead}
-                        onChange={(e) => {setSelectedTeamLead(e.target.value);setSelectedAgent(user._id)}}
-                      >
-                        <option value="">Select a team lead</option>
-                        {teamLeadAll?.map((el) => {
-                          return <option value={el._id}>{el.name}</option>;
-                        })}
-                      </select>
-                      </td>}
+                    {selectedRole == "Team Lead" ||
+                    localStorage.getItem("userRole") == "Team Lead" ||
+                    localStorage.getItem("userRole") == "Agent" ? null : (
+                      <td className="px-4 py-2">
+                        <select
+                          value={selectedTeamLead}
+                          onChange={(e) => {
+                            setSelectedTeamLead(e.target.value);
+                            setSelectedAgent(user._id);
+                          }}
+                        >
+                          <option value="">Select a team lead</option>
+                          {teamLeadAll?.map((el) => {
+                            return <option value={el._id}>{el.name}</option>;
+                          })}
+                        </select>
+                      </td>
+                    )}
                     {/* <td className=" px-4 py-2">
                       {user.isTeamlead ? (
                         <div className="w-[80px] flex justify-start items-center gap-1 text-emerald-700 px-1 w-[60px] rounded-[50px] text-center mt-2 font-semibold text-xs">

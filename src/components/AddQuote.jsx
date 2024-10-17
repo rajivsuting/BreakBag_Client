@@ -6,11 +6,14 @@ import { serverUrl } from "../api";
 import Sidebar from "./Sidebar";
 import Select from "react-select";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
+import { useNavigate } from "react-router-dom";
+axios.defaults.withCredentials=true;
 
 const AddQuote = () => {
   const [data, setData] = useState([]); // List of travelers
   const [selectedTravellers, setSelectedTravellers] = useState([]); // Selected travelers
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
   const [destinationAll, setDestinationAll] = useState([]);
   const [formState, setFormState] = useState({
     destination: "",
@@ -69,6 +72,7 @@ const AddQuote = () => {
       .then((res) => {
         setIsLoading(false);
         alert("Quote added successfully");
+        navigate("/quote")
       })
       .catch((error) => {
         console.error("Error adding quote:", error);
