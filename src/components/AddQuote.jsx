@@ -7,7 +7,8 @@ import Sidebar from "./Sidebar";
 import Select from "react-select";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
-axios.defaults.withCredentials=true;
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AddQuote = () => {
   const [data, setData] = useState([]); // List of travelers
@@ -22,7 +23,11 @@ const AddQuote = () => {
   });
 
   useEffect(() => {
-    axios.get(`${serverUrl}/api/traveller/all`).then((res) => {
+    axios.get(`${serverUrl}/api/traveller/all`,{
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }).then((res) => {
       setData(res.data.travellers);
     });
     axios.get(`${serverUrl}/api/destination/destinaions`).then((res) => {
@@ -68,10 +73,14 @@ const AddQuote = () => {
     };
 
     axios
-      .post(`${serverUrl}/api/quote/quotes`, formData)
+      .post(`${serverUrl}/api/quote/quotes`, formData,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
       .then((res) => {
         setIsLoading(false);
-        alert("Quote added successfully");
+        toast.success("Quote added successfully");
         navigate("/quote")
       })
       .catch((error) => {

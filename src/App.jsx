@@ -3,56 +3,56 @@ import { useEffect, useState } from "react";
 import { AccordionProvider } from "./context/AccordionContext";
 import AllRoutes from "./routes/AllRoutes";
 import axios from "axios";
-
+import { ToastContainer } from "react-toastify";
 
 function App() {
-//   const [place, setPlace] = useState(""); // Store user's place input
-//   const [location, setLocation] = useState(null); // Store geocoded location
-//   const [hotels, setHotels] = useState([]); // Store list of hotels
-//   const [error, setError] = useState(null); // Handle errors
+  //   const [place, setPlace] = useState(""); // Store user's place input
+  //   const [location, setLocation] = useState(null); // Store geocoded location
+  //   const [hotels, setHotels] = useState([]); // Store list of hotels
+  //   const [error, setError] = useState(null); // Handle errors
 
-//   // Geocode the place name entered by the user
-//   const geocodePlace = async () => {
-//     const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${place}&key=AIzaSyAn79D_s4nCii1jXCPTTZ-o6KQuGpNEQcI`;
+  //   // Geocode the place name entered by the user
+  //   const geocodePlace = async () => {
+  //     const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${place}&key=AIzaSyAn79D_s4nCii1jXCPTTZ-o6KQuGpNEQcI`;
 
-//     try {
-//       const response = await axios.get(geocodeUrl);
-//       const results = response.data.results;
+  //     try {
+  //       const response = await axios.get(geocodeUrl);
+  //       const results = response.data.results;
 
-//       if (results.length > 0) {
-//         const { lat, lng } = results[0].geometry.location;
-//         setLocation(`${lat},${lng}`);
-//       } else {
-//         setError("Place not found");
-//       }
-//     } catch (error) {
-//       setError("Error geocoding place");
-//     }
-//   };
+  //       if (results.length > 0) {
+  //         const { lat, lng } = results[0].geometry.location;
+  //         setLocation(`${lat},${lng}`);
+  //       } else {
+  //         setError("Place not found");
+  //       }
+  //     } catch (error) {
+  //       setError("Error geocoding place");
+  //     }
+  //   };
 
-//   // Fetch nearby hotels once location is set
-//   useEffect(() => {
-//     if (location) {
-//       axios
-//         .get(`http://localhost:8080/hotels?location=${location}`)
-//         .then((response) => {
-//           console.log(response)
-//           setHotels(response.data);
-//         })
-//         .catch((error) => {
-//           setError("Error fetching hotels");
-//         });
-//     }
-//   }, [location]);
-// console.log(location)
-//   const handleSearch = () => {
-//     if (place) {
-//       console.log("knfekendkn")
-//       geocodePlace(); // Convert place to lat/lng before fetching hotels
-//     } else {
-//       setError("Please enter a place name");
-//     }
-//   };
+  //   // Fetch nearby hotels once location is set
+  //   useEffect(() => {
+  //     if (location) {
+  //       axios
+  //         .get(`http://localhost:8080/hotels?location=${location}`)
+  //         .then((response) => {
+  //           console.log(response)
+  //           setHotels(response.data);
+  //         })
+  //         .catch((error) => {
+  //           setError("Error fetching hotels");
+  //         });
+  //     }
+  //   }, [location]);
+  // console.log(location)
+  //   const handleSearch = () => {
+  //     if (place) {
+  //       console.log("knfekendkn")
+  //       geocodePlace(); // Convert place to lat/lng before fetching hotels
+  //     } else {
+  //       setError("Please enter a place name");
+  //     }
+  //   };
 
   return (
     <div>
@@ -85,17 +85,23 @@ function App() {
       <AccordionProvider>
         <AllRoutes />
       </AccordionProvider>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
     </div>
   );
 }
 
 export default App;
-
-
-
-
-
-
 
 // import React, { useState, useEffect } from "react";
 // import axios from "axios";

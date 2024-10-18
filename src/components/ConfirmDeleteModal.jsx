@@ -3,8 +3,8 @@ import { Button, Input, List, ListItem } from "@material-tailwind/react";
 import { AiFillDelete } from "react-icons/ai";
 import axios from "axios";
 import { serverUrl } from "../api";
-import { toastConfig } from "../App";
 import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ConfirmDeleteModal = ({ isOpen, onClose, handleDelete }) => {
   if (!isOpen) return;

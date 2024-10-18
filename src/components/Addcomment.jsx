@@ -5,6 +5,8 @@ import axios from "axios";
 import { serverUrl } from "../api";
 import Select from "react-select";
 import { useParams, useSearchParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Addcomment = ({ isOpen, onClose, getAlldata }) => {
   const [searchparam] = useSearchParams();
@@ -25,7 +27,7 @@ console.log(localStorage.getItem("token"))
         },
       }
     ).then((res)=>{
-        alert("Comments added");
+      toast.success("Comments added");
         getAlldata();
         onClose()
     });

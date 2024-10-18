@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Input, Button } from "@material-tailwind/react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -8,22 +8,44 @@ const SignIn = () => {
   const [email, setEmail] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [message, setMessage] = useState("");
-  const navigate = useNavigate();
   const [otp, setOtp] = useState("");
+  const [canResendOtp, setCanResendOtp] = useState(false);
+  const [timer, setTimer] = useState(60);
+  const [loading, setLoading] = useState(false); // Loading state for login
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    let countdown;
+
+    if (otpSent && !canResendOtp) {
+      countdown = setInterval(() => {
+        setTimer((prevTimer) => {
+          if (prevTimer <= 1) {
+            clearInterval(countdown);
+            setCanResendOtp(true);
+            return 0;
+          }
+          return prevTimer - 1;
+        });
+      }, 1000);
+    }
+
+    return () => clearInterval(countdown);
+  }, [otpSent, canResendOtp]);
 
   const handleGetOtp = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post(
-        `${serverUrl}/api/auth/login`,
-        {
-          email,
-        }
-      );
+      const response = await axios.post(`${serverUrl}/api/auth/login`, {
+        email,
+      });
 
       setMessage(response.data.message);
       setOtpSent(true);
+      setCanResendOtp(false);
+      setTimer(60);
     } catch (error) {
       console.error("Error fetching OTP:", error);
       setMessage("Failed to send OTP. Please try again.");
@@ -32,7 +54,8 @@ const SignIn = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-  
+    setLoading(true); // Show loading indicator
+
     try {
       const response = await axios.post(`${serverUrl}/api/auth/verify-otp`, {
         email,
@@ -40,20 +63,20 @@ const SignIn = () => {
       });
       console.log("Role:", response.data.role);
       setMessage(response.data.message);
-      console.log(response);
       localStorage.setItem("userRole", response.data.role);
       localStorage.setItem("token", response.data.token);
-  
-      // Ensure role is being correctly checked
+
       setTimeout(() => {
         navigate("/quote");
       }, 1000);
     } catch (error) {
       console.error("Error during login:", error);
       setMessage("Failed to login. Please try again.");
+    } finally {
+      setLoading(false); // Hide loading indicator once login is complete
     }
   };
-  
+
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100 relative">
       <div className="absolute top-5 left-10 z-20">
@@ -113,6 +136,22 @@ const SignIn = () => {
             {message && <p className="text-center text-green-500">{message}</p>}
             {otpSent && (
               <>
+                {canResendOtp ? (
+                  <p
+                    onClick={handleGetOtp}
+                    className="cursor-pointer text-center text-green-500"
+                  >
+                    Resend OTP
+                  </p>
+                ) : (
+                  <p className="text-center text-gray-500">
+                    Resend OTP in {timer} seconds
+                  </p>
+                )}
+              </>
+            )}
+            {otpSent && (
+              <>
                 <div className="mb-4">
                   <Input
                     variant="standard"
@@ -122,13 +161,18 @@ const SignIn = () => {
                     onChange={(e) => setOtp(e.target.value)}
                   />
                 </div>
-                <Button
-                  type="submit"
-                  onClick={handleLogin}
-                  className="w-full mb-4 bg-main text-white hover:bg-opacity-80"
-                >
-                  Login
-                </Button>
+
+                {loading ? (
+                  <p className="text-center text-blue-500">Logging in...</p> // Loading indicator
+                ) : (
+                  <Button
+                    type="submit"
+                    onClick={handleLogin}
+                    className="w-full mb-4 bg-main text-white hover:bg-opacity-80"
+                  >
+                    Login
+                  </Button>
+                )}
               </>
             )}
           </form>

@@ -18,7 +18,8 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import Select from "react-select";
 import { AiOutlineClose, AiOutlinePlus } from "react-icons/ai";
-import { FiInfo } from "react-icons/fi";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { IoMdClose, IoMdSearch } from "react-icons/io";
 
 const CreateItinerary = () => {
@@ -269,7 +270,7 @@ const CreateItinerary = () => {
         setAllTravelData(res.data.data);
       })
       .catch((err) => {
-        alert(err.response.data.message);
+        toast.error(err.response.data.message);
       });
   };
 
@@ -282,7 +283,7 @@ const CreateItinerary = () => {
         setAllActivityData(res.data.data);
       })
       .catch((err) => {
-        alert(err.response.data.message);
+        toast.error(err.response.data.message);
       });
   };
 
@@ -294,7 +295,7 @@ const CreateItinerary = () => {
         setAllExclusion(res.data.data);
       })
       .catch((err) => {
-        alert(err.response.data.message);
+        toast.error(err.response.data.message);
       });
   };
 
@@ -335,7 +336,7 @@ const CreateItinerary = () => {
         setAllTransfer(res.data.data);
       })
       .catch((err) => {
-        alert(err.response.data.message);
+        toast.error(err.response.data.message);
       });
   };
 
@@ -354,7 +355,7 @@ const CreateItinerary = () => {
         setAllOtherInformation(res.data.data);
       })
       .catch((err) => {
-        alert(err.response.data.message);
+        toast.error(err.response.data.message);
       });
   };
 
@@ -500,7 +501,7 @@ const CreateItinerary = () => {
         setAllInclusion(res.data.data);
       })
       .catch((err) => {
-        alert(err.response.data.message);
+        toast.error(err.response.data.message);
       });
   };
 

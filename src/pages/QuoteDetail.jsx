@@ -67,7 +67,7 @@ const QuoteDetail = () => {
       case "Follow Up":
         return "bg-orange-500"; // Orange
       case "Confirmed":
-        return "bg-dark-green-500"; // Dark Green
+        return "bg-green-900"; // Dark Green
       case "Cancelled":
         return "bg-red-500"; // Red
       case "CNP":
@@ -170,7 +170,7 @@ const QuoteDetail = () => {
               <div className="flex justify-between mt-5">
                 <div className="text-start w-[30%]">
                   <div className="text-gray-400">Created by</div>
-                  <div>{data?.createdBy?.name}</div>
+                  <div>{data?.createdBy?.name || "Unknown"}</div>
                 </div>
                 {/* <div className="text-start w-[30%]">
                   <div className="text-gray-400">Travellers</div>

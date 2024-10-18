@@ -10,6 +10,7 @@ import { AiOutlineClose } from "react-icons/ai";
 import axios from "axios";
 import usePreventScrollOnNumberInput from "../CustomHook/usePreventScrollOnNumberInput";
 import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { serverUrl } from "../api";
 
 const Addagents = ({ isOpen, onClose, getAllData }) => {
@@ -59,11 +60,11 @@ const Addagents = ({ isOpen, onClose, getAllData }) => {
           },
         }
       );
-
+  
       // Show success toast
-     alert("Agent added successfully!");
+      toast.success("Agent added successfully!");
       getAllData();
-      
+  
       // Clear the form
       setFormData({
         name: "",
@@ -71,16 +72,47 @@ const Addagents = ({ isOpen, onClose, getAllData }) => {
         phone: "",
         role: "",
       });
-
+  
       // Close the modal
       onClose();
     } catch (error) {
-      console.error("Error submitting form:", error);
-      alert("Error adding agent.");
+      // Handle different types of errors
+      if (error.response) {
+        const status = error.response.status;
+        const errorMessage = error.response.data.message || "Something went wrong";
+  
+        // Show custom error messages based on status codes
+        switch (status) {
+          case 400:
+            toast.error(`Bad Request: ${errorMessage}`);
+            break;
+          case 401:
+            toast.error("Unauthorized: Please log in again.");
+            break;
+          case 403:
+            toast.error("Forbidden: You do not have permission to perform this action.");
+            break;
+          case 404:
+            toast.error("Not Found: The requested resource could not be found.");
+            break;
+          case 500:
+            toast.error("Server Error: Please try again later.");
+            break;
+          default:
+            toast.error(`Error: ${errorMessage}`);
+        }
+      } else if (error.request) {
+        // Network error (no response received)
+        toast.error("Network Error: No response received from the server.");
+      } else {
+        // Something else happened
+        toast.error(`Error: ${error.message}`);
+      }
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   if (!isOpen) return null;
 

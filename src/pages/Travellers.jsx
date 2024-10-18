@@ -16,7 +16,8 @@ import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 import { serverUrl } from "../api";
 import axios from "axios";
 import Addtraveller from "../components/Addtraveller";
-axios.defaults.withCredentials=true;
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const data = [
   {
@@ -44,7 +45,11 @@ const Travellers = () => {
   const [data, setData] = useState([]);
 
   const getAlldata = () => {
-    axios.get(`${serverUrl}/api/traveller/all`).then((res) => {
+    axios.get(`${serverUrl}/api/traveller/all`,{
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }).then((res) => {
       console.log(res)
       setData(res.data.travellers);
     });
@@ -63,11 +68,11 @@ const Travellers = () => {
     axios
       .delete(`${serverUrl}/api/traveller/delete/${id}`)
       .then((res) => {
-        alert("Traveller deleted");
+         toast.success("Traveller deleted");
         getAlldata();
       })
       .catch((err) => {
-        alert(err.response.data.error);
+         toast.success(err.response.data.error);
       });
   };
 

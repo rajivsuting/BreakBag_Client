@@ -16,9 +16,8 @@ import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 import { serverUrl } from "../api";
 import axios from "axios";
 import Addagents from "../components/Addagents";
-import ToogleTeamLead from "../components/ToogleTeamLead";
-import { FiInfo } from "react-icons/fi";
-import Select from "react-select/base";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const data = [
   {
@@ -94,11 +93,11 @@ const Agents = () => {
           [selectedAgent]
         )
         .then((res) => {
-          alert("Team lead assigned");
+          toast.success("Team lead assigned");
         })
         .catch((err) => {
           console.log(err);
-          alert("Something went wrong");
+          toast.success("Something went wrong");
         });
     }
   }, [selectedTeamLead]);

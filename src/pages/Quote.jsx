@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import { Button, Input, Textarea } from "@material-tailwind/react";
 import { MdDelete, MdEdit } from "react-icons/md";
@@ -19,16 +19,21 @@ import Addtraveller from "../components/Addtraveller";
 import AddQuote from "../components/AddQuote";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import Addcomment from "../components/Addcomment";
-axios.defaults.withCredentials = true;
 
 const Travellers = () => {
   const navigate = useNavigate();
   const [commentModalOpen, setCommentModalOpen] = useState(false);
   const [searchparam, setSearchParams] = useSearchParams();
+  const [selectedQuote, setSelectedQuote] = useState("");
+  const [selectedId, setSelctedId] = useState("")
   const [data, setData] = useState([]);
 
   const getAlldata = () => {
-    axios.get(`${serverUrl}/api/quote/quotes`).then((res) => {
+    axios.get(`${serverUrl}/api/quote/quotes`,{
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }).then((res) => {
       setData(res.data.data);
       console.log(res);
     });
@@ -42,6 +47,16 @@ const Travellers = () => {
   }, []);
 
   const handleEdit = () => {};
+
+  useMemo(()=>{
+    if (selectedQuote && selectedId){
+      axios.patch(`${serverUrl}/api/quote/quote/${selectedId}`,{status:selectedQuote})
+      .then((res)=>{
+        alert("Status updated");
+        getAlldata(); 
+      })
+    }
+  },[selectedQuote,selectedId])
 
   const handleDelete = (id) => {
     // axios.delete(`${serverUrl}/api/traveller/delete/${id}`).then((res)=>{
@@ -61,7 +76,7 @@ const Travellers = () => {
       case "Follow Up":
         return "bg-orange-500"; // Orange
       case "Confirmed":
-        return "bg-dark-green-500"; // Dark Green
+        return "bg-green-900"; // Dark Green
       case "Cancelled":
         return "bg-red-500"; // Red
       case "CNP":
@@ -212,6 +227,24 @@ const Travellers = () => {
                       </div>
                     )}
                   </td>
+                  <td className="px-4 py-2 flex justify-center items-center gap-2">
+                    <span className={`w-2 h-2 rounded-[50%]  ${getStatusColorbackground(
+                      user.status
+                    )}`}></span>
+                        <select
+                          value={user.status}
+                          onChange={(e) => {setSelectedQuote(e.target.value);setSelctedId(user._id)}}
+                        >
+                          <option value="">Select a status</option>
+                          <option value="Active">Active</option>
+                          <option value="Quoted">Quoted</option>
+                          <option value="Follow Up">Follow Up</option>
+                          <option value="Confirmed">Confirmed</option>
+                          <option value="Cancelled">Cancelled</option>
+                          <option value="CNP">CNP</option>
+                          <option value="Groups">Groups</option>
+                        </select>
+                      </td>
                   <td
                     onClick={() => handleComment(user._id)}
                     className="cursor-pointer px-4 py-2"
