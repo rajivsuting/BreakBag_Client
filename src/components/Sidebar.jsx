@@ -20,7 +20,7 @@ import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { NavLink, useLocation } from "react-router-dom";
 import { PiUploadDuotone } from "react-icons/pi";
 import { useAccordion } from "../context/AccordionContext"; // Import the custom hook
-import { MdChevronLeft } from "react-icons/md";
+import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 
 const Sidebar = () => {
   const { openAccordion, setOpenAccordion } = useAccordion();
@@ -108,7 +108,7 @@ const Sidebar = () => {
                     className={isActive("/agent") ? "text-red-500" : ""}
                   >
                     <ListItemPrefix>
-                      <MdChevronLeft className="h-5 w-5" />
+                      <MdOutlineKeyboardArrowRight className="h-5 w-5" />
                     </ListItemPrefix>
                     Agents & Team leads
                   </ListItem>
@@ -119,7 +119,7 @@ const Sidebar = () => {
                     className={isActive("/destination") ? "text-red-500" : ""}
                   >
                     <ListItemPrefix>
-                      <MdChevronLeft className="h-5 w-5" />
+                      <MdOutlineKeyboardArrowRight className="h-5 w-5" />
                     </ListItemPrefix>
                     Destination
                   </ListItem>
@@ -129,7 +129,7 @@ const Sidebar = () => {
                     className={isActive("/travellers") ? "text-red-500" : ""}
                   >
                     <ListItemPrefix>
-                      <MdChevronLeft className="h-5 w-5" />
+                      <MdOutlineKeyboardArrowRight className="h-5 w-5" />
                     </ListItemPrefix>
                     Travellers
                   </ListItem>
@@ -198,7 +198,7 @@ const Sidebar = () => {
                     }
                   >
                     <ListItemPrefix>
-                      <MdChevronLeft className="h-5 w-5" />
+                      <MdOutlineKeyboardArrowRight className="h-5 w-5" />
                     </ListItemPrefix>
                     Travel Summary
                   </ListItem>
@@ -208,7 +208,7 @@ const Sidebar = () => {
                     className={isActive("/activity") ? "text-red-500" : ""}
                   >
                     <ListItemPrefix>
-                      <MdChevronLeft className="h-5 w-5" />
+                      <MdOutlineKeyboardArrowRight className="h-5 w-5" />
                     </ListItemPrefix>
                     Activities
                   </ListItem>
@@ -218,7 +218,7 @@ const Sidebar = () => {
                     className={isActive("/inclusion") ? "text-red-500" : ""}
                   >
                     <ListItemPrefix>
-                      <MdChevronLeft className="h-5 w-5" />
+                      <MdOutlineKeyboardArrowRight className="h-5 w-5" />
                     </ListItemPrefix>
                     Inclusion
                   </ListItem>
@@ -228,7 +228,7 @@ const Sidebar = () => {
                     className={isActive("/exclusion") ? "text-red-500" : ""}
                   >
                     <ListItemPrefix>
-                      <MdChevronLeft className="h-5 w-5" />
+                      <MdOutlineKeyboardArrowRight className="h-5 w-5" />
                     </ListItemPrefix>
                     Exclusion
                   </ListItem>
@@ -238,7 +238,7 @@ const Sidebar = () => {
                     className={isActive("/transfer") ? "text-red-500" : ""}
                   >
                     <ListItemPrefix>
-                      <MdChevronLeft className="h-5 w-5" />
+                      <MdOutlineKeyboardArrowRight className="h-5 w-5" />
                     </ListItemPrefix>
                     Transfers
                   </ListItem>
@@ -250,7 +250,7 @@ const Sidebar = () => {
                     }
                   >
                     <ListItemPrefix>
-                      <MdChevronLeft className="h-5 w-5" />
+                      <MdOutlineKeyboardArrowRight className="h-5 w-5" />
                     </ListItemPrefix>
                     Other Information
                   </ListItem>
