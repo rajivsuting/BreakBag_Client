@@ -17,6 +17,7 @@ import QuoteDetail from '../pages/QuoteDetail';
 import CreateItinary from '../pages/CreateItinary';
 import { useState } from "react";
 import TeamLead from "../pages/TeamLead";
+import Agentroutes from "../pages/Agentroutes";
 
 const App = () => {
   const [role, setRole] = useState(localStorage.getItem('userRole') || ''); // Get role from storage after login
@@ -140,6 +141,14 @@ const App = () => {
           element={
             <ProtectedRoute role={role} allowedRoles={['Agent', 'Admin', "Team Lead"]}>
               <CreateItinary />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/agent-details/:userid" 
+          element={
+            <ProtectedRoute role={role} allowedRoles={['Admin', "Team Lead"]}>
+              <Agentroutes />
             </ProtectedRoute>
           } 
         />

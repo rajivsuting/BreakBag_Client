@@ -18,6 +18,7 @@ import axios from "axios";
 import Addagents from "../components/Addagents";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Link } from "react-router-dom";
 
 const data = [
   {
@@ -227,7 +228,8 @@ const Agents = () => {
                     key={index}
                     className="hover:bg-gray-100 transition-colors duration-200"
                   >
-                    <td className="px-4 py-2">{user.name}</td>
+                    <Link to={`/agent-details/${user._id}`}> 
+                    <td className="px-4 py-2">{user.name}</td></Link>
                     <td className="px-4 py-2">{user.email}</td>
                     <td className="px-4 py-2">{user.phone}</td>
                     {selectedRole == "Team Lead" ||

@@ -15,8 +15,8 @@ import {
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 import { serverUrl } from "../api";
 import axios from "axios";
-import Addtraveller from "../components/Addtraveller";
-import AddQuote from "../components/AddQuote";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import Addcomment from "../components/Addcomment";
 
@@ -52,8 +52,10 @@ const Travellers = () => {
     if (selectedQuote && selectedId){
       axios.patch(`${serverUrl}/api/quote/quote/${selectedId}`,{status:selectedQuote})
       .then((res)=>{
-        alert("Status updated");
+      toast.success("Status updated");
         getAlldata(); 
+      }).catch((err)=>{
+        toast.error("Failed to update status, please try again")
       })
     }
   },[selectedQuote,selectedId])
