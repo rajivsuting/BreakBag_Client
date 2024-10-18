@@ -229,7 +229,7 @@ const Agents = () => {
                     className="hover:bg-gray-100 transition-colors duration-200"
                   >
                     <Link to={`/agent-details/${user._id}`}> 
-                    <td className="px-4 py-2">{user.name}</td></Link>
+                    <td className="px-4 py-4 hover:text-main hover:border-b-2 hover:border-main transition-all duration-200">{user.name}</td></Link>
                     <td className="px-4 py-2">{user.email}</td>
                     <td className="px-4 py-2">{user.phone}</td>
                     {selectedRole == "Team Lead" ||
