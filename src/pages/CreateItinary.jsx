@@ -24,6 +24,7 @@ import { IoMdClose, IoMdSearch } from "react-icons/io";
 
 const CreateItinerary = () => {
   const { tripid } = useParams();
+  const [loadingItinery, setLoadingItinery] = useState();
   const [selectedCategory, setSelectedCategory] = useState("Travel Summary");
   const [allTravelData, setAllTravelData] = useState([]);
   const [originalTravelData, setOriginalTravelData] = useState([]);
@@ -540,6 +541,7 @@ const CreateItinerary = () => {
     //   selectedTransfers,
     //   selectedInclusions,
     // })
+    setLoadingItinery(true);
     axios
       .post(
         `${serverUrl}/api/quote/itenerary/generate`,
@@ -559,6 +561,7 @@ const CreateItinerary = () => {
         }
       )
       .then((res) => {
+        setLoadingItinery(false);
         // Create a new Blob object using the response data (PDF binary)
         const file = new Blob([res.data], { type: "application/pdf" });
 
@@ -582,11 +585,12 @@ const CreateItinerary = () => {
         document.body.removeChild(link);
       })
       .catch((error) => {
+        setLoadingItinery(false);
         console.error("Error generating the PDF:", error);
       });
   };
 
-  console.log(data);
+  // console.log(data);
 
   return (
     <div className="flex gap-5">
@@ -992,7 +996,7 @@ const CreateItinerary = () => {
                         className="bg-main m-auto mt-5"
                         onClick={handleFinalSubmit}
                       >
-                        Final Submit
+                        {loadingItinery ? "Generating pdf..." : "Final Submit"}
                       </Button>
                     </div>
                   </div>
