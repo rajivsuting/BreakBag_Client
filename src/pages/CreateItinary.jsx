@@ -528,19 +528,22 @@ const CreateItinerary = () => {
 
   //inclusoon extra
 
+  console.log(data);
+  
+
   const handleFinalSubmit = () => {
     // Send the POST request with your itinerary data
-    // console.log({
-    //   destination:data?.destination,
-    //   travelSummaryPerDay,
-    //   activityPerDay,
-    //   priceDetails,
-    //   selectedHotel,
-    //   selectedExclusions,
-    //   selectedOtherInformation,
-    //   selectedTransfers,
-    //   selectedInclusions,
-    // })
+    console.log({
+      destination:data?.destination,
+      travelSummaryPerDay,
+      activityPerDay,
+      priceDetails,
+      selectedHotel,
+      selectedExclusions,
+      selectedOtherInformation,
+      selectedTransfers,
+      selectedInclusions,
+    })
     setLoadingItinery(true);
     axios
       .post(
@@ -562,6 +565,7 @@ const CreateItinerary = () => {
       )
       .then((res) => {
         setLoadingItinery(false);
+        console.log(res)
         // Create a new Blob object using the response data (PDF binary)
         const file = new Blob([res.data], { type: "application/pdf" });
 
@@ -666,11 +670,11 @@ const CreateItinerary = () => {
                       {travelSummaryPerDay?.length < data?.duration ? (
                         <div className="w-[20%]">
                           <div  onClick={addTravelSummaryDay} className="cursor-pointer text-center border border-green-500 text-green-500 hover:bg-green-500 hover:text-white px-2 py-1 rounded ">
-                            New date
+                            New day
                           </div>
                           {/* <ul className="w-[150px] absolute right-0 shadow text-center hidden bg-white border rounded p-2 text-gray-700 group-hover:block z-10">
                             <li className="flex justify-center items-center gap-2 w-full text-xs font-semibold">
-                              <FiInfo className="font-bold" /> Add new date
+                              <FiInfo className="font-bold" /> Add New day
                             </li>
                           </ul> */}
                         </div> )
@@ -749,7 +753,7 @@ const CreateItinerary = () => {
                       {activityPerDay?.length < data?.duration ? (
                         <div className="w-[20%]">
                         <div  onClick={addActivityDay} className="cursor-pointer text-center border border-green-500 text-green-500 hover:bg-green-500 hover:text-white px-2 py-1 rounded ">
-                          New date
+                          New day
                         </div>
                         </div>
                       ) : null}

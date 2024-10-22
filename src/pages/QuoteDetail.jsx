@@ -128,31 +128,31 @@ const QuoteDetail = () => {
             <div className=" w-[50%]">
               <div className="flex justify-between">
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-400">Starting date</div>
+                  <div className="text-gray-600">Starting date</div>
                   <div>{data?.startDate?.split("T")[0]}</div>
                 </div>
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-400">Ending date</div>
+                  <div className="text-gray-600">Ending date</div>
                   <div>{data?.endDate?.split("T")[0]}</div>
                 </div>
               </div>
               <div className="flex justify-between mt-5">
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-400">Destination</div>
+                  <div className="text-gray-600">Destination</div>
                   <div>{data?.destination?.title}</div>
                 </div>
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-400">No. of traveller</div>
+                  <div className="text-gray-600">No. of traveller</div>
                   <div>{data?.numberOfTravellers}</div>
                 </div>
               </div>
               <div className="flex justify-between mt-5">
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-400">Duration</div>
+                  <div className="text-gray-600">Duration</div>
                   <div>{data?.duration}</div>
                 </div>
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-400">Travellers</div>
+                  <div className="text-gray-600">Travellers</div>
                   <div>
                     {" "}
                     {data?.travellers?.slice(0, 2).map((participant, index) => (
@@ -169,11 +169,11 @@ const QuoteDetail = () => {
               </div>
               <div className="flex justify-between mt-5">
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-400">Created by</div>
+                  <div className="text-gray-600">Created by</div>
                   <div>{data?.createdBy?.name || "Unknown"}</div>
                 </div>
                 {/* <div className="text-start w-[30%]">
-                  <div className="text-gray-400">Travellers</div>
+                  <div className="text-gray-600">Travellers</div>
                   <div>
                     {" "}
                     {data?.travellers?.slice(0, 2).map((participant, index) => (
