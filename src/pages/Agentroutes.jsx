@@ -233,7 +233,7 @@ const Agentroutes = () => {
                           {user.tripId}
                         </td>
                       </Link>
-                      <td className="px-4 py-2 cursor-pointer">
+                      {/* <td className="px-4 py-2 cursor-pointer">
                         {user?.comments?.length == 0 ? (
                           <div className="relative group">
                             {data?.user?.name} haven't made any comment.
@@ -251,7 +251,7 @@ const Agentroutes = () => {
                             </ul>
                           </div>
                         )}
-                      </td>
+                      </td> */}
                     </tr>
                   ))}
                 </tbody>

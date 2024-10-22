@@ -207,11 +207,7 @@ const Travellers = () => {
                     </td>
                   </Link>
                   <td className="px-4 py-2 cursor-pointer">
-                    {user?.comments?.length == 0 ? (
-                      <div className="relative group">
-                        Write you first comment
-                      </div>
-                    ) : (
+                    {/* {user?.comments?.length == 0 ? null : (
                       <div className="relative group">
                         {
                           user?.comments?.[user?.comments?.length - 1]?.author
@@ -227,7 +223,7 @@ const Travellers = () => {
                           </li>
                         </ul>
                       </div>
-                    )}
+                    )} */}
                   </td>
                   <td className="px-4 py-2 flex justify-center items-center gap-2">
                     <span className={`w-2 h-2 rounded-[50%]  ${getStatusColorbackground(
@@ -247,12 +243,12 @@ const Travellers = () => {
                           <option value="Groups">Groups</option>
                         </select>
                       </td>
-                  <td
+                  {/* <td
                     onClick={() => handleComment(user._id)}
                     className="cursor-pointer px-4 py-2"
                   >
                     Add a comment
-                  </td>
+                  </td> */}
                   <td className="px-4 py-2">
                     <MdDelete
                       onClick={() => handleDelete(user._id)}
@@ -265,11 +261,11 @@ const Travellers = () => {
           </table>
         </div>
       </div>
-      <Addcomment
+      {/* <Addcomment
         isOpen={commentModalOpen}
         onClose={() => setCommentModalOpen(false)}
         getAlldata={getAlldata}
-      />
+      /> */}
     </div>
   );
 };

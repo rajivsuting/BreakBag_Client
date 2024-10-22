@@ -17,12 +17,13 @@ import {
   PowerIcon,
 } from "@heroicons/react/24/solid";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { PiUploadDuotone } from "react-icons/pi";
 import { useAccordion } from "../context/AccordionContext"; // Import the custom hook
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 
 const Sidebar = () => {
+  const navigate = useNavigate();
   const { openAccordion, setOpenAccordion } = useAccordion();
   const location = useLocation();
 
@@ -293,17 +294,19 @@ const Sidebar = () => {
           </ListItem>
         </NavLink>
 
-<div className=" mb-24">
-
-        <NavLink to={"/logout"}>
-          <ListItem className={isActive("/logout") ? "text-red-500" : ""}>
-            <ListItemPrefix>
-              <PowerIcon className="h-5 w-5" />
-            </ListItemPrefix>
-            Logout
-          </ListItem>
-        </NavLink>
-</div>
+        <div className=" ">
+          {/* <NavLink to={"/logout"}> */}
+            <ListItem onClick={()=>{
+              navigate("/signin");
+              localStorage.clear()
+            }} className={`${isActive("/logout") ? "text-red-500" : ""} mb-32`}>
+              <ListItemPrefix>
+                <PowerIcon className="h-5 w-5" />
+              </ListItemPrefix>
+              Logout
+            </ListItem>
+          {/* </NavLink> */}
+        </div>
       </List>
     </div>
   );
