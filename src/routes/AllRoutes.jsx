@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import ProtectedRoute from '../context/ProtectedRoute'; // The component we just created
 import SignIn from '../pages/Signin';
 import AdminDashboard from '../pages/admin/AdminDashboard';
@@ -15,13 +15,81 @@ import Quote from '../pages/Quote';
 import AddQuote from '../components/AddQuote';
 import QuoteDetail from '../pages/QuoteDetail';
 import CreateItinary from '../pages/CreateItinary';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TeamLead from "../pages/TeamLead";
 import Agentroutes from "../pages/Agentroutes";
+import { serverUrl } from "../api";
+import axios from "axios";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const App = () => {
   const [role, setRole] = useState(localStorage.getItem('userRole') || ''); // Get role from storage after login
   const isAuthenticated = !!role; // Check if user is authenticated (role is set)
+  // const navigate = useNavigate();
+
+  const handleValidateToken = async () => {
+    try {
+      const response = await axios.get(`${serverUrl}/api/validateToken`,{
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+    } catch (error) {
+      // Handle different types of errors
+      if (error.response) {
+        const status = error.response.status;
+        const errorMessage =
+          error.response.data.message || "Something went wrong";
+
+        // Show custom error messages based on status codes
+        switch (status) {
+          case 400:
+            toast.error(`Bad Request: ${errorMessage}`);
+            // navigate("/signin")
+            break;
+          case 401:
+            toast.error("Unauthorized: Please log in again.");
+            // navigate("/signin")
+            break;
+          case 403:
+            toast.error(
+              "Forbidden: You do not have permission to perform this action."
+            );
+            // navigate("/signin")
+            break;
+          case 404:
+            toast.error(
+              "Not Found: The requested resource could not be found."
+            );
+            // navigate("/signin")
+            break;
+          case 500:
+            toast.error("Server Error: Please try again later.");
+            // navigate("/signin")
+            break;
+          default:
+            toast.error(`Error: ${errorMessage}`);
+            // navigate("/signin")
+        }
+      } else if (error.request) {
+        // Network error (no response received)
+        toast.error("Network Error: No response received from the server.");
+      } else {
+        // Something else happened
+        toast.error(`Error: ${error.message}`);
+      }
+    } finally {
+    }
+  };
+
+  useEffect(() => {
+    handleValidateToken();
+
+    return () => {
+      console.log("done");
+    };
+  }, []);
 
   return (
     <Router>
