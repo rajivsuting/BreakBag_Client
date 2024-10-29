@@ -50,7 +50,6 @@ input[type="number"] {
   background-color: rgb(235, 28, 36); /* Darker color when hovered */
 }
 
-
 /* Sidebar styles */
 .fixed-sidebar {
   position: fixed;
@@ -61,4 +60,17 @@ input[type="number"] {
   background-color: #333; /* Adjust based on your design */
   z-index: 1000; /* Ensure it stays on top */
   overflow-y: auto; /* If you want the sidebar content to be scrollable */
+}
+
+@font-face {
+  font-family: "Brandon Grotesque";
+  src: url("./fonts/HvDTrial_Brandon_Grotesque_regular-BF64a625c9311e1.otf")
+    format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Apply as default font */
+body {
+  font-family: "Brandon Grotesque", sans-serif;
 }
