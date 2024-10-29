@@ -59,7 +59,7 @@ const Acitivities = () => {
     <div className="flex gap-5 ">
       <Sidebar />
       <div className="w-[100%] m-auto mt-3 rounded-md ml-[20rem] p-4">
-      <div className="relative w-full">
+        <div className="relative w-full">
           {/* Background Image with dark overlay */}
           <div
             className="inset-0 bg-cover bg-center rounded-md relative"
@@ -155,15 +155,16 @@ const Acitivities = () => {
                 </tr>
               </thead>
               <tbody>
-                {data.map((user, index) => (
+                {data?.map((user, index) => (
                   <tr
                     key={index}
                     className="hover:bg-gray-100 transition-colors duration-200"
                   >
                     <td className="px-4 py-2">{user?.title}</td>
-                    <td className="px-4 py-2">{user?.description?.slice(0, 2).map((el, index) => (
+                    <td className="px-4 py-2">
+                      {user?.description?.slice(0, 2).map((el, index) => (
                         <span key={index}>
-                          {el}
+                          {el.length <=20 ? el : el.slice(0,20)+ "..."}
                           {index < 1 && user?.description?.length >= 2
                             ? ", "
                             : ""}
@@ -171,7 +172,8 @@ const Acitivities = () => {
                       ))}
                       {user?.description?.length > 2 && (
                         <span> and {user?.description?.length - 2} more</span>
-                      )}</td>
+                      )}
+                    </td>
                     <td className="px-4 py-2">{user?.destination?.title}</td>
                     {/* <td className="px-4 py-2">
                       <MdRemoveRedEye className="h-5 w-5 text-maincolor2 cursor-pointer" />

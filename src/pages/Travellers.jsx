@@ -178,7 +178,7 @@ const Travellers = () => {
                 </tr>
               </thead>
               <tbody>
-                {data.map((user, index) => (
+                {data?.map((user, index) => (
                   <tr
                     key={index}
                     className="hover:bg-gray-100 transition-colors duration-200"

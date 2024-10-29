@@ -156,18 +156,22 @@ const Transfer = () => {
                 </tr>
               </thead>
               <tbody>
-              {data.map((user, index) => (
+              {data?.map((user, index) => (
                   <tr
                     key={index}
                     className="hover:bg-gray-100 transition-colors duration-200"
                   >
                     {/* Titles Column */}
                     <td className="px-4 py-2">
-                      {user.title}
+                   {user.title.length <= 20
+                                ? user.title
+                                : user.title.slice(0, 20) + "..."}
                     </td>
 
                     <td className="px-4 py-2">
-                      {user?.description || "NA"}
+                   {user.description.length <= 40
+                                ? user.description
+                                : user.description.slice(0, 40) + "..."}
                     </td>
 
                     

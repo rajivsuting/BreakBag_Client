@@ -86,21 +86,21 @@ const CreateItinerary = () => {
       });
 
       const results = response.data.results;
-console.log(response)
+      console.log(response);
       if (results.length > 0) {
         const { lat, lng } = results[0].geometry.location;
         setLocation(`${lat},${lng}`);
         axios
-        .get(`${serverUrl}/hotels?location=${lat,lng}&name=${name}`)
-        .then((response) => {
-          console.log(response)
-          setAllHotel(response.data);
-          setOriginalHotel(response.data);
-        })
-        .catch((error) => {
-          console.log(error)
-          setError("Error fetching hotels");
-        });
+          .get(`${serverUrl}/hotels?location=${(lat, lng)}&name=${name}`)
+          .then((response) => {
+            console.log(response);
+            setAllHotel(response.data);
+            setOriginalHotel(response.data);
+          })
+          .catch((error) => {
+            console.log(error);
+            setError("Error fetching hotels");
+          });
       } else {
         setError("Place not found");
       }
@@ -218,6 +218,7 @@ console.log(response)
     });
 
     axios.get(`${serverUrl}/api/inclusion/inclusions/`).then((res) => {
+      console.log("keknef");
       setAllInclusion(res.data.data);
       setOriginalInclusion(res.data.data); // Store original data
     });
@@ -236,7 +237,7 @@ console.log(response)
     });
   }, []);
 
-  // useEffect(() => { 
+  // useEffect(() => {
   //   if (location) {
   //     axios
   //       .get(`${serverUrl}/hotels?location=${location}&name=${name}`)
@@ -283,7 +284,7 @@ console.log(response)
       .get(`${serverUrl}/api/activity/search/?keyword=${searchTermActivity}`)
       .then((res) => {
         console.log(res);
-        setAllActivityData(res.data.data)
+        setAllActivityData(res.data.data);
       })
       .catch((err) => {
         toast.error(err.response.data.message);
@@ -518,17 +519,28 @@ console.log(response)
     setSelectedInclusions((prev) => [...prev, inclusion]); // Add to array
     resetSearchInclusion(); // Reset search
   };
-  const handleInputChangeInclusion = (e, index) => {
+  const handleInputChangeInclusion = (e, inclusionIndex, descriptionIndex) => {
     const { name, value } = e.target;
     setSelectedInclusions((prev) =>
       prev.map((inclusion, i) =>
-        i === index ? { ...inclusion, [name]: value } : inclusion
+        i === inclusionIndex
+          ? {
+              ...inclusion,
+              [name]:
+                name === "title"
+                  ? value
+                  : inclusion.description.map((desc, j) =>
+                      j === descriptionIndex ? value : desc
+                    ),
+            }
+          : inclusion
       )
     );
   };
   const handleRemoveInclusion = (index) => {
     setSelectedInclusions((prev) => prev.filter((_, i) => i !== index));
   };
+
   const resetSearchInclusion = () => {
     setSearchTermInclusion(""); // Clear search term
     setAllInclusion(originalInclusion); // Reset to original data
@@ -1165,33 +1177,47 @@ console.log(response)
                       Inclusion details
                     </div>
                     <div className="flex flex-col w-full gap-5 p-2">
-                      {selectedInclusions.map((inclusion, index) => (
-                        <div key={index} className="flex justify-between gap-4">
+                      {selectedInclusions.map((inclusion, inclusionIndex) => (
+                        <div
+                          key={inclusionIndex}
+                          className="flex justify-between gap-4"
+                        >
                           <div className="w-[95%]">
                             <Input
-                              label={`Title ${index + 1}`}
+                              label={`Title ${inclusionIndex + 1}`}
                               name="title"
                               value={inclusion.title}
                               onChange={(e) =>
-                                handleInputChangeInclusion(e, index)
+                                handleInputChangeInclusion(e, inclusionIndex)
                               }
                             />
                             <div className="mt-5">
-                              <Textarea
-                                label={`Description ${index + 1}`}
-                                name="description"
-                                value={inclusion.description}
-                                onChange={(e) =>
-                                  handleInputChangeInclusion(e, index)
-                                }
-                                className="min-h-[50px] h-auto w-full "
-                              />
+                              {inclusion.description.map(
+                                (desc, descriptionIndex) => (
+                                  <Textarea
+                                    key={descriptionIndex}
+                                    label={`Point ${descriptionIndex + 1}`}
+                                    name="description"
+                                    value={desc}
+                                    onChange={(e) =>
+                                      handleInputChangeInclusion(
+                                        e,
+                                        inclusionIndex,
+                                        descriptionIndex
+                                      )
+                                    }
+                                    className="min-h-[50px] h-auto w-full"
+                                  />
+                                )
+                              )}
                             </div>
                           </div>
                           <div className="w-[5%]">
                             <button
-                              className=" text-main"
-                              onClick={() => handleRemoveInclusion(index)}
+                              className="text-main"
+                              onClick={() =>
+                                handleRemoveInclusion(inclusionIndex)
+                              }
                             >
                               <IoMdClose size={20} />
                             </button>
@@ -1239,7 +1265,7 @@ console.log(response)
                   <div className="flex-1 overflow-y-auto sidebar">
                     <List className="border-t border-gray-300">
                       {allTravelData?.length > 0 ? (
-                        allTravelData.map((summary, index) => (
+                        allTravelData?.map((summary, index) => (
                           <div
                             key={index}
                             className="py-2 px-2 hover:bg-gray-200 transition-colors cursor-pointer"
@@ -1248,9 +1274,15 @@ console.log(response)
                               resetSearch();
                             }}
                           >
-                            <div className="font-bold">{summary.title}</div>
+                            <div className="font-bold">
+                              {summary.title.length <= 20
+                                ? summary.title
+                                : summary.title.slice(0, 20) + "..."}
+                            </div>
                             <div className="text-gray-600">
-                              {summary.description}
+                              {summary.description.length <= 30
+                                ? summary.description
+                                : summary.description.slice(0, 30) + "..."}
                             </div>
                           </div>
                         ))
@@ -1300,7 +1332,7 @@ console.log(response)
                   <div className="flex-1 overflow-y-auto sidebar">
                     <List className="border-t border-gray-300">
                       {allActivityData?.length > 0 ? (
-                        allActivityData.map((summary, index) => (
+                        allActivityData?.map((summary, index) => (
                           <div
                             key={index}
                             className="py-2 px-2 hover:bg-gray-200 transition-colors cursor-pointer"
@@ -1309,13 +1341,15 @@ console.log(response)
                               resetSearchActivity();
                             }}
                           >
-                            <div className="font-bold">{summary.title}</div>
+                            <div className="font-bold">  {summary.title.length <= 20
+                                ? summary.title
+                                : summary.title.slice(0, 20) + "..."}</div>
                             <div className="text-gray-600">
                               {summary?.description
                                 ?.slice(0, 2)
                                 .map((el, index) => (
                                   <span key={index}>
-                                    {el}
+                                    {el.length <=20 ? el : el.slice(0,20)+ "..."}
                                     {index < 1 &&
                                     summary?.description?.length >= 2
                                       ? ", "
@@ -1385,9 +1419,13 @@ console.log(response)
                             className="py-2 px-2 hover:bg-gray-200 transition-colors cursor-pointer"
                             onClick={() => handleSelectExclusion(summary)} // Add to multiple selections
                           >
-                            <div className="font-bold">{summary.title}</div>
+                            <div className="font-bold">{summary.title.length <= 20
+                                ? summary.title
+                                : summary.title.slice(0, 20) + "..."}</div>
                             <div className="text-gray-600">
-                              {summary.description}
+                              {summary.description.length <= 30
+                                ? summary.description
+                                : summary.description.slice(0, 30) + "..."}
                             </div>
                           </div>
                         ))
@@ -1443,9 +1481,13 @@ console.log(response)
                             className="py-2 px-2 hover:bg-gray-200 transition-colors cursor-pointer"
                             onClick={() => handleSelectTransfer(summary)}
                           >
-                            <div className="font-bold">{summary.title}</div>
+                            <div className="font-bold">{summary.title.length <= 20
+                                ? summary.title
+                                : summary.title.slice(0, 20) + "..."}</div>
                             <div className="text-gray-600">
-                              {summary.description}
+                              {summary.description.length <= 30
+                                ? summary.description
+                                : summary.description.slice(0, 30) + "..."}
                             </div>
                           </div>
                         ))
@@ -1505,9 +1547,13 @@ console.log(response)
                               handleSelectOtherinformation(summary)
                             }
                           >
-                            <div className="font-bold">{summary.title}</div>
+                            <div className="font-bold">{summary.title.length <= 20
+                                ? summary.title
+                                : summary.title.slice(0, 20) + "..."}</div>
                             <div className="text-gray-600">
-                              {summary.description}
+                              {summary.description.length <= 30
+                                ? summary.description
+                                : summary.description.slice(0, 30) + "..."}
                             </div>
                           </div>
                         ))
@@ -1534,7 +1580,7 @@ console.log(response)
                         value={searchTermHotel}
                         onChange={(e) => setSearchTermHotel(e.target.value)}
                         required
-                        />
+                      />
                       <div className="mt-2">
                         <Input
                           label="Search hotel by name"
@@ -1644,9 +1690,27 @@ console.log(response)
                             className="py-2 px-2 hover:bg-gray-200 transition-colors cursor-pointer"
                             onClick={() => handleSelectInclusion(summary)} // Add to multiple selections
                           >
-                            <div className="font-bold">{summary.title}</div>
+                            <div className="font-bold">{summary.title.length <= 20
+                                ? summary.title
+                                : summary.title.slice(0, 20) + "..."}</div>
                             <div className="text-gray-600">
-                              {summary.description}
+                              {summary?.description
+                                ?.slice(0, 2)
+                                .map((el, index) => (
+                                  <span key={index}>
+                                    {el.length <=30 ? el : el.slice(0,30)+ "..."}
+                                    {index < 1 &&
+                                    summary?.description?.length >= 2
+                                      ? ", "
+                                      : ""}
+                                  </span>
+                                ))}
+                              {summary?.description?.length > 2 && (
+                                <span>
+                                  {" "}
+                                  and {summary?.description?.length - 2} more
+                                </span>
+                              )}
                             </div>
                           </div>
                         ))

@@ -116,14 +116,14 @@ const Inclusion = () => {
               <thead>
                 <tr className="bg-gray-200">
                   <th className="px-4 py-2">Title</th>
-                  <th className="px-4 py-2">Description</th>
+                  <th className="px-4 py-2">Point</th>
                   {/* <th className="px-4 py-2"></th>
                   <th className="px-4 py-2"></th>
                   <th className="px-4 py-2"></th> */}
                 </tr>
               </thead>
               <tbody>
-                {data.map((user, index) => (
+                {data?.map((user, index) => (
                   <tr
                     key={index}
                     className="hover:bg-gray-100 transition-colors duration-200"
@@ -134,7 +134,17 @@ const Inclusion = () => {
                     </td>
 
                     <td className="px-4 py-2">
-                      {user?.description || "NA"}
+                    {user?.description?.slice(0, 2).map((el, index) => (
+                        <span key={index}>
+                          {el.length <=20 ? el : el.slice(0,20)+ "..."}
+                          {index < 1 && user?.description?.length >= 2
+                            ? ", "
+                            : ""}
+                        </span>
+                      ))}
+                      {user?.description?.length > 2 && (
+                        <span> and {user?.description?.length - 2} more</span>
+                      )}
                     </td>
                     {/* <td className="px-4 py-2">
                       <MdRemoveRedEye className="h-5 w-5 text-maincolor2 cursor-pointer" />
