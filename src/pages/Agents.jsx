@@ -218,8 +218,8 @@ const Agents = () => {
                   localStorage.getItem("userRole") == "Agent" ? null : (
                     <th className="px-4 py-2">Assign to a team lead</th>
                   )}
-                  <th className="px-4 py-2"></th>
-                  <th className="px-4 py-2"></th>
+                  {/* <th className="px-4 py-2"></th>
+                  <th className="px-4 py-2"></th> */}
                 </tr>
               </thead>
               <tbody>
@@ -282,12 +282,12 @@ const Agents = () => {
                       </ul>
                     </td> */}
 
-                    <td className="px-4 py-2">
+                    {/* <td className="px-4 py-2">
                       <MdEdit className="h-5 w-5 text-maincolor2 cursor-pointer" />
                     </td>
                     <td className="px-4 py-2">
                       <MdDelete className="h-5 w-5 text-main cursor-pointer" />
-                    </td>
+                    </td> */}
                   </tr>
                 ))}
               </tbody>

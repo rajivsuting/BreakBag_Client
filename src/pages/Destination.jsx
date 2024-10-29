@@ -148,9 +148,9 @@ const Destination = () => {
               <thead>
                 <tr className="bg-gray-200">
                   <th className="px-4 py-2">Title</th>
+                  {/* <th className="px-4 py-2"></th>
                   <th className="px-4 py-2"></th>
-                  <th className="px-4 py-2"></th>
-                  <th className="px-4 py-2"></th>
+                  <th className="px-4 py-2"></th> */}
                 </tr>
               </thead>
               <tbody>
@@ -160,7 +160,7 @@ const Destination = () => {
                     className="hover:bg-gray-100 transition-colors duration-200"
                   >
                     <td className="px-4 py-2">{user.title}</td>
-                    <td className="px-4 py-2">
+                    {/* <td className="px-4 py-2">
                       <MdRemoveRedEye className="h-5 w-5 text-maincolor2 cursor-pointer" />
                     </td>
                     <td className="px-4 py-2">
@@ -168,7 +168,7 @@ const Destination = () => {
                     </td>
                     <td className="px-4 py-2">
                       <MdDelete className="h-5 w-5 text-main cursor-pointer" />
-                    </td>
+                    </td> */}
                   </tr>
                 ))}
               </tbody>

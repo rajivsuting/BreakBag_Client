@@ -173,8 +173,8 @@ const Travellers = () => {
                   <th className="px-4 py-2">Address</th>
                   <th className="px-4 py-2">Date of birth</th>
                   <th className="px-4 py-2">User type</th>
-                  <th className="px-4 py-2"></th>
-                  <th className="px-4 py-2"></th>
+                  {/* <th className="px-4 py-2"></th>
+                  <th className="px-4 py-2"></th> */}
                 </tr>
               </thead>
               <tbody>
@@ -189,7 +189,7 @@ const Travellers = () => {
                     <td className="px-4 py-2">{user.address}</td>
                     <td className="px-4 py-2">{user.dateOfBirth.split("T")[0]}</td>
                     <td className="px-4 py-2">{user.userType}</td>
-                    <td className="px-4 py-2">
+                    {/* <td className="px-4 py-2">
                       <MdEdit className="h-5 w-5 text-maincolor2 cursor-pointer" />
                     </td>
                     <td className="px-4 py-2">
@@ -197,7 +197,7 @@ const Travellers = () => {
                         onClick={() => handleDelete(user._id)}
                         className="h-5 w-5 text-main cursor-pointer"
                       />
-                    </td>
+                    </td> */}
                   </tr>
                 ))}
               </tbody>
