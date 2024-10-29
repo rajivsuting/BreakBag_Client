@@ -11,16 +11,16 @@ import "react-toastify/dist/ReactToastify.css";
 const AddActivities = ({ isOpen, onClose, getAlldata }) => {
   usePreventScrollOnNumberInput();
 
-  // State to manage form inputs
   const [formData, setFormData] = useState({
     title: "",
     destination: "",
-    description: [""], // Initially one description
+    description: [""],
   });
-  const [files, setFiles] = useState([]); // state to handle multiple files
+  const [files, setFiles] = useState([]);
+  const [fileError, setFileError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [destinationAll, setDestinationAll] = useState([]);
-  const [selectedDestination, setSelectedDestination] = useState(null); // null initially
+  const [selectedDestination, setSelectedDestination] = useState(null);
 
   const options = destinationAll.map((destination) => ({
     value: destination._id,
@@ -36,11 +36,9 @@ const AddActivities = ({ isOpen, onClose, getAlldata }) => {
         console.error("Error fetching destinations:", error);
       }
     };
-
     fetchDestinations();
   }, []);
 
-  // Update `formData.destination` when `selectedDestination` changes
   useEffect(() => {
     if (selectedDestination) {
       setFormData((prevState) => ({
@@ -50,7 +48,6 @@ const AddActivities = ({ isOpen, onClose, getAlldata }) => {
     }
   }, [selectedDestination]);
 
-  // Handle form input changes for title
   const handleChangeInput = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -59,14 +56,12 @@ const AddActivities = ({ isOpen, onClose, getAlldata }) => {
     });
   };
 
-  // Handle description changes
   const handleDescriptionChange = (index, value) => {
     const newDescriptions = [...formData.description];
     newDescriptions[index] = value;
     setFormData({ ...formData, description: newDescriptions });
   };
 
-  // Add new description field
   const handleAddDescription = () => {
     setFormData((prevState) => ({
       ...prevState,
@@ -74,40 +69,53 @@ const AddActivities = ({ isOpen, onClose, getAlldata }) => {
     }));
   };
 
-  // Remove a description field
   const handleRemoveDescription = (index) => {
     const newDescriptions = formData.description.filter((_, i) => i !== index);
     setFormData({ ...formData, description: newDescriptions });
   };
 
-  // Handle file input changes (for multiple files)
+  // Updated handleFileChange function
   const handleFileChange = (e) => {
-    setFiles(e.target.files); // store multiple files
+    const selectedFiles = Array.from(e.target.files);
+
+    // Combine new files with existing files, preventing duplicates by checking file names
+    const allFiles = [...files, ...selectedFiles].reduce((acc, file) => {
+      if (!acc.some((f) => f.name === file.name)) {
+        acc.push(file);
+      }
+      return acc;
+    }, []);
+
+    // Check if the combined total exceeds 3 files
+    if (allFiles.length > 3) {
+      setFileError("You can only select up to 3 images.");
+    } else {
+      setFiles(allFiles);
+      setFileError(""); // Clear error if 3 or fewer files
+    }
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent the form from refreshing the page
+    e.preventDefault();
+    if (fileError) {
+      return; // Prevent form submission if file validation fails
+    }
     setIsLoading(true);
 
     const data = new FormData();
-
-    // Append form data (title, descriptions as an array, and destination)
     data.append("title", formData.title);
     formData.description.forEach((description, i) => {
       data.append(`description[${i}]`, description);
     });
     data.append("destination", formData.destination);
 
-    // Append multiple files
     if (files.length > 0) {
       Array.from(files).forEach((file) => {
-        data.append("images", file); // Ensure you use the correct key, which is `images`
+        data.append("images", file);
       });
     }
 
     try {
-      // API call to submit form data
       const response = await axios.post(
         `${serverUrl}/api/activity/create`,
         data,
@@ -120,18 +128,15 @@ const AddActivities = ({ isOpen, onClose, getAlldata }) => {
       console.log("Response:", response.data);
       toast.success("Activity added successfully");
       getAlldata();
-      // Reset form after successful submission
       setFormData({ title: "", destination: "", description: [""] });
       setFiles([]);
-      setSelectedDestination(null); // Reset selected destination
-      onClose(); // Close modal on success
+      setSelectedDestination(null);
+      onClose();
     } catch (error) {
-      // Handle different types of errors
       if (error.response) {
         const status = error.response.status;
-        const errorMessage = error.response.data.message || "Something went wrong";
-  
-        // Show custom error messages based on status codes
+        const errorMessage =
+          error.response.data.message || "Something went wrong";
         switch (status) {
           case 400:
             toast.error(`Bad Request: ${errorMessage}`);
@@ -140,10 +145,14 @@ const AddActivities = ({ isOpen, onClose, getAlldata }) => {
             toast.error("Unauthorized: Please log in again.");
             break;
           case 403:
-            toast.error("Forbidden: You do not have permission to perform this action.");
+            toast.error(
+              "Forbidden: You do not have permission to perform this action."
+            );
             break;
           case 404:
-            toast.error("Not Found: The requested resource could not be found.");
+            toast.error(
+              "Not Found: The requested resource could not be found."
+            );
             break;
           case 500:
             toast.error("Server Error: Please try again later.");
@@ -152,10 +161,8 @@ const AddActivities = ({ isOpen, onClose, getAlldata }) => {
             toast.error(`Error: ${errorMessage}`);
         }
       } else if (error.request) {
-        // Network error (no response received)
         toast.error("Network Error: No response received from the server.");
       } else {
-        // Something else happened
         toast.error(`Error: ${error.message}`);
       }
     } finally {
@@ -200,16 +207,48 @@ const AddActivities = ({ isOpen, onClose, getAlldata }) => {
                 required
               />
             </div>
-            <div className="flex justify-between items-center m-auto gap-10 mt-5">
+            <div className="flex flex-col gap-2 mt-5">
+              {/* Reduced gap to 2 */}
               <Input
-                label="Upload Files"
+                label="Upload Images"
                 name="file"
                 type="file"
-                multiple // allow multiple files
+                multiple
                 onChange={handleFileChange}
-                required
+                className={`${fileError ? "border-red-500" : ""}`}
               />
+              {/* Display file error message (if any) directly below the input */}
+              {fileError && (
+                <p className="text-red-500 text-sm mt-1">{fileError}</p>
+              )}
+              {/* Dynamically colored file count */}
+              <p
+                className={`text-sm ${
+                  files.length === 3 ? "text-green-500" : "text-red-500"
+                }`}
+              >
+                Selected images: {files.length}/3
+              </p>
+              {/* Display selected file names with reduced spacing */}
+              <ul className="text-sm mt-1">
+                {" "}
+                {/* Reduced margin-top */}
+                {files.map((file, index) => (
+                  <li key={index} className="flex items-center">
+                    {file.name}
+                    <button
+                      onClick={() => {
+                        setFiles(files.filter((_, i) => i !== index));
+                      }}
+                      className="text-red-500 underline ml-2"
+                    >
+                      Remove
+                    </button>
+                  </li>
+                ))}
+              </ul>
             </div>
+
             <div className="m-auto mt-5">
               <div className="font-normal text-lg mb-2">Points</div>
               {formData.description.map((description, index) => (
@@ -217,7 +256,7 @@ const AddActivities = ({ isOpen, onClose, getAlldata }) => {
                   <Textarea
                     label={`Point ${index + 1}`}
                     name={`description${index}`}
-                    className="min-h-[50px] h-auto" // Adjusted height
+                    className="min-h-[50px] h-auto"
                     value={description}
                     onChange={(e) =>
                       handleDescriptionChange(index, e.target.value)
