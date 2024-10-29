@@ -84,8 +84,39 @@ const AddQuote = () => {
         navigate("/quote")
       })
       .catch((error) => {
-        console.error("Error adding quote:", error);
         setIsLoading(false);
+        if (error.response) {
+          const status = error.response.status;
+          const errorMessage =
+            error.response.data.message || "Something went wrong";
+          switch (status) {
+            case 400:
+              toast.error(`Bad Request: ${errorMessage}`);
+              break;
+            case 401:
+              toast.error("Unauthorized: Please log in again.");
+              break;
+            case 403:
+              toast.error(
+                "Forbidden: You do not have permission to perform this action."
+              );
+              break;
+            case 404:
+              toast.error(
+                "Not Found: The requested resource could not be found."
+              );
+              break;
+            case 500:
+              toast.error("Server Error: Please try again later.");
+              break;
+            default:
+              toast.error(`Error: ${errorMessage}`);
+          }
+        } else if (error.request) {
+          toast.error("Network Error: No response received from the server.");
+        } else {
+          toast.error(`Error: ${error.message}`);
+        }
       });
   };
 

@@ -4,20 +4,14 @@ import {
   Button,
   Input,
   List,
-  ListItem,
   Textarea,
 } from "@material-tailwind/react";
-import { MdDelete, MdEdit, MdRemoveRedEye } from "react-icons/md";
-import { LuPlusCircle } from "react-icons/lu";
-
+import { FaSpinner } from 'react-icons/fa';
 import { Card, CardBody } from "@material-tailwind/react";
-import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
-import AddActivities from "../components/AddActivities";
 import { serverUrl } from "../api";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import Select from "react-select";
-import { AiOutlineClose, AiOutlinePlus } from "react-icons/ai";
+import { AiOutlineClose } from "react-icons/ai";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { IoMdClose, IoMdSearch } from "react-icons/io";
@@ -529,12 +523,11 @@ const CreateItinerary = () => {
   //inclusoon extra
 
   console.log(data);
-  
 
   const handleFinalSubmit = () => {
     // Send the POST request with your itinerary data
     console.log({
-      destinationOnly:data?.destination,
+      destinationOnly: data?.destination,
       travelSummaryPerDay,
       activityPerDay,
       priceDetails,
@@ -543,13 +536,13 @@ const CreateItinerary = () => {
       selectedOtherInformation,
       selectedTransfers,
       selectedInclusions,
-    })
+    });
     setLoadingItinery(true);
     axios
       .post(
         `${serverUrl}/api/quote/itenerary/generate`,
         {
-          destinationOnly:data?.destination,
+          destinationOnly: data?.destination,
           travelSummaryPerDay,
           activityPerDay,
           priceDetails,
@@ -565,7 +558,7 @@ const CreateItinerary = () => {
       )
       .then((res) => {
         setLoadingItinery(false);
-        console.log(res)
+        console.log(res);
         // Create a new Blob object using the response data (PDF binary)
         const file = new Blob([res.data], { type: "application/pdf" });
 
@@ -590,7 +583,38 @@ const CreateItinerary = () => {
       })
       .catch((error) => {
         setLoadingItinery(false);
-        console.error("Error generating the PDF:", error);
+        if (error.response) {
+          const status = error.response.status;
+          const errorMessage =
+            error.response.data.message || "Something went wrong";
+          switch (status) {
+            case 400:
+              toast.error(`Bad Request: ${errorMessage}`);
+              break;
+            case 401:
+              toast.error("Unauthorized: Please log in again.");
+              break;
+            case 403:
+              toast.error(
+                "Forbidden: You do not have permission to perform this action."
+              );
+              break;
+            case 404:
+              toast.error(
+                "Not Found: The requested resource could not be found."
+              );
+              break;
+            case 500:
+              toast.error("Server Error: Please try again later.");
+              break;
+            default:
+              toast.error(`Error: ${errorMessage}`);
+          }
+        } else if (error.request) {
+          toast.error("Network Error: No response received from the server.");
+        } else {
+          toast.error(`Error: ${error.message}`);
+        }
       });
   };
 
@@ -669,7 +693,10 @@ const CreateItinerary = () => {
                       </div>
                       {travelSummaryPerDay?.length < data?.duration ? (
                         <div className="w-[20%]">
-                          <div  onClick={addTravelSummaryDay} className="cursor-pointer text-center border border-green-500 text-green-500 hover:bg-green-500 hover:text-white px-2 py-1 rounded ">
+                          <div
+                            onClick={addTravelSummaryDay}
+                            className="cursor-pointer text-center border border-green-500 text-green-500 hover:bg-green-500 hover:text-white px-2 py-1 rounded "
+                          >
                             New day
                           </div>
                           {/* <ul className="w-[150px] absolute right-0 shadow text-center hidden bg-white border rounded p-2 text-gray-700 group-hover:block z-10">
@@ -677,8 +704,8 @@ const CreateItinerary = () => {
                               <FiInfo className="font-bold" /> Add New day
                             </li>
                           </ul> */}
-                        </div> )
-                      : null}
+                        </div>
+                      ) : null}
                     </div>
 
                     {travelSummaryPerDay.map((daySummary, index) =>
@@ -752,9 +779,12 @@ const CreateItinerary = () => {
                       </div>
                       {activityPerDay?.length < data?.duration ? (
                         <div className="w-[20%]">
-                        <div  onClick={addActivityDay} className="cursor-pointer text-center border border-green-500 text-green-500 hover:bg-green-500 hover:text-white px-2 py-1 rounded ">
-                          New day
-                        </div>
+                          <div
+                            onClick={addActivityDay}
+                            className="cursor-pointer text-center border border-green-500 text-green-500 hover:bg-green-500 hover:text-white px-2 py-1 rounded "
+                          >
+                            New day
+                          </div>
                         </div>
                       ) : null}
                     </div>
@@ -997,10 +1027,20 @@ const CreateItinerary = () => {
                       </div>
 
                       <Button
-                        className="bg-main m-auto mt-5"
+                        className={`bg-main m-auto mt-5 ${
+                          loadingItinery ? "cursor-not-allowed opacity-75" : ""
+                        }`}
                         onClick={handleFinalSubmit}
+                        disabled={loadingItinery}
                       >
-                        {loadingItinery ? "Generating pdf..." : "Final Submit"}
+                        {loadingItinery ? (
+                          <span className="flex items-center gap-2">
+                            <FaSpinner className="animate-spin" /> Generating
+                            pdf...
+                          </span>
+                        ) : (
+                          "Final Submit"
+                        )}
                       </Button>
                     </div>
                   </div>
