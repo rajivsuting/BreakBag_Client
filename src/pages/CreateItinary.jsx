@@ -1,12 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
-import {
-  Button,
-  Input,
-  List,
-  Textarea,
-} from "@material-tailwind/react";
-import { FaSpinner } from 'react-icons/fa';
+import { Button, Input, List, Textarea } from "@material-tailwind/react";
+import { FaSpinner } from "react-icons/fa";
 import { Card, CardBody } from "@material-tailwind/react";
 import { serverUrl } from "../api";
 import axios from "axios";
@@ -45,7 +40,7 @@ const CreateItinerary = () => {
   const [originalInclusion, setOriginalInclusion] = useState([]);
   const [selectedInclusions, setSelectedInclusions] = useState([]);
   const [searchTermInclusion, setSearchTermInclusion] = useState("");
-
+  const [name, setName] = useState("");
   const [data, setData] = useState([]);
   const [adultPrice, setAdultPrice] = useState(""); // Default adult price
   const [childPrice, setChildPrice] = useState(""); // Default child price
@@ -91,10 +86,21 @@ const CreateItinerary = () => {
       });
 
       const results = response.data.results;
-
+console.log(response)
       if (results.length > 0) {
         const { lat, lng } = results[0].geometry.location;
         setLocation(`${lat},${lng}`);
+        axios
+        .get(`${serverUrl}/hotels?location=${lat,lng}&name=${name}`)
+        .then((response) => {
+          console.log(response)
+          setAllHotel(response.data);
+          setOriginalHotel(response.data);
+        })
+        .catch((error) => {
+          console.log(error)
+          setError("Error fetching hotels");
+        });
       } else {
         setError("Place not found");
       }
@@ -230,19 +236,21 @@ const CreateItinerary = () => {
     });
   }, []);
 
-  useEffect(() => {
-    if (location) {
-      axios
-        .get(`${serverUrl}/hotels?location=${location}`)
-        .then((response) => {
-          setAllHotel(response.data);
-          setOriginalHotel(response.data);
-        })
-        .catch((error) => {
-          setError("Error fetching hotels");
-        });
-    }
-  }, [location]);
+  // useEffect(() => { 
+  //   if (location) {
+  //     axios
+  //       .get(`${serverUrl}/hotels?location=${location}&name=${name}`)
+  //       .then((response) => {
+  //         console.log(response)
+  //         setAllHotel(response.data);
+  //         setOriginalHotel(response.data);
+  //       })
+  //       .catch((error) => {
+  //         console.log(error)
+  //         setError("Error fetching hotels");
+  //       });
+  //   }
+  // }, [location,name]);
 
   const categories = [
     "Travel Summary",
@@ -275,7 +283,7 @@ const CreateItinerary = () => {
       .get(`${serverUrl}/api/activity/search/?keyword=${searchTermActivity}`)
       .then((res) => {
         console.log(res);
-        setAllActivityData(res.data.data);
+        setAllActivityData(res.data.data)
       })
       .catch((err) => {
         toast.error(err.response.data.message);
@@ -301,7 +309,8 @@ const CreateItinerary = () => {
 
   const handleSearchHotel = (e) => {
     e.preventDefault();
-    if (searchTermHotel) {
+    // console.log(searchTermHotel,name)
+    if (searchTermHotel && name) {
       geocodePlace(); // Convert place to lat/lng before fetching hotels
     } else {
       setError("Please enter a place name");
@@ -441,6 +450,11 @@ const CreateItinerary = () => {
     setAllHotel(originalHotel); // Reset to original data
   };
 
+  const resetName = () => {
+    setName("");
+    setAllHotel(originalHotel);
+  };
+
   const handleCategoryClick = (category) => {
     setSelectedCategory(category);
   };
@@ -522,7 +536,7 @@ const CreateItinerary = () => {
 
   //inclusoon extra
 
-  console.log(data);
+  // console.log(data);
 
   const handleFinalSubmit = () => {
     // Send the POST request with your itinerary data
@@ -1511,21 +1525,39 @@ const CreateItinerary = () => {
                 <div className="w-[30%] h-[400px] bg-gray-100 p-4 rounded-lg shadow-md flex flex-col">
                   <form
                     onSubmit={handleSearchHotel}
-                    className="mb-4 flex justify-between items-center gap-2"
+                    className="mb-4 flex justify-between gap-2"
                   >
                     <div className="relative w-[85%]">
                       <Input
-                        label="Search hotel"
+                        label="Enter location"
                         className="w-full"
                         value={searchTermHotel}
                         onChange={(e) => setSearchTermHotel(e.target.value)}
                         required
-                      />
+                        />
+                      <div className="mt-2">
+                        <Input
+                          label="Search hotel by name"
+                          className="w-full"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          required
+                        />
+                      </div>
                       {searchTermHotel && (
                         <button
                           type="button"
                           onClick={resetSearchHotel}
-                          className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-600"
+                          className="absolute right-2 top-5 transform -translate-y-1/2 text-gray-600"
+                        >
+                          &times;
+                        </button>
+                      )}
+                      {name && (
+                        <button
+                          type="button"
+                          onClick={resetName}
+                          className="absolute right-2 top-16 transform -translate-y-1/2 text-gray-600"
                         >
                           &times;
                         </button>
@@ -1533,7 +1565,7 @@ const CreateItinerary = () => {
                     </div>
                     <button
                       type="submit"
-                      className="w-[15%] bg-main px-2 py-2 text-xl text-white cursor-pointer rounded flex justify-center items-center"
+                      className="w-[15%] h-[40px] bg-main px-2 py-2 text-xl text-white cursor-pointer rounded flex justify-center items-center"
                     >
                       <IoMdSearch />
                     </button>
