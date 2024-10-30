@@ -1,313 +1,204 @@
-import React, { useCallback } from "react";
+// Sidebar.jsx
+import React from "react";
+import { useAccordion } from "../context/AccordionContext"; // Adjust the path as necessary
+import { Link, NavLink, useLocation } from "react-router-dom";
+import { ListItem, ListItemPrefix } from "@material-tailwind/react";
+import { PowerIcon, UserCircleIcon } from "@heroicons/react/16/solid";
+import { RiDashboardFill } from "react-icons/ri";
 import {
-  Card,
-  Typography,
-  List,
-  ListItem,
-  ListItemPrefix,
-  Accordion,
-  AccordionHeader,
-  AccordionBody,
-} from "@material-tailwind/react";
-import {
-  PresentationChartBarIcon,
-  ShoppingBagIcon,
-  UserCircleIcon,
-  InboxIcon,
-  PowerIcon,
-} from "@heroicons/react/24/solid";
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { PiUploadDuotone } from "react-icons/pi";
-import { useAccordion } from "../context/AccordionContext"; // Import the custom hook
-import { MdOutlineKeyboardArrowRight } from "react-icons/md";
+  MdCardTravel,
+  MdOutlineLibraryAdd,
+  MdOutlinePeople,
+} from "react-icons/md";
+import { FaAngleDown, FaAngleUp } from "react-icons/fa";
+import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 
 const Sidebar = () => {
-  const navigate = useNavigate();
   const { openAccordion, setOpenAccordion } = useAccordion();
   const location = useLocation();
 
-  // Function to toggle accordion open state
-  const toggleAccordion = useCallback(
-    (value) => {
-      setOpenAccordion((prev) =>
-        prev.includes(value)
-          ? prev.filter((item) => item !== value)
-          : [...prev, value]
-      );
-    },
-    [setOpenAccordion]
-  );
+  const toggleAccordion = (section) => {
+    setOpenAccordion((prev) =>
+      prev.includes(section)
+        ? prev.filter((item) => item !== section)
+        : [...prev, section]
+    );
+  };
 
-  // Function to check if the link is active
-  const isActive = useCallback(
-    (path) => location.pathname === path,
-    [location.pathname]
-  );
+  const isActive = (path) => location.pathname === path;
 
   return (
-    <div className="fixed top-0 left-0 h-screen w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5">
-      <div className="m-auto mb-2">
-        <Typography variant="h5" color="blue-gray">
-          <img
-            src="https://breakbag.com/static/media/logo.3fff3126fefbf4f3afe7.png"
-            alt="Logo"
-            className="w-42 h-14"
-          />
-        </Typography>
+    <div className="fixed top-0 left-0 h-screen w-64 bg-white text-black shadow-lg">
+      <div className="p-4">
+        <img
+        className="w-[80%] m-auto"
+          src="https://breakbag.com/static/media/logo.3fff3126fefbf4f3afe7.png"
+          alt=""
+        />
       </div>
-      <List className="sidebar overflow-y-scroll h-[100vh]">
-        {/* Dashboard Accordion */}
+      <nav>
+        <div className="border-t border-gray-600"></div>
 
         {localStorage.getItem("userRole") == "Agent" ||
         localStorage.getItem("userRole") == "Team Lead" ? null : (
-          <Accordion open={openAccordion.includes("dashboard")}>
-            <ListItem
-              className="p-0"
+          <div>
+            <div
+              className="flex justify-between items-center p-4 cursor-pointer"
               onClick={() => toggleAccordion("dashboard")}
             >
-              <AccordionHeader className="border-b-0 p-3 flex justify-between items-center">
-                <div className="w-[70%] flex items-center">
-                  <ListItemPrefix>
-                    <PresentationChartBarIcon
-                      className={`h-5 w-5 ${
-                        isActive("/agent") ||
-                        isActive("/destination") ||
-                        isActive("/travellers")
-                          ? "text-main"
-                          : "text-blue-gray"
-                      }`}
-                    />
-                  </ListItemPrefix>
-                  <Typography
-                    color={
-                      isActive("/agent") ||
-                      isActive("/destination") ||
-                      isActive("/travellers")
-                        ? "red"
-                        : "blue-gray"
-                    }
-                    className="mr-auto font-normal"
-                  >
-                    Dashboard
-                  </Typography>
-                </div>
-                {/* Arrow Icon */}
-                <div>
-                  <ChevronDownIcon
-                    className={`h-3 w-3 transition-transform ${
-                      openAccordion.includes("dashboard") ? "rotate-180" : ""
-                    }`}
-                  />
-                </div>
-              </AccordionHeader>
-            </ListItem>
-            <AccordionBody className="py-1">
-              <List className="p-0">
-                <NavLink to={"/agent"}>
-                  <ListItem
-                    className={isActive("/agent") ? "text-red-500" : ""}
-                  >
-                    <ListItemPrefix>
-                      <MdOutlineKeyboardArrowRight className="h-5 w-5" />
-                    </ListItemPrefix>
-                    Agents & Team leads
-                  </ListItem>
-                </NavLink>
-
-                <NavLink to={"/destination"}>
-                  <ListItem
-                    className={isActive("/destination") ? "text-red-500" : ""}
-                  >
-                    <ListItemPrefix>
-                      <MdOutlineKeyboardArrowRight className="h-5 w-5" />
-                    </ListItemPrefix>
-                    Destination
-                  </ListItem>
-                </NavLink>
-                <NavLink to={"/travellers"}>
-                  <ListItem
-                    className={isActive("/travellers") ? "text-red-500" : ""}
-                  >
-                    <ListItemPrefix>
-                      <MdOutlineKeyboardArrowRight className="h-5 w-5" />
-                    </ListItemPrefix>
-                    Travellers
-                  </ListItem>
-                </NavLink>
-              </List>
-            </AccordionBody>
-          </Accordion>
+              <span className="flex justify-start gap-3 items-center">
+                <RiDashboardFill  className="w-5 h-5"/>
+                Dashboard
+              </span>
+              <span className="text-sm" >{openAccordion.includes("dashboard") ? <IoIosArrowUp /> : <IoIosArrowDown />}</span>
+            </div>
+            {openAccordion.includes("dashboard") && (
+              <div className="pl-4">
+                <Link
+                  to="/agent"
+                  className={`block p-2  pl-7 hover:text-main ${
+                    isActive("/agent") ? "text-main" : ""
+                  }`}
+                >
+                  Agents & Team leads
+                </Link>
+                <Link
+                  to="/destination"
+                  className={`block p-2  pl-7 hover:text-main ${
+                    isActive("/destination") ? "text-main" : ""
+                  }`}
+                >
+                  Destination
+                </Link>
+                <Link
+                  to="/travellers"
+                  className={`block p-2  pl-7 hover:text-main ${
+                    isActive("/travellers") ? "text-main" : ""
+                  }`}
+                >
+                  Travellers
+                </Link>
+              </div>
+            )}
+          </div>
         )}
-
-        {/* Itinerary Library Accordion */}
         {localStorage.getItem("userRole") == "Agent" ||
         localStorage.getItem("userRole") == "Team Lead" ? null : (
-          <Accordion open={openAccordion.includes("itinerary")}>
-            <ListItem
-              className="p-0"
+          <div>
+            <div
+              className="flex justify-between items-center p-4 cursor-pointer"
               onClick={() => toggleAccordion("itinerary")}
             >
-              <AccordionHeader className="border-b-0 p-3 flex justify-between items-center">
-                <div className="w-[70%] flex items-center">
-                  <ListItemPrefix>
-                    <ShoppingBagIcon
-                      className={`h-5 w-5 ${
-                        isActive("/travel-summery") ||
-                        isActive("/activity") ||
-                        isActive("/inclusion") ||
-                        isActive("/exclusion") ||
-                        isActive("/transfer") ||
-                        isActive("/other-information")
-                          ? "text-main"
-                          : "text-blue-gray"
-                      }`}
-                    />
-                  </ListItemPrefix>
-
-                  <Typography
-                    color={
-                      isActive("/travel-summery") ||
-                      isActive("/activity") ||
-                      isActive("/inclusion") ||
-                      isActive("/exclusion") ||
-                      isActive("/transfer") ||
-                      isActive("/other-information")
-                        ? "red"
-                        : "blue-gray"
-                    }
-                    className="mr-auto font-normal"
-                  >
-                    Itinerary Library
-                  </Typography>
-                </div>
-                {/* Arrow Icon */}
-                <ChevronDownIcon
-                  className={`h-3 w-3 transition-transform ${
-                    openAccordion.includes("itinerary") ? "rotate-180" : ""
+              <span className={`flex justify-start gap-3 items-center`}>
+                <MdOutlineLibraryAdd className="w-5 h-5"/>
+                Itinerary Library
+              </span>
+              <span className="text-sm">{openAccordion.includes("itinerary") ? <IoIosArrowUp /> : <IoIosArrowDown />}</span>
+            </div>
+            {openAccordion.includes("itinerary") && (
+              <div className="pl-4">
+                <Link
+                  to="/travel-summery" // Link updated to '//travel-summery'
+                  className={`block p-2 pl-7 hover:text-main ${
+                    isActive("/travel-summery") ? "text-main" : "" // Adjusted active state
                   }`}
-                />
-              </AccordionHeader>
-            </ListItem>
-
-            <AccordionBody className="py-1">
-              <List className="p-0">
-                <NavLink to={"/travel-summery"}>
-                  <ListItem
-                    className={
-                      isActive("/travel-summery") ? "text-red-500" : ""
-                    }
-                  >
-                    <ListItemPrefix>
-                      <MdOutlineKeyboardArrowRight className="h-5 w-5" />
-                    </ListItemPrefix>
-                    Travel Summary
-                  </ListItem>
-                </NavLink>
-                <NavLink to={"/activity"}>
-                  <ListItem
-                    className={isActive("/activity") ? "text-red-500" : ""}
-                  >
-                    <ListItemPrefix>
-                      <MdOutlineKeyboardArrowRight className="h-5 w-5" />
-                    </ListItemPrefix>
-                    Activities
-                  </ListItem>
-                </NavLink>
-                <NavLink to={"/inclusion"}>
-                  <ListItem
-                    className={isActive("/inclusion") ? "text-red-500" : ""}
-                  >
-                    <ListItemPrefix>
-                      <MdOutlineKeyboardArrowRight className="h-5 w-5" />
-                    </ListItemPrefix>
-                    Inclusion
-                  </ListItem>
-                </NavLink>
-                <NavLink to={"/exclusion"}>
-                  <ListItem
-                    className={isActive("/exclusion") ? "text-red-500" : ""}
-                  >
-                    <ListItemPrefix>
-                      <MdOutlineKeyboardArrowRight className="h-5 w-5" />
-                    </ListItemPrefix>
-                    Exclusion
-                  </ListItem>
-                </NavLink>
-                <NavLink to={"/transfer"}>
-                  <ListItem
-                    className={isActive("/transfer") ? "text-red-500" : ""}
-                  >
-                    <ListItemPrefix>
-                      <MdOutlineKeyboardArrowRight className="h-5 w-5" />
-                    </ListItemPrefix>
-                    Transfers
-                  </ListItem>
-                </NavLink>
-                <NavLink to={"/other-information"}>
-                  <ListItem
-                    className={
-                      isActive("/other-information") ? "text-red-500" : ""
-                    }
-                  >
-                    <ListItemPrefix>
-                      <MdOutlineKeyboardArrowRight className="h-5 w-5" />
-                    </ListItemPrefix>
-                    Other Information
-                  </ListItem>
-                </NavLink>
-              </List>
-            </AccordionBody>
-          </Accordion>
+                >
+                  Travel Summary
+                </Link>
+                <Link
+                  to="/activity" // Link updated to '/activity'
+                  className={`block p-2  pl-7 hover:text-main ${
+                    isActive("/activity") ? "text-main" : ""
+                  }`}
+                >
+                  Activities
+                </Link>
+                <Link
+                  to="/inclusion" // Link updated to '/inclusion'
+                  className={`block p-2  pl-7 hover:text-main ${
+                    isActive("/inclusion") ? "text-main" : ""
+                  }`}
+                >
+                  Inclusion
+                </Link>
+                <Link
+                  to="/exclusion" // Link updated to '/exclusion'
+                  className={`block p-2  pl-7 hover:text-main ${
+                    isActive("/exclusion") ? "text-main" : ""
+                  }`}
+                >
+                  Exclusion
+                </Link>
+                <Link
+                  to="/transfer" // Link updated to '/transfer'
+                  className={`block p-2  pl-7 hover:text-main ${
+                    isActive("/transfer") ? "text-main" : ""
+                  }`}
+                >
+                  Transfer
+                </Link>
+                <Link
+                  to="/other-information" // Link updated to '/other-information'
+                  className={`block p-2  pl-7 hover:text-main ${
+                    isActive("/other-information") ? "text-main" : ""
+                  }`}
+                >
+                  Other Information
+                </Link>
+              </div>
+            )}
+          </div>
         )}
 
-        {/* Other Links */}
-
         {localStorage.getItem("userRole") == "Agent" ? (
-          <NavLink to={"/travellers"}>
-            <ListItem className={isActive("/travellers") ? "text-red-500" : ""}>
-              <ListItemPrefix>
-                <UserCircleIcon className="h-5 w-5" />
-              </ListItemPrefix>
-              Traveller
-            </ListItem>
-          </NavLink>
+          <Link
+            to="/travellers" // Link updated to '/other-information'
+            className={`block p-2 flex justify-start items-center gap-2 p-2 pl-4 hover:text-main ${
+              isActive("/travellers") ? "text-main" : ""
+            }`}
+          >
+            <MdOutlinePeople className="h-5 w-5" /> Traveller
+          </Link>
         ) : null}
 
         {localStorage.getItem("userRole") == "Team Lead" ? (
-          <NavLink to={"/agent"}>
-            <ListItem className={isActive("/agent") ? "text-red-500" : ""}>
-              <ListItemPrefix>
-                <UserCircleIcon className="h-5 w-5" />
-              </ListItemPrefix>
-              Agents
-            </ListItem>
-          </NavLink>
+          <Link
+            to="/agent" // Link updated to '/other-information'
+            className={`block p-2 flex justify-start items-center gap-2 p-2 pl-4 hover:text-main ${
+              isActive("/agent") ? "text-main" : ""
+            }`}
+          >
+            <MdCardTravel className="h-5 w-5" /> Agent
+          </Link>
         ) : null}
 
-        <NavLink to={"/quote"}>
-          <ListItem className={isActive("/quote") ? "text-red-500" : ""}>
-            <ListItemPrefix>
-              <UserCircleIcon className="h-5 w-5" />
-            </ListItemPrefix>
-            Quote
-          </ListItem>
-        </NavLink>
+        <Link
+          to="/quote" // Link updated to '/other-information'
+          className={`block p-2 flex justify-start items-center gap-2 p-2 pl-4 hover:text-main ${
+            isActive("/quote") ? "text-main" : ""
+          }`}
+        >
+          <UserCircleIcon className="h-5 w-5" /> Quote
+        </Link>
 
-        <div className=" ">
-          {/* <NavLink to={"/logout"}> */}
-            <ListItem onClick={()=>{
-              navigate("/signin");
-              localStorage.clear()
-            }} className={`${isActive("/logout") ? "text-red-500" : ""} mb-32`}>
-              <ListItemPrefix>
-                <PowerIcon className="h-5 w-5" />
-              </ListItemPrefix>
-              Logout
-            </ListItem>
-          {/* </NavLink> */}
+        <div
+          onClick={() => {
+            navigate("/signin");
+            localStorage.clear();
+          }}
+          className="mt-2"
+        >
+          <Link
+            // to="/logout" // Link updated to '/other-information'
+            className={`block p-2 flex justify-start items-center gap-2 p-2 pl-4 hover:text-main`}
+          >
+            <PowerIcon className="h-5 w-5" />
+            Logout
+          </Link>
         </div>
-      </List>
+
+        
+      </nav>
     </div>
   );
 };

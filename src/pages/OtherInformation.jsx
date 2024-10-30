@@ -35,8 +35,8 @@ const OtherInformation = () => {
 
   return (
     <div className="flex gap-5 ">
-      <Sidebar />
-      <div className="w-[100%] m-auto mt-3 rounded-md ml-[20rem] p-4">
+      
+      <div className="w-[100%] m-auto mt-3 rounded-md p-4">
         <div className="relative w-full">
           {/* Background Image with dark overlay */}
           <div

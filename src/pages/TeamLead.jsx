@@ -63,8 +63,8 @@ const TeamLead = () => {
 
   return (
     <div className="flex gap-5 ">
-      <Sidebar />
-      <div className="w-[100%] m-auto mt-3 rounded-md ml-[20rem] p-4">Team lead</div>
+      
+      <div className="w-[100%] m-auto mt-3 rounded-md p-4">Team lead</div>
     </div>
   );
 };

@@ -1,5 +1,5 @@
 // AllRoutes.jsx
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
 import ProtectedRoute from '../context/ProtectedRoute'; // Adjust the path as needed
 import SignIn from '../pages/Signin';
 import AdminDashboard from '../pages/admin/AdminDashboard';
@@ -27,6 +27,7 @@ const AllRoutes = () => {
   const [role, setRole] = useState(localStorage.getItem('userRole') || '');
   const isAuthenticated = !!role;
   const navigate = useNavigate();
+  let location = useLocation();
 
   const handleValidateToken = async () => {
     try {
@@ -46,7 +47,7 @@ const AllRoutes = () => {
             navigate("/signin");
             break;
           case 401:
-            toast.error("Unauthorized: Please log in again.");
+            toast.error("Unauthorized: Please log in.");
             navigate("/signin");
             break;
           case 403:
@@ -73,9 +74,29 @@ const AllRoutes = () => {
     }
   };
 
+  function getPageNameFromURL() {
+    // Regex pattern to match the page name
+    const pattern = /([^\/?]+)/;
+
+    // Extract the page name using regex match
+    const match = location?.pathname?.match(pattern);
+
+    // Check if match found
+    if (match && match.length > 1) {
+      // Return the matched page name
+      return match[1];
+    } else {
+      // If no match found, return null
+      return null;
+    }
+  }
+
+
   useEffect(() => {
-    handleValidateToken();
-  }, []);
+    if (getPageNameFromURL() !== "signin"){
+      handleValidateToken();
+    }
+  }, [getPageNameFromURL]);
 
   return (
     <Routes>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import { Button, Input, List, Textarea } from "@material-tailwind/react";
-import { FaSpinner } from "react-icons/fa";
+import { FaSpinner, FaStar } from "react-icons/fa";
 import { Card, CardBody } from "@material-tailwind/react";
 import { serverUrl } from "../api";
 import axios from "axios";
@@ -32,6 +32,17 @@ const CreateItinerary = () => {
   const [allHotel, setAllHotel] = useState([]);
   const [originalHotel, setOriginalHotel] = useState([]);
   const [selectedHotel, setSelectedHotel] = useState([]);
+  const [showManualForm, setShowManualForm] = useState(false); // To toggle the manual entry form
+  const [manualHotel, setManualHotel] = useState({
+    name: "",
+    formatted_address: "",
+    rating: "",
+    checkInDate: "",
+    checkOutDate: "",
+    mealPlan: "",
+    numberOfGuest: "",
+    roomType: "",
+  });
 
   const [allActivityData, setAllActivityData] = useState([]);
   const [originalActivityData, setOriginalActivityData] = useState([]);
@@ -77,36 +88,36 @@ const CreateItinerary = () => {
   const [error, setError] = useState(null); // Handle errors
 
   const geocodePlace = async () => {
-    const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${searchTermHotel}&key=AIzaSyBSDhdL2tinLiAKRk7w9JhDAv5gAQXFMIk`;
-
-    try {
-      // Override withCredentials for this specific request
-      const response = await axios.get(geocodeUrl, {
-        withCredentials: false, // Disable withCredentials for this request
+    axios
+      .get(`${serverUrl}/search-hotel/?hotelName=${searchTermHotel}`)
+      .then((response) => {
+        console.log(response);
+        setAllHotel(response.data);
+        setOriginalHotel(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+        setError("Error fetching hotels");
       });
+    // const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${searchTermHotel}&key=AIzaSyBSDhdL2tinLiAKRk7w9JhDAv5gAQXFMIk`;
 
-      const results = response.data.results;
-      console.log(response);
-      if (results.length > 0) {
-        const { lat, lng } = results[0].geometry.location;
-        setLocation(`${lat},${lng}`);
-        axios
-          .get(`${serverUrl}/hotels?location=${(lat, lng)}&name=${name}`)
-          .then((response) => {
-            console.log(response);
-            setAllHotel(response.data);
-            setOriginalHotel(response.data);
-          })
-          .catch((error) => {
-            console.log(error);
-            setError("Error fetching hotels");
-          });
-      } else {
-        setError("Place not found");
-      }
-    } catch (error) {
-      setError("Error geocoding place");
-    }
+    // try {
+    //   // Override withCredentials for this specific request
+    //   const response = await axios.get(geocodeUrl, {
+    //     withCredentials: false, // Disable withCredentials for this request
+    //   });
+
+    //   const results = response.data.results;
+    //   console.log(response);
+    //   if (results.length > 0) {
+    //     const { lat, lng } = results[0].geometry.location;
+    //     setLocation(`${lat},${lng}`);
+    //   } else {
+    //     setError("Place not found");
+    //   }
+    // } catch (error) {
+    //   setError("Error geocoding place");
+    // }
   };
 
   // Add a new travel summary day
@@ -311,7 +322,7 @@ const CreateItinerary = () => {
   const handleSearchHotel = (e) => {
     e.preventDefault();
     // console.log(searchTermHotel,name)
-    if (searchTermHotel && name) {
+    if (searchTermHotel) {
       geocodePlace(); // Convert place to lat/lng before fetching hotels
     } else {
       setError("Please enter a place name");
@@ -393,6 +404,28 @@ const CreateItinerary = () => {
 
   const handleRemoveHotel = (index) => {
     setSelectedHotel((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleManualHotelChange = (e) => {
+    const { name, value } = e.target;
+    setManualHotel((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Add manually entered hotel to the selectedHotel array
+  const handleAddManualHotel = (e) => {
+    e.preventDefault();
+    setSelectedHotel((prev) => [...prev, manualHotel]);
+    setShowManualForm(false); // Close the manual entry form
+    setManualHotel({
+      name: "",
+      formatted_address: "",
+      rating: "",
+      checkInDate: "",
+      checkOutDate: "",
+      mealPlan: "",
+      numberOfGuest: "",
+      roomType: "",
+    });
   };
 
   const handleInputChangeTransfer = (e, index) => {
@@ -648,8 +681,7 @@ const CreateItinerary = () => {
 
   return (
     <div className="flex gap-5">
-      <Sidebar />
-      <div className="w-[100%] m-auto mt-3 rounded-md ml-[20rem] p-4">
+      <div className="w-[100%] m-auto mt-3 rounded-md p-4">
         <div>
           <img
             src="/img/lanscape2.jpg"
@@ -869,9 +901,15 @@ const CreateItinerary = () => {
                     <div className="mt-5 mb-5 text-lg font-normal">
                       Exclusion details
                     </div>
-                    <div className="flex flex-col w-full gap-5 p-2">
+                    <div className="flex flex-col w-full gap-5">
                       {selectedExclusions.map((exclusion, index) => (
-                        <div key={index} className="flex justify-between gap-4">
+                        <div
+                          key={index}
+                          className="flex justify-between gap-4 p-4 rounded"
+                          style={{
+                            "box-shadow": "rgba(0, 0, 0, 0.05) 0px 0px 0px 1px",
+                          }}
+                        >
                           <div className="w-[95%]">
                             <Input
                               label={`Title ${index + 1}`}
@@ -912,9 +950,15 @@ const CreateItinerary = () => {
                     <div className="mt-5 mb-5 text-lg font-normal">
                       Transfer details
                     </div>
-                    <div className="flex flex-col w-full gap-5 p-2">
+                    <div className="flex flex-col w-full gap-5">
                       {selectedTransfers.map((trnsfer, index) => (
-                        <div key={index} className="flex justify-between gap-4">
+                        <div
+                          key={index}
+                          className="flex justify-between gap-4 p-4 rounded"
+                          style={{
+                            "box-shadow": "rgba(0, 0, 0, 0.05) 0px 0px 0px 1px",
+                          }}
+                        >
                           <div className="w-[95%]">
                             <Input
                               label={`Title ${index + 1}`}
@@ -955,12 +999,16 @@ const CreateItinerary = () => {
                     <div className="mt-5 mb-5 text-lg font-normal">
                       Other information details
                     </div>
-                    <div className="flex flex-col w-full gap-5 p-2">
+                    <div className="flex flex-col w-full gap-5">
                       {selectedOtherInformation.map((other, index) => {
                         return (
                           <div
                             key={index}
-                            className="flex justify-between gap-4"
+                            className="flex justify-between gap-4 p-4 rounded"
+                            style={{
+                              "box-shadow":
+                                "rgba(0, 0, 0, 0.05) 0px 0px 0px 1px",
+                            }}
                           >
                             <div className="w-[95%]">
                               <Input
@@ -1018,17 +1066,9 @@ const CreateItinerary = () => {
                       </h2>
 
                       <div className="flex justify-between items-center mb-2 gap-5">
-                        <label className="w-[50%] block mb-2">
-                          Adult Price:
-                        </label>
-                        <label className="w-[50%] block mb-2">
-                          Child Price:
-                        </label>
-                      </div>
-
-                      <div className="flex justify-between items-center mb-2 gap-5">
                         <Input
                           type="number"
+                          label="Adult Price"
                           value={adultPrice}
                           onChange={(e) =>
                             setAdultPrice(Number(e.target.value))
@@ -1037,6 +1077,7 @@ const CreateItinerary = () => {
                         />
                         <Input
                           type="number"
+                          label="Child Price"
                           value={childPrice}
                           onChange={(e) =>
                             setChildPrice(Number(e.target.value))
@@ -1045,44 +1086,176 @@ const CreateItinerary = () => {
                         />
                       </div>
 
-                      <div className="border border-gray-300 p-4 rounded-md mt-4">
-                        <h3 className="font-semibold">Total Cost:</h3>
+                      <div className="border border-gray-300 p-4 rounded-md mt-4 flex justify-start items-center gap-2">
+                        <h3 className="font-semibold">Total Cost :</h3>
                         <p className="text-xl font-bold">
                           Rs. {calculateTotal()}
                         </p>
                       </div>
 
-                      <Button
-                        className={`bg-main m-auto mt-5 ${
-                          loadingItinery ? "cursor-not-allowed opacity-75" : ""
-                        }`}
-                        onClick={handleFinalSubmit}
-                        disabled={loadingItinery}
-                      >
-                        {loadingItinery ? (
-                          <span className="flex items-center gap-2">
-                            <FaSpinner className="animate-spin" /> Generating
-                            pdf...
-                          </span>
-                        ) : (
-                          "Final Submit"
-                        )}
-                      </Button>
+                      <div className="flex justify-center items-center">
+                        <Button
+                          className={`bg-main m-auto mt-5 ${
+                            loadingItinery
+                              ? "cursor-not-allowed opacity-75"
+                              : ""
+                          }`}
+                          onClick={handleFinalSubmit}
+                          disabled={loadingItinery}
+                        >
+                          {loadingItinery ? (
+                            <span className="flex items-center gap-2">
+                              <FaSpinner className="animate-spin" /> Generating
+                              pdf...
+                            </span>
+                          ) : (
+                            "Final Submit"
+                          )}
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 )}
 
                 {selectedCategory === "Hotel details" && (
                   <>
-                    <div className="mt-5 mb-5 text-lg font-normal">
-                      Hotel details
+                    <div className="flex justify-between items-center">
+                      <div className="mt-5 mb-5 text-lg font-normal">
+                        Hotel details
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setShowManualForm((prev) => !prev)}
+                        className="px-4 py-2 bg-main text-sm text-white rounded-md"
+                      >
+                        Add Manually
+                      </button>
                     </div>
-                    <div className="flex flex-col w-full gap-5 p-2">
+                    {/* modal ------------ */}
+                    {showManualForm && (
+                      <div className="fixed inset-0 z-[999] grid h-screen w-screen place-items-center bg-black bg-opacity-60 backdrop-blur-sm transition-opacity duration-300">
+                        <div className="sidebar relative m-4 w-[40%] max-h-[90vh] overflow-y-auto rounded-lg bg-white font-sans text-base font-light leading-relaxed text-blue-gray-500 shadow-2xl p-8">
+                          <div className="flex items-center justify-between p-4 font-sans text-2xl font-semibold text-blue-gray-900">
+                            Add hotel manually
+                            <AiOutlineClose
+                              className="cursor-pointer"
+                              size={24}
+                              onClick={() => setShowManualForm(false)}
+                            />
+                          </div>
+                          <div className="px-4">
+                            <form
+                              onSubmit={handleAddManualHotel}
+                              className="mt-4 rounded-md"
+                            >
+                              <div>
+                                <Input
+                                  type="text"
+                                  name="name"
+                                  label="Hotel Name"
+                                  value={manualHotel.name}
+                                  onChange={handleManualHotelChange}
+                                  className="w-full px-4 py-2 mb-2 border rounded-md"
+                                  required
+                                />
+                              </div>
+                              <div className="mt-5">
+                                <Input
+                                  type="text"
+                                  name="formatted_address"
+                                  label="Address"
+                                  value={manualHotel.formatted_address}
+                                  onChange={handleManualHotelChange}
+                                  className="w-full px-4 py-2 mb-2 border rounded-md"
+                                  required
+                                />
+                              </div>
+                              <div className="mt-5 flex justify-between gap-5">
+                                <Input
+                                  type="text"
+                                  name="mealPlan"
+                                  label="Meal Plan"
+                                  value={manualHotel.mealPlan}
+                                  onChange={handleManualHotelChange}
+                                  required
+                                  className="w-full px-4 py-2 mb-2 border rounded-md"
+                                />
+                                <Input
+                                  type="number"
+                                  name="rating"
+                                  label="Rating"
+                                  value={manualHotel.rating}
+                                  onChange={handleManualHotelChange}
+                                  className="w-full px-4 py-2 mb-2 border rounded-md"
+                                />
+                              </div>
+                              <div className="mt-5 flex justify-between gap-5">
+                                <Input
+                                  type="date"
+                                  name="checkInDate"
+                                  label="Check-in Date"
+                                  value={manualHotel.checkInDate}
+                                  onChange={handleManualHotelChange}
+                                  required
+                                  className="w-full px-4 py-2 mb-2 border rounded-md"
+                                />
+                                <Input
+                                  type="date"
+                                  name="checkOutDate"
+                                  label="Check-out Date"
+                                  value={manualHotel.checkOutDate}
+                                  onChange={handleManualHotelChange}
+                                  required
+                                  className="w-full px-4 py-2 mb-2 border rounded-md"
+                                />
+                              </div>
+
+                              <div className="mt-5 flex justify-between gap-5">
+                                <Input
+                                  type="number"
+                                  name="numberOfGuest"
+                                  label="Number of Guests"
+                                  value={manualHotel.numberOfGuest}
+                                  onChange={handleManualHotelChange}
+                                  required
+                                  className="w-full px-4 py-2 mb-2 border rounded-md"
+                                />
+                                <Input
+                                  type="text"
+                                  name="roomType"
+                                  label="Room Type"
+                                  value={manualHotel.roomType}
+                                  onChange={handleManualHotelChange}
+                                  required
+                                  className="w-full px-4 py-2 mb-2 border rounded-md"
+                                />
+                              </div>
+                              <div className="flex justify-center items-center">
+                                <button
+                                  type="submit"
+                                  className="w-1/5 px-4 py-2  mt-5 bg-main text-white rounded-md "
+                                >
+                                  Add Hotel
+                                </button>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    {/* modal ---------- */}
+                    <div className="flex flex-col w-full gap-5">
                       {selectedHotel.map((hotel, index) => {
                         return (
                           <div
                             key={index}
-                            className="flex justify-between gap-4 mb-5"
+                            className={`flex justify-between gap-4 rounded p-4 ${
+                              index == 0 ? "mt-0" : "mt-3"
+                            }`}
+                            style={{
+                              "box-shadow":
+                                "rgba(0, 0, 0, 0.05) 0px 0px 0px 1px",
+                            }}
                           >
                             <div className="w-[95%]">
                               {/* Hotel Info */}
@@ -1090,21 +1263,43 @@ const CreateItinerary = () => {
                                 <div className="font-semibold">
                                   {hotel?.name}
                                 </div>
-                                <div>{hotel?.vicinity}</div>
-                                <div>{hotel?.rating}</div>
+                                <div className="mt-1 text-sm">
+                                  {hotel?.formatted_address}
+                                </div>
+                                <div className="flex justify-start items-center gap-2 text-sm">
+                                  <FaStar />
+                                  {hotel?.rating}
+                                </div>
                               </div>
 
-                              {/* Input Fields */}
                               <div className="w-[100%] flex justify-between items-center gap-3 mt-5">
+                                <label
+                                  htmlFor={`'checkin'${index}`}
+                                  className="w-[48%] cursor-pointer text-sm font-semibold"
+                                >
+                                  Check in
+                                </label>
+
+                                <label
+                                  htmlFor={`'checkout'${index}`}
+                                  className="w-[48%] cursor-pointer text-sm font-semibold"
+                                >
+                                  Check out
+                                </label>
+                              </div>
+                              {/* Input Fields */}
+                              <div className="w-[100%] flex justify-between items-center gap-3 mt-1">
                                 <input
                                   label="Check-in"
                                   type="date"
                                   name="checkInDate"
                                   value={hotel.checkInDate}
+                                  placeholder="whdhw"
                                   onChange={(e) =>
                                     handleInputChangeHotel(e, index)
                                   }
-                                  className="w-[30%] px-4 py-2 border rounded-md"
+                                  id={`'checkin'${index}`}
+                                  className="w-[48%] px-4 py-2 border rounded-md"
                                 />
 
                                 <input
@@ -1115,9 +1310,32 @@ const CreateItinerary = () => {
                                   onChange={(e) =>
                                     handleInputChangeHotel(e, index)
                                   }
-                                  className="w-[30%] px-4 py-2 border rounded-md"
+                                  id={`'checkout'${index}`}
+                                  className="w-[48%] px-4 py-2 border rounded-md"
                                 />
+                              </div>
+                              <div className="w-[100%] flex justify-between items-center gap-3 mt-5">
+                                <label
+                                  htmlFor={`'Mealplan'${index}`}
+                                  className="w-[30%] cursor-pointer text-sm font-semibold"
+                                >
+                                  Meal plan
+                                </label>
 
+                                <label
+                                  htmlFor={`'Noguest'${index}`}
+                                  className="w-[30%] cursor-pointer text-sm font-semibold"
+                                >
+                                  No. of guest
+                                </label>
+                                <label
+                                  htmlFor={`'Roomtype'${index}`}
+                                  className="w-[30%] cursor-pointer text-sm font-semibold"
+                                >
+                                  Room type
+                                </label>
+                              </div>
+                              <div className="flex justify-between items-center mt-1">
                                 <input
                                   label="Meal plan"
                                   name="mealPlan"
@@ -1125,31 +1343,31 @@ const CreateItinerary = () => {
                                   onChange={(e) =>
                                     handleInputChangeHotel(e, index)
                                   }
+                                  id={`'Mealplan'${index}`}
                                   className="w-[30%] px-4 py-2 border rounded-md"
                                   placeholder="Meal plan"
                                 />
-                              </div>
-
-                              <div className="flex justify-between items-center mt-5">
                                 <input
                                   label={`No. of guest`}
+                                  id={`'Noguest'${index}`}
                                   name="numberOfGuest"
                                   value={hotel.numberOfGuest}
                                   onChange={(e) =>
                                     handleInputChangeHotel(e, index)
                                   }
-                                  className="w-[48%] px-4 py-2 border rounded-md"
+                                  className="w-[30%] px-4 py-2 border rounded-md"
                                   placeholder="No. of guest"
                                   type="number"
                                 />
                                 <input
                                   label={`Room type`}
+                                  id={`'Roomtype'${index}`}
                                   name="roomType"
                                   value={hotel.roomType}
                                   onChange={(e) =>
                                     handleInputChangeHotel(e, index)
                                   }
-                                  className="w-[48%] px-4 py-2 border rounded-md"
+                                  className="w-[30%] px-4 py-2 border rounded-md"
                                   placeholder="Room type"
                                 />
                               </div>
@@ -1176,11 +1394,14 @@ const CreateItinerary = () => {
                     <div className="mt-5 mb-5 text-lg font-normal">
                       Inclusion details
                     </div>
-                    <div className="flex flex-col w-full gap-5 p-2">
+                    <div className="flex flex-col w-full gap-5">
                       {selectedInclusions.map((inclusion, inclusionIndex) => (
                         <div
                           key={inclusionIndex}
-                          className="flex justify-between gap-4"
+                          className="flex justify-between gap-4 p-4 rounded"
+                          style={{
+                            "box-shadow": "rgba(0, 0, 0, 0.05) 0px 0px 0px 1px",
+                          }}
                         >
                           <div className="w-[95%]">
                             <Input
@@ -1341,15 +1562,20 @@ const CreateItinerary = () => {
                               resetSearchActivity();
                             }}
                           >
-                            <div className="font-bold">  {summary.title.length <= 20
+                            <div className="font-bold">
+                              {" "}
+                              {summary.title.length <= 20
                                 ? summary.title
-                                : summary.title.slice(0, 20) + "..."}</div>
+                                : summary.title.slice(0, 20) + "..."}
+                            </div>
                             <div className="text-gray-600">
                               {summary?.description
                                 ?.slice(0, 2)
                                 .map((el, index) => (
                                   <span key={index}>
-                                    {el.length <=20 ? el : el.slice(0,20)+ "..."}
+                                    {el.length <= 20
+                                      ? el
+                                      : el.slice(0, 20) + "..."}
                                     {index < 1 &&
                                     summary?.description?.length >= 2
                                       ? ", "
@@ -1419,9 +1645,11 @@ const CreateItinerary = () => {
                             className="py-2 px-2 hover:bg-gray-200 transition-colors cursor-pointer"
                             onClick={() => handleSelectExclusion(summary)} // Add to multiple selections
                           >
-                            <div className="font-bold">{summary.title.length <= 20
+                            <div className="font-bold">
+                              {summary.title.length <= 20
                                 ? summary.title
-                                : summary.title.slice(0, 20) + "..."}</div>
+                                : summary.title.slice(0, 20) + "..."}
+                            </div>
                             <div className="text-gray-600">
                               {summary.description.length <= 30
                                 ? summary.description
@@ -1481,9 +1709,11 @@ const CreateItinerary = () => {
                             className="py-2 px-2 hover:bg-gray-200 transition-colors cursor-pointer"
                             onClick={() => handleSelectTransfer(summary)}
                           >
-                            <div className="font-bold">{summary.title.length <= 20
+                            <div className="font-bold">
+                              {summary.title.length <= 20
                                 ? summary.title
-                                : summary.title.slice(0, 20) + "..."}</div>
+                                : summary.title.slice(0, 20) + "..."}
+                            </div>
                             <div className="text-gray-600">
                               {summary.description.length <= 30
                                 ? summary.description
@@ -1547,9 +1777,11 @@ const CreateItinerary = () => {
                               handleSelectOtherinformation(summary)
                             }
                           >
-                            <div className="font-bold">{summary.title.length <= 20
+                            <div className="font-bold">
+                              {summary.title.length <= 20
                                 ? summary.title
-                                : summary.title.slice(0, 20) + "..."}</div>
+                                : summary.title.slice(0, 20) + "..."}
+                            </div>
                             <div className="text-gray-600">
                               {summary.description.length <= 30
                                 ? summary.description
@@ -1581,15 +1813,6 @@ const CreateItinerary = () => {
                         onChange={(e) => setSearchTermHotel(e.target.value)}
                         required
                       />
-                      <div className="mt-2">
-                        <Input
-                          label="Search hotel by name"
-                          className="w-full"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                          required
-                        />
-                      </div>
                       {searchTermHotel && (
                         <button
                           type="button"
@@ -1628,11 +1851,12 @@ const CreateItinerary = () => {
                             onClick={() => handleSelectHotel(summary)}
                           >
                             <div className="font-bold">{summary.name}</div>
-                            <div className="text-gray-600">
-                              {summary.vicinity}
+                            <div className="text-gray-600 text-sm">
+                              {summary.formatted_address}
                             </div>
-                            <div className="text-gray-600">
-                              {summary.rating}
+                            <div className="text-gray-600 text-sm flex justify-start items-center gap-2">
+                              <FaStar />
+                              <span className="">{summary.rating}</span>
                             </div>
                           </div>
                         ))
@@ -1690,15 +1914,19 @@ const CreateItinerary = () => {
                             className="py-2 px-2 hover:bg-gray-200 transition-colors cursor-pointer"
                             onClick={() => handleSelectInclusion(summary)} // Add to multiple selections
                           >
-                            <div className="font-bold">{summary.title.length <= 20
+                            <div className="font-bold">
+                              {summary.title.length <= 20
                                 ? summary.title
-                                : summary.title.slice(0, 20) + "..."}</div>
+                                : summary.title.slice(0, 20) + "..."}
+                            </div>
                             <div className="text-gray-600">
                               {summary?.description
                                 ?.slice(0, 2)
                                 .map((el, index) => (
                                   <span key={index}>
-                                    {el.length <=30 ? el : el.slice(0,30)+ "..."}
+                                    {el.length <= 30
+                                      ? el
+                                      : el.slice(0, 30) + "..."}
                                     {index < 1 &&
                                     summary?.description?.length >= 2
                                       ? ", "
