@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Input, Button } from "@material-tailwind/react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { serverUrl } from "../api";
 
 const SignIn = () => {
@@ -67,8 +67,8 @@ const SignIn = () => {
       localStorage.setItem("token", response.data.token);
 
       setTimeout(() => {
-        navigate("/quote");
-      }, 1000);
+        navigate("/quote")
+      }, 2000);
     } catch (error) {
       console.error("Error during login:", error);
       setMessage("Failed to login. Please try again.");
@@ -78,7 +78,7 @@ const SignIn = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100 relative">
+    <div className="min-h-screen border flex flex-col w-full justify-center items-center bg-gray-100 relative">
       <div className="absolute top-5 left-10 z-20">
         <img
           src="https://breakbag.com/static/media/logo.3fff3126fefbf4f3afe7.png"

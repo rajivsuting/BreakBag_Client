@@ -10,13 +10,13 @@ import {
   MdOutlineLibraryAdd,
   MdOutlinePeople,
 } from "react-icons/md";
-import { FaAngleDown, FaAngleUp } from "react-icons/fa";
+import {useNavigate} from "react-router-dom"
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 
 const Sidebar = () => {
   const { openAccordion, setOpenAccordion } = useAccordion();
   const location = useLocation();
-
+const navigate = useNavigate()
   const toggleAccordion = (section) => {
     setOpenAccordion((prev) =>
       prev.includes(section)
@@ -185,6 +185,7 @@ const Sidebar = () => {
           onClick={() => {
             navigate("/signin");
             localStorage.clear();
+            window.location.reload()
           }}
           className="mt-2"
         >
