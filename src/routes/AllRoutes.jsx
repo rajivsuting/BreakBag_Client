@@ -24,11 +24,20 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 const AllRoutes = () => {
-  const [role, setRole] = useState(localStorage.getItem('userRole') || '');
+ const [role, setRole] = useState(localStorage.getItem('userRole') || '');
   const isAuthenticated = !!role;
   const navigate = useNavigate();
-  let location = useLocation();
+  const location = useLocation();
 
+  // Update `role` state whenever the component mounts or when `localStorage` changes
+  useEffect(() => {
+    const storedRole = localStorage.getItem('userRole');
+    if (storedRole) {
+      setRole(storedRole);
+    }
+  }, [location]); // Empty dependency array ensures this runs only once
+
+  // Handle token validation
   const handleValidateToken = async () => {
     try {
       await axios.get(`${serverUrl}/api/validateToken`, {
@@ -43,66 +52,37 @@ const AllRoutes = () => {
 
         switch (status) {
           case 400:
-            // toast.error(`Bad Request: ${errorMessage}`);
+          case 401:
+          case 403:
+          case 404:
+          case 500:
             localStorage.clear();
             navigate("/signin");
             break;
-          case 401:
-            // toast.error("Unauthorized: Please log in.");
-               localStorage.clear();
-            navigate("/signin");
-            break;
-          case 403:
-            // toast.error("Forbidden: You do not have permission to perform this action.");
-               localStorage.clear();
-            navigate("/signin");
-            break;
-          case 404:
-            // toast.error("Not Found: The requested resource could not be found.");
-               localStorage.clear();
-            navigate("/signin");
-            break;
-          case 500:
-            // toast.error("Server Error: Please try again later.");
-               localStorage.clear();
-            navigate("/signin");
-            break;
           default:
-            // toast.error(`Error: ${errorMessage}`);
             localStorage.clear();
             navigate("/signin");
         }
       } else if (error.request) {
         toast.error("Network Error: No response received from the server.");
       } else {
-        toast.error(`Error: ${error.message}`); 
+        toast.error(`Error: ${error.message}`);
       }
     }
   };
 
-  function getPageNameFromURL() {
-    // Regex pattern to match the page name
+  const getPageNameFromURL = () => {
     const pattern = /([^\/?]+)/;
-
-    // Extract the page name using regex match
     const match = location?.pathname?.match(pattern);
-
-    // Check if match found
-    if (match && match.length > 1) {
-      // Return the matched page name
-      return match[1];
-    } else {
-      // If no match found, return null
-      return null;
-    }
-  }
-
+    return match && match.length > 1 ? match[1] : null;
+  };
 
   useEffect(() => {
-    if (getPageNameFromURL() !== "signin"){
+    if (getPageNameFromURL() !== "signin") {
       handleValidateToken();
     }
-  }, [getPageNameFromURL]);
+  }, [location]);
+
 
   return (
     <Routes> 
