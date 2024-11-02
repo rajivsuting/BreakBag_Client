@@ -94,7 +94,7 @@ const CreateItinerary = () => {
         console.log(response);
         setAllHotel(response.data);
         setOriginalHotel(response.data);
-      })
+      }) 
       .catch((error) => {
         console.log(error);
         setError("Error fetching hotels");
