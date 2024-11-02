@@ -24,7 +24,7 @@ const Addtraveller = ({ isOpen, onClose, getAlldata }) => {
     email: "",
     phone: "",
     address: "",
-    dateOfBirth: "",
+    // dateOfBirth: "",
     userType: "",
     agentAssigned: "",
   });
@@ -104,7 +104,7 @@ console.log(formData);
         email: "",
         phone: "",
         address: "",
-        dateOfBirth: "",
+        // dateOfBirth: "",
         userType: "",
       });
 
@@ -182,14 +182,14 @@ console.log(formData);
                 onChange={handleChange}
                 required
               />
-              <Input
+              {/* <Input
                 label="Date of birth"
                 name="dateOfBirth"
                 type="date"
                 value={formData.dateOfBirth}
                 onChange={handleChange}
                 required
-              />
+              /> */}
             </div>
 
             <div className="flex justify-between items-center m-auto gap-10 mt-5">
