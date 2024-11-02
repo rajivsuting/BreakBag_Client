@@ -75,7 +75,7 @@ const AllRoutes = () => {
       } else if (error.request) {
         toast.error("Network Error: No response received from the server.");
       } else {
-        toast.error(`Error: ${error.message}`);
+        toast.error(`Error: ${error.message}`); 
       }
     }
   };
