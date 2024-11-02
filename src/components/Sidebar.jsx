@@ -10,13 +10,13 @@ import {
   MdOutlineLibraryAdd,
   MdOutlinePeople,
 } from "react-icons/md";
-import {useNavigate} from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 
 const Sidebar = () => {
   const { openAccordion, setOpenAccordion } = useAccordion();
   const location = useLocation();
-const navigate = useNavigate()
+  const navigate = useNavigate();
   const toggleAccordion = (section) => {
     setOpenAccordion((prev) =>
       prev.includes(section)
@@ -31,7 +31,7 @@ const navigate = useNavigate()
     <div className="fixed top-0 left-0 h-screen w-64 bg-white text-black shadow-lg">
       <div className="p-4">
         <img
-        className="w-[80%] m-auto"
+          className="w-[80%] m-auto"
           src="https://breakbag.com/static/media/logo.3fff3126fefbf4f3afe7.png"
           alt=""
         />
@@ -47,10 +47,16 @@ const navigate = useNavigate()
               onClick={() => toggleAccordion("dashboard")}
             >
               <span className="flex justify-start gap-3 items-center">
-                <RiDashboardFill  className="w-5 h-5"/>
+                <RiDashboardFill className="w-5 h-5" />
                 Dashboard
               </span>
-              <span className="text-sm" >{openAccordion.includes("dashboard") ? <IoIosArrowUp /> : <IoIosArrowDown />}</span>
+              <span className="text-sm">
+                {openAccordion.includes("dashboard") ? (
+                  <IoIosArrowUp />
+                ) : (
+                  <IoIosArrowDown />
+                )}
+              </span>
             </div>
             {openAccordion.includes("dashboard") && (
               <div className="pl-4">
@@ -90,10 +96,16 @@ const navigate = useNavigate()
               onClick={() => toggleAccordion("itinerary")}
             >
               <span className={`flex justify-start gap-3 items-center`}>
-                <MdOutlineLibraryAdd className="w-5 h-5"/>
+                <MdOutlineLibraryAdd className="w-5 h-5" />
                 Itinerary Library
               </span>
-              <span className="text-sm">{openAccordion.includes("itinerary") ? <IoIosArrowUp /> : <IoIosArrowDown />}</span>
+              <span className="text-sm">
+                {openAccordion.includes("itinerary") ? (
+                  <IoIosArrowUp />
+                ) : (
+                  <IoIosArrowDown />
+                )}
+              </span>
             </div>
             {openAccordion.includes("itinerary") && (
               <div className="pl-4">
@@ -184,8 +196,8 @@ const navigate = useNavigate()
         <div
           onClick={() => {
             navigate("/signin");
+            window.location.reload();
             localStorage.clear();
-            window.location.reload()
           }}
           className="mt-2"
         >
@@ -197,8 +209,6 @@ const navigate = useNavigate()
             Logout
           </Link>
         </div>
-
-        
       </nav>
     </div>
   );

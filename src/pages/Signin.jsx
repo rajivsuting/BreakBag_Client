@@ -12,6 +12,7 @@ const SignIn = () => {
   const [canResendOtp, setCanResendOtp] = useState(false);
   const [timer, setTimer] = useState(60);
   const [loading, setLoading] = useState(false); // Loading state for login
+  const [otpLoader, setOtpLoader] = useState(false)
 
   const navigate = useNavigate();
 
@@ -36,7 +37,7 @@ const SignIn = () => {
 
   const handleGetOtp = async (e) => {
     e.preventDefault();
-
+    setOtpLoader(true)
     try {
       const response = await axios.post(`${serverUrl}/api/auth/login`, {
         email,
@@ -45,10 +46,12 @@ const SignIn = () => {
       setMessage(response.data.message);
       setOtpSent(true);
       setCanResendOtp(false);
+      setOtpLoader(false)
       setTimer(60);
     } catch (error) {
+      setOtpLoader(false)
       console.error("Error fetching OTP:", error);
-      setMessage("Failed to send OTP. Please try again.");
+      setMessage(error.response.data.message);
     }
   };
 
@@ -65,13 +68,14 @@ const SignIn = () => {
       setMessage(response.data.message);
       localStorage.setItem("userRole", response.data.role);
       localStorage.setItem("token", response.data.token);
-
+      console.log("Ahise")    
       setTimeout(() => {
         navigate("/quote")
       }, 2000);
+      console.log("goise")    
     } catch (error) {
       console.error("Error during login:", error);
-      setMessage("Failed to login. Please try again.");
+      setMessage(error.response.data.message);
     } finally {
       setLoading(false); // Hide loading indicator once login is complete
     }
@@ -128,12 +132,13 @@ const SignIn = () => {
             {!otpSent && (
               <Button
                 type="submit"
+                disabled={!email || otpLoader}
                 className="w-full mb-4 bg-main text-white hover:bg-opacity-80"
               >
                 Get OTP
               </Button>
             )}
-            {message && <p className="text-center text-green-500">{message}</p>}
+            {message && <p className={`text-center text-green-500`}>{message} !!</p>}
             {otpSent && (
               <>
                 {canResendOtp ? (

@@ -1,41 +1,44 @@
-// App.jsx
 import React, { useEffect, useState } from "react";
 import { AccordionProvider } from "./context/AccordionContext";
-import { BrowserRouter as Router } from "react-router-dom";
+import { BrowserRouter as Router, useLocation } from "react-router-dom";
 import AllRoutes from "./routes/AllRoutes";
 import Sidebar from "./components/Sidebar"; // Adjust the path accordingly
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-function App() {
-  // let location = useLocation();
-  const [test, setTest] = useState(false)
+function AppContent() {
+  const location = useLocation(); // Now it's inside the Router context
+  const [test, setTest] = useState(false);
 
-  function getPageNameFromURL() {
+  const getPageNameFromURL = () => {
     const fullPath = window.location.pathname;
+    const endpoint = fullPath.split("/").filter(Boolean).pop();
+    return endpoint;
+  };
 
-    // Split the path and get the last segment (endpoint)
-    const endpoint = fullPath.split('/').filter(Boolean).pop();
-    return endpoint
-  }
-
-  useEffect(()=>{
-    if (getPageNameFromURL() !== "signin"){
-      setTest(true)
+  useEffect(() => {
+    if (getPageNameFromURL() !== "signin") {
+      setTest(true);
     }
-  },[getPageNameFromURL,test])
+    console.log(getPageNameFromURL());
+  }, [location]); // Using location as a dependency
+
   return (
-    <div>
-      <AccordionProvider>
-        <Router>
-        <Sidebar />
-          <div className={`${test ? "ml-64" : 'ml-0'}`}>
-            {" "}
-            {/* Adjust margin for sidebar */}
-            <AllRoutes />
-          </div>
-        </Router>
-      </AccordionProvider>
+    <>
+      <Sidebar />
+      <div className={`${test || getPageNameFromURL() !== "signin" ? "ml-64" : "ml-0"}`}>
+        <AllRoutes />
+      </div>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <AccordionProvider>
+      <Router>
+        <AppContent /> {/* Separate component to use hooks */}
+      </Router>
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -48,7 +51,7 @@ function App() {
         pauseOnHover
         theme="colored"
       />
-    </div>
+    </AccordionProvider>
   );
 }
 

@@ -43,27 +43,33 @@ const AllRoutes = () => {
 
         switch (status) {
           case 400:
-            toast.error(`Bad Request: ${errorMessage}`);
+            // toast.error(`Bad Request: ${errorMessage}`);
+            localStorage.clear();
             navigate("/signin");
             break;
           case 401:
-            toast.error("Unauthorized: Please log in.");
+            // toast.error("Unauthorized: Please log in.");
+               localStorage.clear();
             navigate("/signin");
             break;
           case 403:
-            toast.error("Forbidden: You do not have permission to perform this action.");
+            // toast.error("Forbidden: You do not have permission to perform this action.");
+               localStorage.clear();
             navigate("/signin");
             break;
           case 404:
-            toast.error("Not Found: The requested resource could not be found.");
+            // toast.error("Not Found: The requested resource could not be found.");
+               localStorage.clear();
             navigate("/signin");
             break;
           case 500:
-            toast.error("Server Error: Please try again later.");
+            // toast.error("Server Error: Please try again later.");
+               localStorage.clear();
             navigate("/signin");
             break;
           default:
-            toast.error(`Error: ${errorMessage}`);
+            // toast.error(`Error: ${errorMessage}`);
+            localStorage.clear();
             navigate("/signin");
         }
       } else if (error.request) {
@@ -99,12 +105,20 @@ const AllRoutes = () => {
   }, [getPageNameFromURL]);
 
   return (
-    <Routes>
+    <Routes> 
       <Route path="/signin" element={<SignIn />} />
 
       <Route 
         path="/" 
         element={isAuthenticated ? <Navigate to="/quote" /> : <Navigate to="/signin" />} 
+      />
+      <Route 
+        path="/quote" 
+        element={
+          <Quote />
+          // <ProtectedRoute role={role} allowedRoles={['Admin', 'Agent', "Team Lead"]}>
+          // </ProtectedRoute>
+        } 
       />
 
       <Route 
