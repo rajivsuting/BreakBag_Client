@@ -54,6 +54,9 @@ const AllRoutes = () => {
           case 400:
           case 401:
           case 403:
+            localStorage.clear();
+            navigate("/signin");
+            break;
           case 404:
           case 500:
             localStorage.clear();
