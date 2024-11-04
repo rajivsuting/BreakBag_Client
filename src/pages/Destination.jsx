@@ -16,6 +16,7 @@ import AddActivities from "../components/AddActivities";
 import { serverUrl } from "../api";
 import axios from "axios";
 import AddDestination from "../components/AddDestination";
+import { useSearchParams } from "react-router-dom";
 
 const data = [
   {
@@ -43,19 +44,41 @@ const Destination = () => {
 
   const [data, setData] = useState([]);
 
+  const [search, setSearch] = useState("");
+  const [searchParams, setsearchParams] = useSearchParams();
+  const [currentPage, setCurrentPage] = useState(searchParams.get("page") || 1);
+  const [limit, setLimit] = useState(searchParams.get("limit") || 10); // default limit
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
   const getAlldata = () => {
-    axios.get(`${serverUrl}/api/destination/destinaions`).then((res) => {
+    axios.get(`${serverUrl}/api/destination/destinaions?page=${currentPage}&limit=${limit}`).then((res) => {
       setData(res.data.data);
     });
   };
 
   useEffect(() => {
+    setsearchParams({ page: currentPage, limit: limit });
     getAlldata();
     return () => {
       console.log("Avoid errors");
     };
-  }, []);
+  }, [currentPage, limit]);
 
+  const handleSearch = (e) => {
+    e.preventDefault();
+    // axios
+    //   .get(`${serverUrl}/api/transfer/search/?keywords=${search}`)
+    //   .then((res) => {
+    //     console.log(res);
+    //     setData(res.data.data);
+    //   })
+    //   .catch((err) => {
+    //     toast.error(err.response.data.message);
+    //   });
+  };
   return (
     <div className="flex gap-5 ">
 
@@ -81,13 +104,17 @@ const Destination = () => {
               <div className="flex justify-between items-center pb-2 gap-5 w-full">
                 {/* Search Form */}
                 <div className="w-[50%]">
-                  <form className="flex justify-start items-center gap-5">
+                  <form
+                    onSubmit={handleSearch}
+                    className="flex justify-start items-center gap-5"
+                  >
                     <div className="w-[50%]">
                       {/* Slightly dark background for the search box */}
                       <div className="bg-white rounded-md">
                         <Input
-                          label="Search any title..."
-                          name="password"
+                          label="Search any inclusion..."
+                          value={search}
+                          onChange={(e) => setSearch(e.target.value)}
                           required
                           className="bg-white bg-opacity-70 text-black"
                         />
@@ -97,6 +124,14 @@ const Destination = () => {
                       Search
                     </Button>
                     <Button
+                      onClick={() => {
+                        setSearch("");
+                        getAlldata();
+                        setCurrentPage(1);
+                        setLimit(10);
+                      }}
+                      variant=""
+                      disabled={!search && !limit}
                       type="button"
                       className="bg-white text-main border border-main"
                     >
@@ -115,10 +150,27 @@ const Destination = () => {
                   </div>
                   <div className="flex justify-end items-center">
                     <div className="flex justify-center items-center">
-                      <RiArrowLeftSLine className={`text-lg cursor-pointer`} />
-                      <span className="px-5 font-medium">{0}</span>
+                      <RiArrowLeftSLine
+                        className={`text-lg cursor-pointer ${
+                          currentPage === 1
+                            ? "text-gray-400 pointer-events-none"
+                            : ""
+                        }`}
+                        onClick={() =>
+                          currentPage !== 1 && handlePageChange(currentPage - 1)
+                        }
+                      />
+                      <span className="px-5 font-medium">{currentPage}</span>
                       <RiArrowRightSLine
-                        className={`text-lg cursor-pointer text-gray-400 pointer-events-none`}
+                        className={`text-lg cursor-pointer ${
+                          data?.length < limit
+                            ? "text-gray-400 pointer-events-none"
+                            : ""
+                        }`}
+                        onClick={() =>
+                          data?.length >= limit &&
+                          handlePageChange(currentPage + 1)
+                        }
                       />
                     </div>
                     <div>
@@ -126,7 +178,8 @@ const Destination = () => {
                       <div className="rounded-md p-2">
                         <select
                           className="border px-2 py-2 rounded-md text-black"
-                          value={0}
+                          value={limit}
+                          onChange={(e) => setLimit(e.target.value)}
                         >
                           <option value="5">5 per page</option>
                           <option value="10">10 per page</option>

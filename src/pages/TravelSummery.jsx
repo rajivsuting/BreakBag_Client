@@ -15,44 +15,49 @@ import AddTravelSummery from "../components/AddTravelSummery";
 import { RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 import { serverUrl } from "../api";
 import axios from "axios";
-
-const data = [
-  {
-    name: "John Doe",
-    email: "john@example.com",
-    role: "Admin",
-    status: "Active",
-  },
-  {
-    name: "Jane Smith",
-    email: "jane@example.com",
-    role: "Editor",
-    status: "Inactive",
-  },
-  {
-    name: "Tom Johnson",
-    email: "tom@example.com",
-    role: "Viewer",
-    status: "Active",
-  },
-];
+import { useSearchParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const TravelSummery = () => {
   const [isAddTravelSummeryModal, setIsAddTravelSummeryModal] = useState(false);
   const [data, setData] = useState([]);
+  const [search, setSearch] = useState("");
+  const [searchParams, setsearchParams] = useSearchParams();
+  const [currentPage, setCurrentPage] = useState(searchParams.get("page") || 1);
+  const [limit, setLimit] = useState(searchParams.get("limit") || 10); // default limit
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
 
   const getAlldata = () => {
-    axios.get(`${serverUrl}/api/travel-summary/travel-summary`).then((res) => {
+    axios.get(`${serverUrl}/api/travel-summary/travel-summary/?page=${currentPage}&limit=${limit}`).then((res) => {
       setData(res.data.travelSummaries);
     });
   };
 
   useEffect(() => {
+    setsearchParams({ page: currentPage, limit: limit });
     getAlldata();
     return () => {
       console.log("Avoid errors");
     };
-  }, []);
+  }, [currentPage,
+    limit]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    axios
+      .get(`${serverUrl}/api/travel-summary/search/?keyword=${search}`)
+      .then((res) => {
+        console.log(res);
+        setData(res.data.data);
+      })
+      .catch((err) => {
+        toast.error(err.response.data.message);
+      });
+  };
 
   return (
     <div className="flex gap-5 ">
@@ -79,13 +84,17 @@ const TravelSummery = () => {
               <div className="flex justify-between items-center pb-2 gap-5 w-full">
                 {/* Search Form */}
                 <div className="w-[50%]">
-                  <form className="flex justify-start items-center gap-5">
+                  <form
+                    onSubmit={handleSearch}
+                    className="flex justify-start items-center gap-5"
+                  >
                     <div className="w-[50%]">
                       {/* Slightly dark background for the search box */}
                       <div className="bg-white rounded-md">
                         <Input
-                          label="Search any title..."
-                          name="password"
+                          label="Search any travel summery..."
+                          value={search}
+                          onChange={(e) => setSearch(e.target.value)}
                           required
                           className="bg-white bg-opacity-70 text-black"
                         />
@@ -95,6 +104,14 @@ const TravelSummery = () => {
                       Search
                     </Button>
                     <Button
+                      onClick={() => {
+                        setSearch("");
+                          getAlldata();
+                          setCurrentPage(1)
+                          setLimit(10)
+                      }}
+                      variant=""
+                      disabled={!search}
                       type="button"
                       className="bg-white text-main border border-main"
                     >
@@ -113,10 +130,27 @@ const TravelSummery = () => {
                   </div>
                   <div className="flex justify-end items-center">
                     <div className="flex justify-center items-center">
-                      <RiArrowLeftSLine className={`text-lg cursor-pointer`} />
-                      <span className="px-5 font-medium">{0}</span>
+                      <RiArrowLeftSLine
+                        className={`text-lg cursor-pointer ${
+                          currentPage === 1
+                            ? "text-gray-400 pointer-events-none"
+                            : ""
+                        }`}
+                        onClick={() =>
+                          currentPage !== 1 && handlePageChange(currentPage - 1)
+                        }
+                      />
+                      <span className="px-5 font-medium">{currentPage}</span>
                       <RiArrowRightSLine
-                        className={`text-lg cursor-pointer text-gray-400 pointer-events-none`}
+                        className={`text-lg cursor-pointer ${
+                          data?.length < limit
+                            ? "text-gray-400 pointer-events-none"
+                            : ""
+                        }`}
+                        onClick={() =>
+                          data?.length >= limit &&
+                          handlePageChange(currentPage + 1)
+                        }
                       />
                     </div>
                     <div>
@@ -124,7 +158,8 @@ const TravelSummery = () => {
                       <div className="rounded-md p-2">
                         <select
                           className="border px-2 py-2 rounded-md text-black"
-                          value={0}
+                          value={limit}
+                          onChange={(e) => setLimit(e.target.value)}
                         >
                           <option value="5">5 per page</option>
                           <option value="10">10 per page</option>
@@ -146,7 +181,7 @@ const TravelSummery = () => {
               <thead>
                 <tr className="bg-gray-200">
                 <th className="px-4 py-2">Title</th>
-                <th className="px-4 py-2">Destination</th>
+                <th className="px-4 py-2">Description</th>
                   {/* <th className="px-4 py-2"></th>
                   <th className="px-4 py-2"></th> */}
                 </tr>
