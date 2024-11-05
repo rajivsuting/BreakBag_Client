@@ -586,6 +586,7 @@ const CreateItinerary = () => {
   const handleFinalSubmit = () => {
     // Send the POST request with your itinerary data
     console.log({
+      quote:data,
       destinationOnly: data?.destination,
       travelSummaryPerDay,
       activityPerDay,
@@ -601,6 +602,7 @@ const CreateItinerary = () => {
       .post(
         `${serverUrl}/api/quote/itenerary/generate`,
         {
+          quote:data,
           destinationOnly: data?.destination,
           travelSummaryPerDay,
           activityPerDay,
