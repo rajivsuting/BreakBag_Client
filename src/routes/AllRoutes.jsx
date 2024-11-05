@@ -22,6 +22,7 @@ import { useEffect, useState } from "react";
 import { serverUrl } from "../api";
 import axios from "axios";
 import { toast } from "react-toastify";
+import EditItinary from "../pages/EditItinary";
 
 const AllRoutes = () => {
  const [role, setRole] = useState(localStorage.getItem('userRole') || '');
@@ -207,6 +208,14 @@ const AllRoutes = () => {
         element={
           <ProtectedRoute role={role} allowedRoles={['Agent', 'Admin', "Team Lead"]}>
             <CreateItinary />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/edit-intinary/:tripid" 
+        element={
+          <ProtectedRoute role={role} allowedRoles={['Agent', 'Admin', "Team Lead"]}>
+            <EditItinary />
           </ProtectedRoute>
         } 
       />

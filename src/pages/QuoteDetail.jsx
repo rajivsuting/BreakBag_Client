@@ -47,7 +47,6 @@ const QuoteDetail = () => {
   const getAlldata = () => {
     axios.get(`${serverUrl}/api/quote/quotes/${tripid}`).then((res) => {
       setData(res.data.data);
-      console.log(res);
     });
   };
 
@@ -117,11 +116,18 @@ const QuoteDetail = () => {
               {tripid}
             </div>
             <div className=" w-[50%] flex justify-end pb-2 gap-5 w-full">
+              {
+                data?.itenerary ? <Link to={`/edit-intinary/${tripid}`}>
+                <Button type="submit" className="bg-main text-white">
+                   Edit itinary
+                </Button>
+              </Link> : 
               <Link to={`/create-intinary/${tripid}`}>
                 <Button type="submit" className="bg-main text-white">
-                  Create itinary
+                Create itinary
                 </Button>
               </Link>
+              }
             </div>
           </div>
           <CardBody className="p-8">

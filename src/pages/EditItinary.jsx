@@ -11,8 +11,9 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { IoMdClose, IoMdSearch } from "react-icons/io";
 
-const CreateItinerary = () => {
+const EditItinary = () => {
   const { tripid } = useParams();
+  const [data, setData] = useState([]);
   const [loadingItinery, setLoadingItinery] = useState();
   const [selectedCategory, setSelectedCategory] = useState("Travel Summary");
   const [allTravelData, setAllTravelData] = useState([]);
@@ -52,15 +53,12 @@ const CreateItinerary = () => {
   const [selectedInclusions, setSelectedInclusions] = useState([]);
   const [searchTermInclusion, setSearchTermInclusion] = useState("");
   const [name, setName] = useState("");
-  const [data, setData] = useState([]);
   const [adultPrice, setAdultPrice] = useState(""); // Default adult price
   const [childPrice, setChildPrice] = useState(""); // Default child price
   const [priceDetails, setPriceDetails] = useState([]); // To store the formatted data
 
   // State to manage travel summaries per day
-  const [travelSummaryPerDay, setTravelSummaryPerDay] = useState([
-    { day: 1, summaryDetails: { title: "", description: "" }, isSaved: false },
-  ]);
+  const [travelSummaryPerDay, setTravelSummaryPerDay] = useState([]);
 
   const [activityPerDay, setActivityPerDay] = useState([
     {
@@ -248,21 +246,17 @@ const CreateItinerary = () => {
     });
   }, []);
 
-  // useEffect(() => {
-  //   if (location) {
-  //     axios
-  //       .get(`${serverUrl}/hotels?location=${location}&name=${name}`)
-  //       .then((response) => {
-  //         console.log(response)
-  //         setAllHotel(response.data);
-  //         setOriginalHotel(response.data);
-  //       })
-  //       .catch((error) => {
-  //         console.log(error)
-  //         setError("Error fetching hotels");
-  //       });
-  //   }
-  // }, [location,name]);
+  useEffect(() => {
+    setTravelSummaryPerDay(data?.itenerary?.travelSummaryPerDay)
+    setActivityPerDay(data?.itenerary?.activityPerDay)
+    setPriceDetails(data?.itenerary?.priceDetails)
+    // console.log(data?.itenerary?.priceDetails);
+    setSelectedHotel(data?.itenerary?.selectedHotel)
+    setSelectedExclusions(data?.itenerary?.selectedExclusions)
+    setSelectedOtherInformation(data?.itenerary?.selectedOtherInformation)
+    setSelectedTransfer(data?.itenerary?.selectedTransfers)
+    setSelectedInclusions(data?.itenerary?.selectedInclusions)
+  }, [data]);
 
   const categories = [
     "Travel Summary",
@@ -581,7 +575,7 @@ const CreateItinerary = () => {
 
   //inclusoon extra
 
-  // console.log(data);
+  console.log(data);
 
   const handleFinalSubmit = () => {
     // Send the POST request with your itinerary data
@@ -728,7 +722,7 @@ const CreateItinerary = () => {
                   <>
                     <div className="flex justify-between bg-white rounded-lg gap-5">
                       <div className="w-[80%] grid grid-cols-4 gap-2 border-gray-300">
-                        {travelSummaryPerDay.map((daySummary, index) => (
+                        {travelSummaryPerDay?.map((daySummary, index) => (
                           <div
                             key={index}
                             className={`w-[80px] h-[30px] flex justify-between items-center rounded cursor-pointer text-center py-1 px-2 text-sm ${
@@ -768,7 +762,7 @@ const CreateItinerary = () => {
                       ) : null}
                     </div>
 
-                    {travelSummaryPerDay.map((daySummary, index) =>
+                    {travelSummaryPerDay?.map((daySummary, index) =>
                       activeDay === daySummary.day ? (
                         <div key={index} className="mb-4">
                           <div className="mt-5 mb-5 text-lg font-normal">
@@ -1976,7 +1970,7 @@ const CreateItinerary = () => {
   );
 };
 
-export default CreateItinerary;
+export default EditItinary;
 
 {
   /* {selectedCategory === "Activity" && (
