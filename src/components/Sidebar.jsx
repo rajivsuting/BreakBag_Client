@@ -48,7 +48,7 @@ const Sidebar = () => {
             >
               <span className="flex justify-start gap-3 items-center">
                 <RiDashboardFill className="w-5 h-5" />
-                Dashboard
+                <strong>Dashboard</strong>
               </span>
               <span className="text-sm">
                 {openAccordion.includes("dashboard") ? (
@@ -97,7 +97,7 @@ const Sidebar = () => {
             >
               <span className={`flex justify-start gap-3 items-center`}>
                 <MdOutlineLibraryAdd className="w-5 h-5" />
-                Itinerary Library
+                <strong>Itinerary Library</strong>
               </span>
               <span className="text-sm">
                 {openAccordion.includes("itinerary") ? (
@@ -190,7 +190,7 @@ const Sidebar = () => {
             isActive("/quote") ? "text-main" : ""
           }`}
         >
-          <UserCircleIcon className="h-5 w-5" /> Quote
+          <UserCircleIcon className="h-5 w-5" /> <strong>Quote</strong>
         </Link>
 
         <div
