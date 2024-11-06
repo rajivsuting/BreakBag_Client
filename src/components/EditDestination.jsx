@@ -62,7 +62,7 @@ const EditDestination = ({ isOpen, onClose,destinationID, getAlldata }) => {
         }
       );
       console.log("Response:", response.data);
-      toast.success("Destination edited successfully");
+      toast.success("Destination updated successfully");
       getAlldata();
 
       // Reset form after successful submission

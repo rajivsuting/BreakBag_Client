@@ -8,7 +8,12 @@ import "react-toastify/dist/ReactToastify.css";
 import { serverUrl } from "../api";
 import Select from "react-select";
 
-const AddTravelSummery = ({ isOpen, onClose, getAlldata }) => {
+const AddTravelSummery = ({
+  isOpen,
+  onClose,
+  singleTravelSummery,
+  getAlldata,
+}) => {
   // Prevent scrolling on number inputs (custom hook)
   usePreventScrollOnNumberInput();
 
@@ -18,6 +23,12 @@ const AddTravelSummery = ({ isOpen, onClose, getAlldata }) => {
     description: "",
     destination: "",
   });
+
+  useEffect(() => {
+    if (singleTravelSummery) {
+      setFormData(singleTravelSummery);
+    }
+  }, [singleTravelSummery]);
 
   const [selectedDestination, setSelectedDestination] = useState("");
 
@@ -47,70 +58,139 @@ const AddTravelSummery = ({ isOpen, onClose, getAlldata }) => {
       destination: selectedDestination,
     };
 
-    try {
-      // Make the API call to submit the form data
-      const response = await axios.post(
-        `${serverUrl}/api/travel-summary/travel-summary`,
-        updatedFormData, // Use the updated formData
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
+    if (singleTravelSummery?.title){
+      try {
+        // Make the API call to submit the form data
+        const response = await axios.put(
+          `${serverUrl}/api/travel-summary/edit/${singleTravelSummery._id}`,
+          updatedFormData, // Use the updated formData
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+  
+        toast.success("Travel summary updated successfully");
+        getAlldata();
+        // Clear the form
+        setFormData({
+          title: "",
+          description: "",
+          destination: "",
+        });
+        setSelectedDestination(""); // Clear the selected destination
+  
+        // Close the modal
+        onClose();
+      } catch (error) {
+        // Handle different types of errors
+        if (error.response) {
+          const status = error.response.status;
+          const errorMessage =
+            error.response.data.message || "Something went wrong";
+  
+          // Show custom error messages based on status codes
+          switch (status) {
+            case 400:
+              toast.error(`Bad Request: ${errorMessage}`);
+              break;
+            case 401:
+              toast.error("Unauthorized: Please log in again.");
+              break;
+            case 403:
+              toast.error(
+                "Forbidden: You do not have permission to perform this action."
+              );
+              break;
+            case 404:
+              toast.error(
+                "Not Found: The requested resource could not be found."
+              );
+              break;
+            case 500:
+              toast.error("Server Error: Please try again later.");
+              break;
+            default:
+              toast.error(`Error: ${errorMessage}`);
+          }
+        } else if (error.request) {
+          // Network error (no response received)
+          toast.error("Network Error: No response received from the server.");
+        } else {
+          // Something else happened
+          toast.error(`Error: ${error.message}`);
         }
-      );
-
-      toast.success("Travel summary submitted");
-      getAlldata();
-      // Clear the form
-      setFormData({
-        title: "",
-        description: "",
-        destination: "",
-      });
-      setSelectedDestination(""); // Clear the selected destination
-
-      // Close the modal
-      onClose();
-    } catch (error) {
-      // Handle different types of errors
-      if (error.response) {
-        const status = error.response.status;
-        const errorMessage =
-          error.response.data.message || "Something went wrong";
-
-        // Show custom error messages based on status codes
-        switch (status) {
-          case 400:
-            toast.error(`Bad Request: ${errorMessage}`);
-            break;
-          case 401:
-            toast.error("Unauthorized: Please log in again.");
-            break;
-          case 403:
-            toast.error(
-              "Forbidden: You do not have permission to perform this action."
-            );
-            break;
-          case 404:
-            toast.error(
-              "Not Found: The requested resource could not be found."
-            );
-            break;
-          case 500:
-            toast.error("Server Error: Please try again later.");
-            break;
-          default:
-            toast.error(`Error: ${errorMessage}`);
-        }
-      } else if (error.request) {
-        // Network error (no response received)
-        toast.error("Network Error: No response received from the server.");
-      } else {
-        // Something else happened
-        toast.error(`Error: ${error.message}`);
+      } finally {
+        setIsLoading(false);
       }
-    } finally {
-      setIsLoading(false);
+    } else {
+      try {
+        // Make the API call to submit the form data
+        const response = await axios.post(
+          `${serverUrl}/api/travel-summary/travel-summary/`,
+          updatedFormData, // Use the updated formData
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+  
+        toast.success("Travel summary submitted");
+        getAlldata();
+        // Clear the form
+        setFormData({
+          title: "",
+          description: "",
+          destination: "",
+        });
+        setSelectedDestination(""); // Clear the selected destination
+  
+        // Close the modal
+        onClose();
+      } catch (error) {
+        // Handle different types of errors
+        if (error.response) {
+          const status = error.response.status;
+          const errorMessage =
+            error.response.data.message || "Something went wrong";
+  
+          // Show custom error messages based on status codes
+          switch (status) {
+            case 400:
+              toast.error(`Bad Request: ${errorMessage}`);
+              break;
+            case 401:
+              toast.error("Unauthorized: Please log in again.");
+              break;
+            case 403:
+              toast.error(
+                "Forbidden: You do not have permission to perform this action."
+              );
+              break;
+            case 404:
+              toast.error(
+                "Not Found: The requested resource could not be found."
+              );
+              break;
+            case 500:
+              toast.error("Server Error: Please try again later.");
+              break;
+            default:
+              toast.error(`Error: ${errorMessage}`);
+          }
+        } else if (error.request) {
+          // Network error (no response received)
+          toast.error("Network Error: No response received from the server.");
+        } else {
+          // Something else happened
+          toast.error(`Error: ${error.message}`);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+
     }
   };
 
@@ -129,7 +209,11 @@ const AddTravelSummery = ({ isOpen, onClose, getAlldata }) => {
         <div className="">
           <form className="m-auto" onSubmit={handleSubmit}>
             <div className="m-auto mb-5">
-              <div className="font-normal text-xl">Add Travel Summary</div>
+              {singleTravelSummery?.title ? (
+                <div className="font-normal text-xl">Edit Travel Summary</div>
+              ) : (
+                <div className="font-normal text-xl">Add Travel Summary</div>
+              )}
             </div>
             <div className="flex justify-between items-center m-auto gap-10 mt-5">
               <Input
@@ -151,7 +235,10 @@ const AddTravelSummery = ({ isOpen, onClose, getAlldata }) => {
             </div>
             <div className="w-[90%] flex justify-center items-center text-center mt-5 m-auto">
               <Button className="bg-main" type="submit" disabled={isLoading}>
-                {isLoading ? "Adding..." : "Add Summary"}
+                {
+                  singleTravelSummery?.title ? 
+                `${isLoading ? "Editing..." : "Edit Summary"}` : `${isLoading ? "Adding..." : "Add Summary"}`
+                }
               </Button>
             </div>
           </form>

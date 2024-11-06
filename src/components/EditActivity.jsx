@@ -8,7 +8,7 @@ import Select from "react-select";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const AddActivities = ({ isOpen, onClose, getAlldata }) => {
+const EditActivity = ({ isOpen, onClose, getAlldata,singleActivity }) => {
   usePreventScrollOnNumberInput();
 
   const [formData, setFormData] = useState({
@@ -28,6 +28,16 @@ const AddActivities = ({ isOpen, onClose, getAlldata }) => {
   }));
 
   useEffect(() => {
+    if (singleActivity) {
+      setFormData(singleActivity);
+      setFiles(singleActivity?.images);
+      setSelectedDestination(singleActivity?.destination?._id)
+    }
+  }, [singleActivity]);
+
+  console.log(singleActivity)
+
+  useEffect(() => {
     const fetchDestinations = async () => {
       try {
         const res = await axios.get(`${serverUrl}/api/destination/destinaions`);
@@ -45,6 +55,11 @@ const AddActivities = ({ isOpen, onClose, getAlldata }) => {
         ...prevState,
         destination: selectedDestination.value,
       }));
+    } else {
+        setFormData((prevState) => ({
+            ...prevState,
+            destination: singleActivity?.destination?._id,
+          }));
     }
   }, [selectedDestination]);
 
@@ -104,7 +119,7 @@ const AddActivities = ({ isOpen, onClose, getAlldata }) => {
 
     const data = new FormData();
     data.append("title", formData.title);
-    formData.description.forEach((description, i) => {
+    formData?.description?.forEach((description, i) => {
       data.append(`description[${i}]`, description);
     });
     data.append("destination", formData.destination);
@@ -116,8 +131,8 @@ const AddActivities = ({ isOpen, onClose, getAlldata }) => {
     }
 
     try {
-      const response = await axios.post(
-        `${serverUrl}/api/activity/create`,
+      const response = await axios.put(
+        `${serverUrl}/api/activity/edit/${singleActivity._id}`,
         data,
         {
           headers: {
@@ -126,7 +141,7 @@ const AddActivities = ({ isOpen, onClose, getAlldata }) => {
         }
       );
       console.log("Response:", response.data);
-      toast.success("Activity added successfully");
+      toast.success("Activity updated successfully");
       getAlldata();
       setFormData({ title: "", destination: "", description: [""] });
       setFiles([]);
@@ -185,7 +200,7 @@ const AddActivities = ({ isOpen, onClose, getAlldata }) => {
         <div>
           <form onSubmit={handleSubmit} className="m-auto">
             <div className="m-auto mb-5">
-              <div className="font-normal text-xl">Add Activities</div>
+              <div className="font-normal text-xl">Edit Activity</div>
             </div>
             <div className="flex justify-between items-center m-auto gap-10 mt-5">
               <div className="w-[100%]">
@@ -196,7 +211,7 @@ const AddActivities = ({ isOpen, onClose, getAlldata }) => {
                   placeholder="Select a destination"
                   isSearchable={true}
                   isClearable={true}
-                  required
+                  
                 />
               </div>
               <Input
@@ -204,7 +219,7 @@ const AddActivities = ({ isOpen, onClose, getAlldata }) => {
                 name="title"
                 value={formData.title}
                 onChange={handleChangeInput}
-                required
+                
               />
             </div>
             <div className="flex flex-col gap-2 mt-5">
@@ -214,6 +229,8 @@ const AddActivities = ({ isOpen, onClose, getAlldata }) => {
                 name="file"
                 type="file"
                 multiple
+                disabled={files?.length == 3}
+                required={files?.length == 3}
                 onChange={handleFileChange}
                 className={`${fileError ? "border-red-500" : ""}`}
               />
@@ -224,19 +241,20 @@ const AddActivities = ({ isOpen, onClose, getAlldata }) => {
               {/* Dynamically colored file count */}
               <p
                 className={`text-sm ${
-                  files.length === 3 ? "text-green-500" : "text-red-500"
+                  files?.length === 3 ? "text-green-500" : "text-red-500"
                 }`}
               >
-                Selected images: {files.length}/3
+                Selected images: {files?.length}/3
               </p>
               {/* Display selected file names with reduced spacing */}
               <ul className="text-sm mt-1">
                 {" "}
                 {/* Reduced margin-top */}
-                {files.map((file, index) => (
+                {files?.map((file, index) => (
                   <li key={index} className="flex items-center">
-                    {file.name}
+                   <img src={file} className="w-32 mb-2" alt="" /> 
                     <button
+                    type="button"
                       onClick={() => {
                         setFiles(files.filter((_, i) => i !== index));
                       }}
@@ -251,7 +269,7 @@ const AddActivities = ({ isOpen, onClose, getAlldata }) => {
 
             <div className="m-auto mt-5">
               <div className="font-normal text-lg mb-2">Points</div>
-              {formData.description.map((description, index) => (
+              {formData?.description?.map((description, index) => (
                 <div key={index} className="flex gap-4 mb-4">
                   <Textarea
                     label={`Point ${index + 1}`}
@@ -261,7 +279,7 @@ const AddActivities = ({ isOpen, onClose, getAlldata }) => {
                     onChange={(e) =>
                       handleDescriptionChange(index, e.target.value)
                     }
-                    required
+                    
                   />
                   {index > 0 ? (
                     <div>
@@ -285,7 +303,7 @@ const AddActivities = ({ isOpen, onClose, getAlldata }) => {
             </div>
             <div className="w-[90%] flex justify-center items-center text-center mt-5 m-auto">
               <Button className="bg-main" type="submit" disabled={isLoading}>
-                {isLoading ? "Adding Activity..." : "Add Activity"}
+                {isLoading ? "Editing Activity..." : "Edit Activity"}
               </Button>
             </div>
           </form>
@@ -295,4 +313,4 @@ const AddActivities = ({ isOpen, onClose, getAlldata }) => {
   );
 };
 
-export default AddActivities;
+export default EditActivity;

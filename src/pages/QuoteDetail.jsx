@@ -18,6 +18,7 @@ import axios from "axios";
 import AddDestination from "../components/AddDestination";
 import { Link, useParams } from "react-router-dom";
 import { convertDate } from "../Utils/Dateformat";
+import EditQuote from "../components/EditQuote";
 
 const data = [
   {
@@ -43,6 +44,7 @@ const data = [
 const QuoteDetail = () => {
   const { tripid } = useParams();
   const [data, setData] = useState([]);
+  const [editModal, setEditModal] = useState(false)
 
   const getAlldata = () => {
     axios.get(`${serverUrl}/api/quote/quotes/${tripid}`).then((res) => {
@@ -97,7 +99,7 @@ const QuoteDetail = () => {
             {/* Content on top of the background */}
             <div className="absolute inset-0 flex flex-col p-4 pb-0 justify-between z-10">
               <div className="text-3xl text-white font-semibold">
-                Quote details
+                Edit details
               </div>
             </div>
           </div>
@@ -116,6 +118,9 @@ const QuoteDetail = () => {
               {tripid}
             </div>
             <div className=" w-[50%] flex justify-end pb-2 gap-5 w-full">
+            <Button type="button" className="bg-main text-white" onClick={()=>setEditModal(true)}>
+                Edit quote
+                </Button>
               {
                 data?.itenerary ? <Link to={`/edit-intinary/${tripid}`}>
                 <Button type="submit" className="bg-main text-white">
@@ -134,31 +139,31 @@ const QuoteDetail = () => {
             <div className=" w-[50%]">
               <div className="flex justify-between">
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-600">Starting date</div>
+                  <div className="text-gray-600 font-bold">Starting date</div>
                   <div>{data?.startDate?.split("T")[0]}</div>
                 </div>
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-600">Ending date</div>
+                  <div className="text-gray-600 font-bold">Ending date</div>
                   <div>{data?.endDate?.split("T")[0]}</div>
                 </div>
               </div>
               <div className="flex justify-between mt-5">
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-600">Destination</div>
+                  <div className="text-gray-600 font-bold">Destination</div>
                   <div>{data?.destination?.title}</div>
                 </div>
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-600">No. of traveller</div>
+                  <div className="text-gray-600 font-bold">No. of traveller</div>
                   <div>{data?.numberOfTravellers}</div>
                 </div>
               </div>
               <div className="flex justify-between mt-5">
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-600">Duration</div>
+                  <div className="text-gray-600 font-bold">Duration</div>
                   <div>{data?.duration}</div>
                 </div>
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-600">Travellers</div>
+                  <div className="text-gray-600 font-bold">Travellers</div>
                   <div>
                     {" "}
                     {data?.travellers?.slice(0, 2).map((participant, index) => (
@@ -175,7 +180,7 @@ const QuoteDetail = () => {
               </div>
               <div className="flex justify-between mt-5">
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-600">Created by</div>
+                  <div className="text-gray-600 font-bold">Created by</div>
                   <div>{data?.createdBy?.name || "Unknown"}</div>
                 </div>
                 {/* <div className="text-start w-[30%]">
@@ -198,6 +203,7 @@ const QuoteDetail = () => {
           </CardBody>
         </Card>
       </div>
+      <EditQuote isOpen={editModal} onClose={()=>setEditModal(false)} singleQuote={data} getAlldata={getAlldata}/>
       {/* <AddDestination
         isOpen={isAddTravelSummeryModal}
         onClose={() => setIsAddTravelSummeryModal(false)}

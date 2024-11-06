@@ -11,14 +11,19 @@ import AddOtherinformation from "../components/AddOtherInformation";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
+import EditOtherinformation from "../components/EditOtherinformation";
 
 const OtherInformation = () => {
   const [isAddTravelSummeryModal, setIsAddTravelSummeryModal] = useState(false);
+  const [isDeleteModal, setIsdeleteModal] = useState(false);
+  const [singleOtherinformation, setSingleOtherinformation] = useState({});
+  const [isEditOtherinformationModal, setIsEditOtherinformationModal] = useState(false);
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
   const [searchParams, setsearchParams] = useSearchParams();
-  const [currentPage, setCurrentPage] = useState(searchParams.get("page") || 1);
-  const [limit, setLimit] = useState(searchParams.get("limit") || 10); // default limit
+  const [currentPage, setCurrentPage] = useState(Number(searchParams.get("page")) || 1);
+  const [limit, setLimit] = useState(Number(searchParams.get("limit")) || 10); // default limit
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -44,7 +49,7 @@ const OtherInformation = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     axios
-      .get(`${serverUrl}/api/transfer/search/?keywords=${search}`)
+      .get(`${serverUrl}/api/other-information/search/?keywords=${search}`)
       .then((res) => {
         console.log(res);
         setData(res.data.data);
@@ -52,6 +57,58 @@ const OtherInformation = () => {
       .catch((err) => {
         toast.error(err.response.data.message);
       });}
+
+      const handleDelete = async () => {
+        try {
+          // Make the API call to submit the form data
+          const response = await axios.delete(
+            `${serverUrl}/api/other-information/delete/${singleOtherinformation._id}`
+          );
+          toast.success("Transfer deleted successfully");
+          getAlldata();
+        } catch (error) {
+          console.log(error);
+          // Handle different types of errors
+          if (error.response) {
+            const status = error.response.status;
+            const errorMessage =
+              error.response.data.message || "Something went wrong";
+    
+            // Show custom error messages based on status codes
+            switch (status) {
+              case 400:
+                toast.error(`Bad Request: ${errorMessage}`);
+                break;
+              case 401:
+                toast.error("Unauthorized: Please log in again.");
+                break;
+              case 403:
+                toast.error(
+                  "Forbidden: You do not have permission to perform this action."
+                );
+                break;
+              case 404:
+                toast.error(
+                  "Not Found: The requested resource could not be found."
+                );
+                break;
+              case 500:
+                toast.error("Server Error: Please try again later.");
+                break;
+              default:
+                toast.error(`Error: ${errorMessage}`);
+            }
+          } else if (error.request) {
+            // Network error (no response received)
+            toast.error("Network Error: No response received from the server.");
+          } else {
+            // Something else happened
+            toast.error(`Error: ${error.message}`);
+          }
+        } finally {
+          // setIsLoading(false);
+        }
+      };
 
   return (
     <div className="flex gap-5 ">
@@ -198,14 +255,23 @@ const OtherInformation = () => {
                         ? user.description
                         : user.description.slice(0, 40) + "..."}
                     </td>
-                    {/* <td className="px-4 py-2">
-                      <MdRemoveRedEye className="h-5 w-5 text-maincolor2 cursor-pointer" />
-                    </td> */}
                     <td className="px-4 py-2">
-                      <MdEdit className="h-5 w-5 text-maincolor2 cursor-pointer" />
+                      <MdEdit
+                        className="h-5 w-5 text-maincolor2 cursor-pointer"
+                        onClick={() => {
+                          setSingleOtherinformation(user);
+                          setIsEditOtherinformationModal(true);
+                        }}
+                      />
                     </td>
                     <td className="px-4 py-2">
-                      <MdDelete className="h-5 w-5 text-main cursor-pointer" />
+                      <MdDelete
+                        className="h-5 w-5 text-main cursor-pointer"
+                        onClick={() => {
+                          setIsdeleteModal(true);
+                          setSingleOtherinformation(user);
+                        }}
+                      />
                     </td>
                   </tr>
                 ))}
@@ -214,6 +280,17 @@ const OtherInformation = () => {
           </CardBody>
         </Card>
       </div>
+      <ConfirmDeleteModal
+        isOpen={isDeleteModal}
+        onClose={() => setIsdeleteModal(false)}
+        handleDelete={handleDelete}
+      />
+<EditOtherinformation
+        singleOtherinformation={singleOtherinformation}
+        isOpen={isEditOtherinformationModal}
+        onClose={() => setIsEditOtherinformationModal(false)}
+        getAlldata={getAlldata}
+      />
       <AddOtherinformation
         isOpen={isAddTravelSummeryModal}
         onClose={() => setIsAddTravelSummeryModal(false)}

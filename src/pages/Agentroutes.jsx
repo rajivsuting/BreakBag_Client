@@ -149,15 +149,15 @@ const Agentroutes = () => {
 
               <div className="flex justify-between">
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-600">Agent name</div>
+                  <div className="text-gray-600 font-bold">Agent name</div>
                   <div>{data?.user?.name}</div>
                 </div>
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-600">Agent email address</div>
+                  <div className="text-gray-600 font-bold">Agent email address</div>
                   <div>{data?.user?.email}</div>
                 </div>
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-600">Phone number</div>
+                  <div className="text-gray-600 font-bold">Phone number</div>
                   <div>{data?.user?.phone}</div>
                 </div>
               </div>
@@ -167,39 +167,39 @@ const Agentroutes = () => {
               </div>
               <div className="flex justify-between mt-5">
               <div className="text-start w-[30%]">
-                  <div className="text-gray-600">Total quotes</div>
+                  <div className="text-gray-600 font-bold">Total quotes</div>
                   <div>{data?.totalQuotes || 0}</div>
                 </div>
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-600">Active</div>
+                  <div className="text-gray-600 font-bold">Active</div>
                   <div>{activeQuote || 0}</div>
                 </div>
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-600">Quoted</div>
+                  <div className="text-gray-600 font-bold">Quoted</div>
                   <div>{quotedQuote || 0}</div>
                 </div>
               </div>
               <div className="flex justify-between mt-5">
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-600">Follow Up</div>
+                  <div className="text-gray-600 font-bold">Follow Up</div>
                   <div>{followUpQuote || 0}</div>
                 </div>
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-600">Confirmed</div>
+                  <div className="text-gray-600 font-bold">Confirmed</div>
                   <div>{confirmedQuote}</div>
                 </div>
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-600">Cancelled</div>
+                  <div className="text-gray-600 font-bold">Cancelled</div>
                   <div>{cancelledQuote || 0}</div>
                 </div>
               </div>
               <div className="flex justify-between mt-5">
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-600">CNP</div>
+                  <div className="text-gray-600 font-bold">CNP</div>
                   <div>{cnpQuote || 0}</div>
                 </div>
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-600">Groups</div>
+                  <div className="text-gray-600 font-bold">Groups</div>
                   <div>{groupsQuote || 0}</div>
                 </div>
                 <div className="text-start w-[30%]">

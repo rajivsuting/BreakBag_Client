@@ -26,7 +26,7 @@ const ConfirmDeleteModal = ({ isOpen, onClose, handleDelete }) => {
             Close
           </button>
           <Button
-            className="bg-maincolor"
+            className="bg-main"
             type="submit"
             onClick={() => {
               onClose();

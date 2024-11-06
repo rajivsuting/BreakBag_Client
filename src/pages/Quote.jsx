@@ -19,10 +19,13 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import Addcomment from "../components/Addcomment";
+import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 
 const Travellers = () => {
   const navigate = useNavigate();
   const [commentModalOpen, setCommentModalOpen] = useState(false);
+  const [quoteDeleteModal, setQuoteDeleteModal] = useState(false);
+  const [singleQuote, setSinglequote] = useState({})
   const [searchparam, setSearchParams] = useSearchParams();
   const [selectedQuote, setSelectedQuote] = useState("");
   const [selectedId, setSelctedId] = useState("")
@@ -50,7 +53,7 @@ const Travellers = () => {
 
   useMemo(()=>{
     if (selectedQuote && selectedId){
-      axios.patch(`${serverUrl}/api/quote/quote/${selectedId}`,{status:selectedQuote})
+      axios.patch(`${serverUrl}/api/quote/edit/${selectedId}`,{status:selectedQuote})
       .then((res)=>{
       toast.success("Status updated");
         getAlldata(); 
@@ -60,13 +63,56 @@ const Travellers = () => {
     }
   },[selectedQuote,selectedId])
 
-  const handleDelete = (id) => {
-    // axios.delete(`${serverUrl}/api/traveller/delete/${id}`).then((res)=>{
-    //   alert("Traveller deleted");
-    //   getAlldata()
-    // }).catch((err)=>{
-    //   alert(err.response.data.error)
-    // })
+  const handleDelete = async() => {
+    try {
+      // Make the API call to submit the form data
+      const response = await axios.delete(
+        `${serverUrl}/api/quote/delete/${singleQuote._id}`
+      );
+      toast.success("Quote deleted successfully");
+      getAlldata();
+    } catch (error) {
+      console.log(error);
+      // Handle different types of errors
+      if (error.response) {
+        const status = error.response.status;
+        const errorMessage =
+          error.response.data.message || "Something went wrong";
+
+        // Show custom error messages based on status codes
+        switch (status) {
+          case 400:
+            toast.error(`Bad Request: ${errorMessage}`);
+            break;
+          case 401:
+            toast.error("Unauthorized: Please log in again.");
+            break;
+          case 403:
+            toast.error(
+              "Forbidden: You do not have permission to perform this action."
+            );
+            break;
+          case 404:
+            toast.error(
+              "Not Found: The requested resource could not be found."
+            );
+            break;
+          case 500:
+            toast.error("Server Error: Please try again later.");
+            break;
+          default:
+            toast.error(`Error: ${errorMessage}`);
+        }
+      } else if (error.request) {
+        // Network error (no response received)
+        toast.error("Network Error: No response received from the server.");
+      } else {
+        // Something else happened
+        toast.error(`Error: ${error.message}`);
+      }
+    } finally {
+      // setIsLoading(false);
+    }
   };
 
   const getStatusColorbackground = (status) => {
@@ -251,7 +297,7 @@ const Travellers = () => {
                   </td> */}
                   <td className="px-4 py-2">
                     <MdDelete
-                      onClick={() => handleDelete(user._id)}
+                      onClick={() => {setQuoteDeleteModal(true);setSinglequote(user)}}
                       className="h-5 w-5 text-main cursor-pointer"
                     />
                   </td>
@@ -261,6 +307,11 @@ const Travellers = () => {
           </table>
         </div>
       </div>
+      <ConfirmDeleteModal
+        isOpen={quoteDeleteModal}
+        onClose={() => setQuoteDeleteModal(false)}
+        handleDelete={handleDelete}
+      />
       {/* <Addcomment
         isOpen={commentModalOpen}
         onClose={() => setCommentModalOpen(false)}

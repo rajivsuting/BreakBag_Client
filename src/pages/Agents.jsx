@@ -19,6 +19,7 @@ import Addagents from "../components/Addagents";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Link } from "react-router-dom";
+import EditAgent from "../components/EditAgent";
 
 const data = [
   {
@@ -43,6 +44,8 @@ const data = [
 
 const Agents = () => {
   const [isAddAgentsModal, setIsAddAgentsModal] = useState(false);
+  const [singleAgent, setSingleAgent] = useState({});
+  const [isEditAgentModal, setIsEditAgentModal] = useState(false);
   const [data, setData] = useState([]);
   const [toogleLead, setToogleLead] = useState(false);
   const [selectedRole, setSelectedRole] = useState("Agent");
@@ -71,6 +74,7 @@ const Agents = () => {
     axios
       .get(`${serverUrl}/api/agent/all/?role=${selectedRole}`)
       .then((res) => {
+        console.log(res);
         setData(res.data.data);
       });
   };
@@ -217,8 +221,7 @@ const Agents = () => {
                   localStorage.getItem("userRole") == "Agent" ? null : (
                     <th className="px-4 py-2">Assign to a team lead</th>
                   )}
-                  {/* <th className="px-4 py-2"></th>
-                  <th className="px-4 py-2"></th> */}
+                  <th className="px-4 py-2"></th>
                 </tr>
               </thead>
               <tbody>
@@ -227,8 +230,11 @@ const Agents = () => {
                     key={index}
                     className="hover:bg-gray-100 transition-colors duration-200"
                   >
-                    <Link to={`/agent-details/${user._id}`}> 
-                    <td className="px-4 py-4 hover:text-main hover:border-b-2 hover:border-main transition-all duration-200">{user.name}</td></Link>
+                    <Link to={`/agent-details/${user._id}`}>
+                      <td className="px-4 py-4 hover:text-main hover:border-b-2 hover:border-main transition-all duration-200">
+                        {user.name}
+                      </td>
+                    </Link>
                     <td className="px-4 py-2">{user.email}</td>
                     <td className="px-4 py-2">{user.phone}</td>
                     {selectedRole == "Team Lead" ||
@@ -244,7 +250,11 @@ const Agents = () => {
                         >
                           <option value="">Select a team lead</option>
                           {teamLeadAll?.map((el) => {
-                            return <option value={el._id}>{el.name}</option>;
+                            return (
+                              <option key={el._id} value={el._id}>
+                                {el.name}
+                              </option>
+                            );
                           })}
                         </select>
                       </td>
@@ -282,10 +292,13 @@ const Agents = () => {
                     </td> */}
 
                     <td className="px-4 py-2">
-                      <MdEdit className="h-5 w-5 text-maincolor2 cursor-pointer" />
-                    </td>
-                    <td className="px-4 py-2">
-                      <MdDelete className="h-5 w-5 text-main cursor-pointer" />
+                      <MdEdit
+                        className="h-5 w-5 text-maincolor2 cursor-pointer"
+                        onClick={() => {
+                          setSingleAgent(user);
+                          setIsEditAgentModal(true);
+                        }}
+                      />
                     </td>
                   </tr>
                 ))}
@@ -297,6 +310,12 @@ const Agents = () => {
       <Addagents
         isOpen={isAddAgentsModal}
         onClose={() => setIsAddAgentsModal(false)}
+        getAllData={getAllData}
+      />
+      <EditAgent
+        singleAgent={singleAgent}
+        isOpen={isEditAgentModal}
+        onClose={() => setIsEditAgentModal(false)}
         getAllData={getAllData}
       />
     </div>

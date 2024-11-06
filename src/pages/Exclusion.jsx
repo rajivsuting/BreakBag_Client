@@ -19,15 +19,20 @@ import AddExclusion from "../components/AddExclusion";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import EditInclusion from "../components/EditInclusion";
+import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
+import EditExclusion from "../components/EditExclusion";
 
 const Exclusion = () => {
   const [isAddTravelSummeryModal, setIsAddTravelSummeryModal] = useState(false);
-
+  const [isDeleteModal, setIsdeleteModal] = useState(false);
+  const [singleExclusion, setSingleExclusion] = useState({});
+  const [isEditExclusionModal, setIsEditExclusionModal] = useState(false);
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
   const [searchParams, setsearchParams] = useSearchParams();
-  const [currentPage, setCurrentPage] = useState(searchParams.get("page") || 1);
-  const [limit, setLimit] = useState(searchParams.get("limit") || 10); // default limit
+  const [currentPage, setCurrentPage] = useState(Number(searchParams.get("page")) || 1);
+  const [limit, setLimit] = useState(Number(searchParams.get("limit")) || 10); // default limit
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -59,6 +64,58 @@ const Exclusion = () => {
       .catch((err) => {
         toast.error(err.response.data.message);
       });
+  };
+
+  const handleDelete = async () => {
+    try {
+      // Make the API call to submit the form data
+      const response = await axios.delete(
+        `${serverUrl}/api/exclusion/delete/${singleExclusion._id}`
+      );
+      toast.success("Exclusion deleted successfully");
+      getAlldata();
+    } catch (error) {
+      console.log(error);
+      // Handle different types of errors
+      if (error.response) {
+        const status = error.response.status;
+        const errorMessage =
+          error.response.data.message || "Something went wrong";
+
+        // Show custom error messages based on status codes
+        switch (status) {
+          case 400:
+            toast.error(`Bad Request: ${errorMessage}`);
+            break;
+          case 401:
+            toast.error("Unauthorized: Please log in again.");
+            break;
+          case 403:
+            toast.error(
+              "Forbidden: You do not have permission to perform this action."
+            );
+            break;
+          case 404:
+            toast.error(
+              "Not Found: The requested resource could not be found."
+            );
+            break;
+          case 500:
+            toast.error("Server Error: Please try again later.");
+            break;
+          default:
+            toast.error(`Error: ${errorMessage}`);
+        }
+      } else if (error.request) {
+        // Network error (no response received)
+        toast.error("Network Error: No response received from the server.");
+      } else {
+        // Something else happened
+        toast.error(`Error: ${error.message}`);
+      }
+    } finally {
+      // setIsLoading(false);
+    }
   };
 
   return (
@@ -204,10 +261,22 @@ const Exclusion = () => {
                       <MdRemoveRedEye className="h-5 w-5 text-maincolor2 cursor-pointer" />
                     </td> */}
                     <td className="px-4 py-2">
-                      <MdEdit className="h-5 w-5 text-maincolor2 cursor-pointer" />
+                      <MdEdit
+                        className="h-5 w-5 text-maincolor2 cursor-pointer"
+                        onClick={() => {
+                          setSingleExclusion(user);
+                          setIsEditExclusionModal(true);
+                        }}
+                      />
                     </td>
                     <td className="px-4 py-2">
-                      <MdDelete className="h-5 w-5 text-main cursor-pointer" />
+                      <MdDelete
+                        className="h-5 w-5 text-main cursor-pointer"
+                        onClick={() => {
+                          setIsdeleteModal(true);
+                          setSingleExclusion(user);
+                        }}
+                      />
                     </td>
                   </tr>
                 ))}
@@ -216,6 +285,17 @@ const Exclusion = () => {
           </CardBody>
         </Card>
       </div>
+      <ConfirmDeleteModal
+        isOpen={isDeleteModal}
+        onClose={() => setIsdeleteModal(false)}
+        handleDelete={handleDelete}
+      />
+<EditExclusion
+        singleExclusion={singleExclusion}
+        isOpen={isEditExclusionModal}
+        onClose={() => setIsEditExclusionModal(false)}
+        getAlldata={getAlldata}
+      />
       <AddExclusion
         isOpen={isAddTravelSummeryModal}
         onClose={() => setIsAddTravelSummeryModal(false)}
