@@ -182,8 +182,8 @@ const TravelSummery = () => {
                 <tr className="bg-gray-200">
                 <th className="px-4 py-2">Title</th>
                 <th className="px-4 py-2">Description</th>
-                  {/* <th className="px-4 py-2"></th>
-                  <th className="px-4 py-2"></th> */}
+                  <th className="px-4 py-2"></th>
+                  <th className="px-4 py-2"></th>
                 </tr>
               </thead>
               <tbody>
@@ -203,12 +203,12 @@ const TravelSummery = () => {
                                 ? user.description
                                 : user.description.slice(0, 40) + "..."}
                     </td>
-                    {/* <td className="px-4 py-2">
+                    <td className="px-4 py-2">
                       <MdEdit className="h-5 w-5 text-maincolor2 cursor-pointer" />
                     </td>
                     <td className="px-4 py-2">
                       <MdDelete className="h-5 w-5 text-main cursor-pointer" />
-                    </td> */}
+                    </td>
                   </tr>
                 ))}
               </tbody>

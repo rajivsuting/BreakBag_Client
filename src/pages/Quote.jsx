@@ -249,12 +249,12 @@ const Travellers = () => {
                   >
                     Add a comment
                   </td> */}
-                  {/* <td className="px-4 py-2">
+                  <td className="px-4 py-2">
                     <MdDelete
                       onClick={() => handleDelete(user._id)}
                       className="h-5 w-5 text-main cursor-pointer"
                     />
-                  </td> */}
+                  </td>
                 </tr>
               ))}
             </tbody>

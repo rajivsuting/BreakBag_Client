@@ -7,19 +7,19 @@ import { serverUrl } from "../api";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const AddDestination = ({ isOpen, onClose, getAlldata }) => {
+const EditDestination = ({ isOpen, onClose,destinationID, getAlldata }) => {
   usePreventScrollOnNumberInput();
-
-  const [formData, setFormData] = useState({
-    title: "",
-    image: "",
-  });
-
+  const [formData, setFormData] = useState({});
   const [file, setFile] = useState(null); // state to handle a single file
   const [isLoading, setIsLoading] = useState(false);
 
-  if (!isOpen) return null;
 
+
+  useEffect(()=>{
+    if(destinationID){
+        setFormData(destinationID)
+    }
+  },[destinationID])
 
   // Handle form input changes
   const handleChangeInput = (e) => {
@@ -52,8 +52,8 @@ const AddDestination = ({ isOpen, onClose, getAlldata }) => {
 
     try {
       // API call to submit form data
-      const response = await axios.post(
-        `${serverUrl}/api/destination/create`,
+      const response = await axios.put(
+        `${serverUrl}/api/destination/edit/${destinationID._id}`,
         data,
         {
           headers: {
@@ -62,7 +62,7 @@ const AddDestination = ({ isOpen, onClose, getAlldata }) => {
         }
       );
       console.log("Response:", response.data);
-      toast.success("Destination added successfully");
+      toast.success("Destination edited successfully");
       getAlldata();
 
       // Reset form after successful submission
@@ -107,6 +107,8 @@ const AddDestination = ({ isOpen, onClose, getAlldata }) => {
     }
   };
 
+  if (!isOpen) return null;
+
   return (
     <div className="fixed inset-0 z-[999] grid h-screen w-screen place-items-center bg-black bg-opacity-60 backdrop-blur-sm transition-opacity duration-300">
       <div className="sidebar relative m-4 w-2/5 min-w-[40%] max-w-[40%] max-h-[90vh] overflow-y-auto rounded-lg bg-white font-sans text-base font-light leading-relaxed text-blue-gray-500 shadow-2xl p-8">
@@ -120,7 +122,7 @@ const AddDestination = ({ isOpen, onClose, getAlldata }) => {
         <div>
           <form onSubmit={handleSubmit} className="m-auto">
             <div className="m-auto mb-5">
-              <div className="font-normal text-xl">Add Destination</div>
+              <div className="font-normal text-xl">Edit Destination</div>
             </div>
             <div className="flex justify-between items-center m-auto gap-10 mt-5">
               <Input
@@ -128,7 +130,6 @@ const AddDestination = ({ isOpen, onClose, getAlldata }) => {
                 name="title"
                 value={formData?.title}
                 onChange={handleChangeInput}
-                required
               />
             </div>
             <div className="flex justify-between items-center m-auto gap-10 mt-5">
@@ -137,13 +138,12 @@ const AddDestination = ({ isOpen, onClose, getAlldata }) => {
                 name="file"
                 type="file"
                 onChange={handleFileChange}
-                required
               />
             </div>
-
+<img src={formData?.image} className="w-64 h-full mt-5" alt="" />
             <div className="w-[90%] flex justify-center items-center text-center mt-5 m-auto">
               <Button className="bg-main" type="submit" disabled={isLoading}>
-                {isLoading ? "Adding destination..." : "Add destination"}
+                {isLoading ? "Editing destination..." : "Edit destination"}
               </Button>
             </div>
           </form>
@@ -153,4 +153,4 @@ const AddDestination = ({ isOpen, onClose, getAlldata }) => {
   );
 };
 
-export default AddDestination;
+export default EditDestination;

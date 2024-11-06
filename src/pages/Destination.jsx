@@ -17,6 +17,7 @@ import { serverUrl } from "../api";
 import axios from "axios";
 import AddDestination from "../components/AddDestination";
 import { useSearchParams } from "react-router-dom";
+import EditDestination from "../components/EditDestination";
 
 const data = [
   {
@@ -41,22 +42,31 @@ const data = [
 
 const Destination = () => {
   const [isAddTravelSummeryModal, setIsAddTravelSummeryModal] = useState(false);
-
+  const [destinationID, setDestinationID] = useState("");
   const [data, setData] = useState([]);
-
+const [isEditModal, setIsEditModal] = useState(false)
   const [search, setSearch] = useState("");
   const [searchParams, setsearchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(searchParams.get("page") || 1);
   const [limit, setLimit] = useState(searchParams.get("limit") || 10); // default limit
+
+  const toggleModal = (el) => {
+    setIsEditModal(!isEditModal);
+    setDestinationID(el);
+  };
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
 
   const getAlldata = () => {
-    axios.get(`${serverUrl}/api/destination/destinaions?page=${currentPage}&limit=${limit}`).then((res) => {
-      setData(res.data.data);
-    });
+    axios
+      .get(
+        `${serverUrl}/api/destination/destinaions?page=${currentPage}&limit=${limit}`
+      )
+      .then((res) => {
+        setData(res.data.data);
+      });
   };
 
   useEffect(() => {
@@ -79,11 +89,12 @@ const Destination = () => {
     //     toast.error(err.response.data.message);
     //   });
   };
+
+  const handleEdit = () => {};
   return (
     <div className="flex gap-5 ">
-
       <div className="w-[100%] m-auto mt-3 rounded-md p-4">
-      <div className="relative w-full">
+        <div className="relative w-full">
           {/* Background Image with dark overlay */}
           <div
             className="inset-0 bg-cover bg-center rounded-md relative"
@@ -201,9 +212,8 @@ const Destination = () => {
               <thead>
                 <tr className="bg-gray-200">
                   <th className="px-4 py-2">Title</th>
-                  {/* <th className="px-4 py-2"></th>
                   <th className="px-4 py-2"></th>
-                  <th className="px-4 py-2"></th> */}
+                  <th className="px-4 py-2"></th>
                 </tr>
               </thead>
               <tbody>
@@ -215,13 +225,16 @@ const Destination = () => {
                     <td className="px-4 py-2">{user.title}</td>
                     {/* <td className="px-4 py-2">
                       <MdRemoveRedEye className="h-5 w-5 text-maincolor2 cursor-pointer" />
-                    </td>
+                    </td> */}
                     <td className="px-4 py-2">
-                      <MdEdit className="h-5 w-5 text-maincolor2 cursor-pointer" />
+                      <MdEdit
+                        className="h-5 w-5 text-maincolor2 cursor-pointer"
+                        onClick={() => toggleModal(user)}
+                      />
                     </td>
                     <td className="px-4 py-2">
                       <MdDelete className="h-5 w-5 text-main cursor-pointer" />
-                    </td> */}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -232,6 +245,12 @@ const Destination = () => {
       <AddDestination
         isOpen={isAddTravelSummeryModal}
         onClose={() => setIsAddTravelSummeryModal(false)}
+        getAlldata={getAlldata}
+      />
+      <EditDestination
+        destinationID={destinationID}
+        isOpen={isEditModal}
+        onClose={() => setIsEditModal(false)}
         getAlldata={getAlldata}
       />
     </div>
