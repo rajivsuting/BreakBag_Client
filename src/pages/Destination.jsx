@@ -45,7 +45,7 @@ const data = [
 
 const Destination = () => {
   const [isAddTravelSummeryModal, setIsAddTravelSummeryModal] = useState(false);
-  const [singleDestination,setSingleDestination] = useState({})
+  const [singleDestination, setSingleDestination] = useState({});
   const [destinationID, setDestinationID] = useState("");
   const [data, setData] = useState([]);
   const [isEditModal, setIsEditModal] = useState(false);
@@ -85,15 +85,15 @@ const Destination = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    // axios
-    //   .get(`${serverUrl}/api/transfer/search/?keywords=${search}`)
-    //   .then((res) => {
-    //     console.log(res);
-    //     setData(res.data.data);
-    //   })
-    //   .catch((err) => {
-    //     toast.error(err.response.data.message);
-    //   });
+    axios
+      .get(`${serverUrl}/api/destination/search/?title=${search}`)
+      .then((res) => {
+        console.log(res);
+        setData(res.data.data);
+      })
+      .catch((err) => {
+        toast.error(err.response.data.message);
+      });
   };
 
   const [isDeleteModal, setIsdeleteModal] = useState(false);
@@ -264,7 +264,7 @@ const Destination = () => {
           </div>
         </div>
 
-        <Card className="overflow-hidden">
+        <Card className="overflow-hidden mt-5">
           <CardBody className="p-0">
             <table className="w-full table-auto text-left">
               <thead>
@@ -303,6 +303,11 @@ const Destination = () => {
                 ))}
               </tbody>
             </table>
+            {data?.length == 0 ? (
+              <div className="text-center mt-5 mb-5">
+                No destination found!!{" "}
+              </div>
+            ) : null}
           </CardBody>
         </Card>
       </div>

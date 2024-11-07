@@ -289,6 +289,11 @@ const TravelSummery = () => {
                 ))}
               </tbody>
             </table>
+            {data?.length == 0 ? (
+              <div className="text-center mt-5 mb-5">
+                No travel summery found!!{" "}
+              </div>
+            ) : null}
           </CardBody>
         </Card>
       </div>

@@ -31,7 +31,9 @@ const Exclusion = () => {
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
   const [searchParams, setsearchParams] = useSearchParams();
-  const [currentPage, setCurrentPage] = useState(Number(searchParams.get("page")) || 1);
+  const [currentPage, setCurrentPage] = useState(
+    Number(searchParams.get("page")) || 1
+  );
   const [limit, setLimit] = useState(Number(searchParams.get("limit")) || 10); // default limit
 
   const handlePageChange = (page) => {
@@ -39,9 +41,13 @@ const Exclusion = () => {
   };
 
   const getAlldata = () => {
-    axios.get(`${serverUrl}/api/exclusion/exclusions/?page=${currentPage}&limit=${limit}`).then((res) => {
-      setData(res.data.data);
-    });
+    axios
+      .get(
+        `${serverUrl}/api/exclusion/exclusions/?page=${currentPage}&limit=${limit}`
+      )
+      .then((res) => {
+        setData(res.data.data);
+      });
   };
 
   useEffect(() => {
@@ -50,8 +56,7 @@ const Exclusion = () => {
     return () => {
       console.log("Avoid errors");
     };
-  }, [currentPage,
-    limit]);
+  }, [currentPage, limit]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -120,7 +125,6 @@ const Exclusion = () => {
 
   return (
     <div className="flex gap-5 ">
-      
       <div className="w-[100%] m-auto mt-3 rounded-md p-4">
         <div className="relative w-full">
           {/* Background Image with dark overlay */}
@@ -163,9 +167,9 @@ const Exclusion = () => {
                     <Button
                       onClick={() => {
                         setSearch("");
-                          getAlldata();
-                          setCurrentPage(1)
-                          setLimit(10)
+                        getAlldata();
+                        setCurrentPage(1);
+                        setLimit(10);
                       }}
                       variant=""
                       disabled={!search}
@@ -238,25 +242,30 @@ const Exclusion = () => {
               <thead>
                 <tr className="bg-gray-200">
                   <th className="px-4 py-2">Title</th>
-                   <th className="px-4 py-2">Description</th>
+                  <th className="px-4 py-2">Description</th>
                   <th className="px-4 py-2"></th>
                   <th className="px-4 py-2"></th>
                 </tr>
               </thead>
               <tbody>
+              
                 {data?.map((user, index) => (
                   <tr
                     key={index}
                     className="hover:bg-gray-100 transition-colors duration-200"
                   >
                     {/* Titles Column */}
-                    <td className="px-4 py-2">{user.title.length <= 20
-                                ? user.title
-                                : user.title.slice(0, 20) + "..."}</td>
+                    <td className="px-4 py-2">
+                      {user.title.length <= 20
+                        ? user.title
+                        : user.title.slice(0, 20) + "..."}
+                    </td>
 
-                    <td className="px-4 py-2">{user.description.length <= 40
-                                ? user.description
-                                : user.description.slice(0, 40) + "..."}</td>
+                    <td className="px-4 py-2">
+                      {user.description.length <= 40
+                        ? user.description
+                        : user.description.slice(0, 40) + "..."}
+                    </td>
                     {/* <td className="px-4 py-2">
                       <MdRemoveRedEye className="h-5 w-5 text-maincolor2 cursor-pointer" />
                     </td> */}
@@ -282,6 +291,11 @@ const Exclusion = () => {
                 ))}
               </tbody>
             </table>
+            {data?.length == 0 ? (
+                  <div className="text-center mt-5 mb-5">
+                    No exclusion found!!{" "}
+                  </div>
+                ) : null}
           </CardBody>
         </Card>
       </div>
@@ -290,7 +304,7 @@ const Exclusion = () => {
         onClose={() => setIsdeleteModal(false)}
         handleDelete={handleDelete}
       />
-<EditExclusion
+      <EditExclusion
         singleExclusion={singleExclusion}
         isOpen={isEditExclusionModal}
         onClose={() => setIsEditExclusionModal(false)}

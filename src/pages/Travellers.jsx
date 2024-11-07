@@ -51,7 +51,9 @@ const Travellers = () => {
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
   const [searchParams, setsearchParams] = useSearchParams();
-  const [currentPage, setCurrentPage] = useState(Number(searchParams.get("page")) || 1);
+  const [currentPage, setCurrentPage] = useState(
+    Number(searchParams.get("page")) || 1
+  );
   const [limit, setLimit] = useState(Number(searchParams.get("limit")) || 10); // default limit
 
   const handlePageChange = (page) => {
@@ -271,13 +273,14 @@ const Travellers = () => {
                   <th className="px-4 py-2">Email</th>
                   <th className="px-4 py-2">Phone</th>
                   <th className="px-4 py-2">Address</th>
-                  {/* <th className="px-4 py-2">Date of birth</th> */}
+                  <th className="px-4 py-2">Asssigned agent</th>
                   <th className="px-4 py-2">User type</th>
                   <th className="px-4 py-2"></th>
                   <th className="px-4 py-2"></th>
                 </tr>
               </thead>
               <tbody>
+                
                 {data?.map((user, index) => (
                   <tr
                     key={index}
@@ -287,7 +290,7 @@ const Travellers = () => {
                     <td className="px-4 py-2">{user.email}</td>
                     <td className="px-4 py-2">{user.phone}</td>
                     <td className="px-4 py-2">{user.address}</td>
-                    {/* <td className="px-4 py-2">{user.dateOfBirth.split("T")[0]}</td> */}
+                    <td className="px-4 py-2">{user.agentAssigned.name}</td>
                     <td className="px-4 py-2">{user.userType}</td>
                     <td className="px-4 py-2">
                       <MdEdit
@@ -311,6 +314,11 @@ const Travellers = () => {
                 ))}
               </tbody>
             </table>
+            {data?.length == 0 ? (
+                  <div className="text-center mt-5 mb-5">
+                    No travellers found!!{" "}
+                  </div>
+                ) : null}
           </CardBody>
         </Card>
       </div>

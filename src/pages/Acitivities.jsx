@@ -245,7 +245,7 @@ const Acitivities = () => {
                 <tr className="bg-gray-200">
                   <th className="px-4 py-2">Title</th>
                   <th className="px-4 py-2">Description</th>
-                  <th className="px-4 py-2">Description</th>
+                  <th className="px-4 py-2">Destination</th>
                   <th className="px-4 py-2"></th>
                   <th className="px-4 py-2"></th>
                 </tr>
@@ -296,6 +296,11 @@ const Acitivities = () => {
                 ))}
               </tbody>
             </table>
+            {data?.length == 0 ? (
+                  <div className="text-center mt-5 mb-5">
+                    No activity found!!{" "}
+                  </div>
+                ) : null}
           </CardBody>
         </Card>
       </div>

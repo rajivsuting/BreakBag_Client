@@ -224,6 +224,7 @@ const Agents = () => {
                   <th className="px-4 py-2"></th>
                 </tr>
               </thead>
+              
               <tbody>
                 {data?.map((user, index) => (
                   <tr
@@ -304,6 +305,11 @@ const Agents = () => {
                 ))}
               </tbody>
             </table>
+            {data?.length == 0 ? (
+                  <div className="text-center mt-5 mb-5">
+                    No agent and teamlead found!!{" "}
+                  </div>
+                ) : null}
           </CardBody>
         </Card>
       </div>

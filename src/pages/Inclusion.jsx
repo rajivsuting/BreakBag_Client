@@ -238,6 +238,7 @@ const Inclusion = () => {
                 </tr>
               </thead>
               <tbody>
+                
                 {data?.map((user, index) => (
                   <tr
                     key={index}
@@ -284,6 +285,11 @@ const Inclusion = () => {
                 ))}
               </tbody>
             </table>
+            {data?.length == 0 ? (
+                  <div className="text-center mt-5 mb-5">
+                    No inclusion found!!{" "}
+                  </div>
+                ) : null}
           </CardBody>
         </Card>
       </div>

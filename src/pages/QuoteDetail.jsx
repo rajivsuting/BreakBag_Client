@@ -163,52 +163,28 @@ const QuoteDetail = () => {
                   <div>{data?.duration}</div>
                 </div>
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-600 font-bold">Travellers</div>
-                  <div>
-                    {" "}
-                    {data?.travellers?.slice(0, 2).map((participant, index) => (
-                      <span key={index}>
-                        {participant.name}
-                        {index < 1 && data?.travellers?.length >= 2 ? ", " : ""}
-                      </span>
-                    ))}
-                    {data?.travellers?.length > 2 && (
-                      <span> and {data?.travellers?.length - 2} more</span>
-                    )}
-                  </div>
+                  <div className="text-gray-600 font-bold">Created by</div>
+                  <div>{data?.createdBy?.name || "Unknown"}</div>
                 </div>
               </div>
               <div className="flex justify-between mt-5">
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-600 font-bold">Created by</div>
-                  <div>{data?.createdBy?.name || "Unknown"}</div>
-                </div>
-                {/* <div className="text-start w-[30%]">
-                  <div className="text-gray-600">Travellers</div>
+                  <div className="text-gray-600 font-bold">Travellers</div>
                   <div>
-                    {" "}
-                    {data?.travellers?.slice(0, 2).map((participant, index) => (
-                      <span key={index}>
+                    {data?.travellers?.map((participant, index) => (
+                      <div key={index}>
                         {participant.name}
-                        {index < 1 && data?.travellers?.length >= 2 ? ", " : ""}
-                      </span>
+                        {/* {index < 1 && data?.travellers?.length >= 2 ? ", " : ""} */}
+                      </div>
                     ))}
-                    {data?.travellers?.length > 2 && (
-                      <span> and {data?.travellers?.length - 2} more</span>
-                    )}
                   </div>
-                </div> */}
+                </div>
               </div>
             </div>
           </CardBody>
         </Card>
       </div>
       <EditQuote isOpen={editModal} onClose={()=>setEditModal(false)} singleQuote={data} getAlldata={getAlldata}/>
-      {/* <AddDestination
-        isOpen={isAddTravelSummeryModal}
-        onClose={() => setIsAddTravelSummeryModal(false)}
-        getAlldata={getAlldata}
-      /> */}
     </div>
   );
 };

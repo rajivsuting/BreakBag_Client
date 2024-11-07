@@ -18,11 +18,14 @@ const OtherInformation = () => {
   const [isAddTravelSummeryModal, setIsAddTravelSummeryModal] = useState(false);
   const [isDeleteModal, setIsdeleteModal] = useState(false);
   const [singleOtherinformation, setSingleOtherinformation] = useState({});
-  const [isEditOtherinformationModal, setIsEditOtherinformationModal] = useState(false);
+  const [isEditOtherinformationModal, setIsEditOtherinformationModal] =
+    useState(false);
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
   const [searchParams, setsearchParams] = useSearchParams();
-  const [currentPage, setCurrentPage] = useState(Number(searchParams.get("page")) || 1);
+  const [currentPage, setCurrentPage] = useState(
+    Number(searchParams.get("page")) || 1
+  );
   const [limit, setLimit] = useState(Number(searchParams.get("limit")) || 10); // default limit
 
   const handlePageChange = (page) => {
@@ -31,7 +34,9 @@ const OtherInformation = () => {
 
   const getAlldata = () => {
     axios
-      .get(`${serverUrl}/api/other-information/other-information/?page=${currentPage}&limit=${limit}`)
+      .get(
+        `${serverUrl}/api/other-information/other-information/?page=${currentPage}&limit=${limit}`
+      )
       .then((res) => {
         setData(res.data.data);
       });
@@ -43,8 +48,7 @@ const OtherInformation = () => {
     return () => {
       console.log("Avoid errors");
     };
-  }, [currentPage,
-    limit]);
+  }, [currentPage, limit]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -56,59 +60,60 @@ const OtherInformation = () => {
       })
       .catch((err) => {
         toast.error(err.response.data.message);
-      });}
+      });
+  };
 
-      const handleDelete = async () => {
-        try {
-          // Make the API call to submit the form data
-          const response = await axios.delete(
-            `${serverUrl}/api/other-information/delete/${singleOtherinformation._id}`
-          );
-          toast.success("Transfer deleted successfully");
-          getAlldata();
-        } catch (error) {
-          console.log(error);
-          // Handle different types of errors
-          if (error.response) {
-            const status = error.response.status;
-            const errorMessage =
-              error.response.data.message || "Something went wrong";
-    
-            // Show custom error messages based on status codes
-            switch (status) {
-              case 400:
-                toast.error(`Bad Request: ${errorMessage}`);
-                break;
-              case 401:
-                toast.error("Unauthorized: Please log in again.");
-                break;
-              case 403:
-                toast.error(
-                  "Forbidden: You do not have permission to perform this action."
-                );
-                break;
-              case 404:
-                toast.error(
-                  "Not Found: The requested resource could not be found."
-                );
-                break;
-              case 500:
-                toast.error("Server Error: Please try again later.");
-                break;
-              default:
-                toast.error(`Error: ${errorMessage}`);
-            }
-          } else if (error.request) {
-            // Network error (no response received)
-            toast.error("Network Error: No response received from the server.");
-          } else {
-            // Something else happened
-            toast.error(`Error: ${error.message}`);
-          }
-        } finally {
-          // setIsLoading(false);
+  const handleDelete = async () => {
+    try {
+      // Make the API call to submit the form data
+      const response = await axios.delete(
+        `${serverUrl}/api/other-information/delete/${singleOtherinformation._id}`
+      );
+      toast.success("Transfer deleted successfully");
+      getAlldata();
+    } catch (error) {
+      console.log(error);
+      // Handle different types of errors
+      if (error.response) {
+        const status = error.response.status;
+        const errorMessage =
+          error.response.data.message || "Something went wrong";
+
+        // Show custom error messages based on status codes
+        switch (status) {
+          case 400:
+            toast.error(`Bad Request: ${errorMessage}`);
+            break;
+          case 401:
+            toast.error("Unauthorized: Please log in again.");
+            break;
+          case 403:
+            toast.error(
+              "Forbidden: You do not have permission to perform this action."
+            );
+            break;
+          case 404:
+            toast.error(
+              "Not Found: The requested resource could not be found."
+            );
+            break;
+          case 500:
+            toast.error("Server Error: Please try again later.");
+            break;
+          default:
+            toast.error(`Error: ${errorMessage}`);
         }
-      };
+      } else if (error.request) {
+        // Network error (no response received)
+        toast.error("Network Error: No response received from the server.");
+      } else {
+        // Something else happened
+        toast.error(`Error: ${error.message}`);
+      }
+    } finally {
+      // setIsLoading(false);
+    }
+  };
 
   return (
     <div className="flex gap-5 ">
@@ -156,9 +161,9 @@ const OtherInformation = () => {
                     <Button
                       onClick={() => {
                         setSearch("");
-                          getAlldata();
-                          setCurrentPage(1)
-                          setLimit(10)
+                        getAlldata();
+                        setCurrentPage(1);
+                        setLimit(10);
                       }}
                       variant=""
                       disabled={!search}
@@ -231,13 +236,14 @@ const OtherInformation = () => {
               <thead>
                 <tr className="bg-gray-200">
                   <th className="px-4 py-2">Title</th>
-                   <th className="px-4 py-2">Description</th>
-               
+                  <th className="px-4 py-2">Description</th>
+
                   <th className="px-4 py-2"></th>
                   <th className="px-4 py-2"></th>
                 </tr>
               </thead>
               <tbody>
+               
                 {data?.map((user, index) => (
                   <tr
                     key={index}
@@ -277,6 +283,11 @@ const OtherInformation = () => {
                 ))}
               </tbody>
             </table>
+            {data?.length == 0 ? (
+                  <div className="text-center mt-5 mb-5">
+                    No other information found!!{" "}
+                  </div>
+                ) : null}
           </CardBody>
         </Card>
       </div>
@@ -285,7 +296,7 @@ const OtherInformation = () => {
         onClose={() => setIsdeleteModal(false)}
         handleDelete={handleDelete}
       />
-<EditOtherinformation
+      <EditOtherinformation
         singleOtherinformation={singleOtherinformation}
         isOpen={isEditOtherinformationModal}
         onClose={() => setIsEditOtherinformationModal(false)}

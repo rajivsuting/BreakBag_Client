@@ -51,7 +51,9 @@ const Transfer = () => {
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
   const [searchParams, setsearchParams] = useSearchParams();
-  const [currentPage, setCurrentPage] = useState(Number(searchParams.get("page")) || 1);
+  const [currentPage, setCurrentPage] = useState(
+    Number(searchParams.get("page")) || 1
+  );
   const [limit, setLimit] = useState(Number(searchParams.get("limit")) || 10); // default limit
 
   const handlePageChange = (page) => {
@@ -59,9 +61,13 @@ const Transfer = () => {
   };
 
   const getAlldata = () => {
-    axios.get(`${serverUrl}/api/transfer/transfers/?page=${currentPage}&limit=${limit}`).then((res) => {
-      setData(res.data.data);
-    });
+    axios
+      .get(
+        `${serverUrl}/api/transfer/transfers/?page=${currentPage}&limit=${limit}`
+      )
+      .then((res) => {
+        setData(res.data.data);
+      });
   };
 
   useEffect(() => {
@@ -70,8 +76,7 @@ const Transfer = () => {
     return () => {
       console.log("Avoid errors");
     };
-  }, [currentPage,
-    limit]);
+  }, [currentPage, limit]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -182,9 +187,9 @@ const Transfer = () => {
                     <Button
                       onClick={() => {
                         setSearch("");
-                          getAlldata();
-                          setCurrentPage(1)
-                          setLimit(10)
+                        getAlldata();
+                        setCurrentPage(1);
+                        setLimit(10);
                       }}
                       variant=""
                       disabled={!search}
@@ -303,6 +308,9 @@ const Transfer = () => {
                 ))}
               </tbody>
             </table>
+            {data?.length == 0 ? (
+              <div className="text-center mt-5 mb-5">No transfer found!! </div>
+            ) : null}
           </CardBody>
         </Card>
       </div>
@@ -311,7 +319,7 @@ const Transfer = () => {
         onClose={() => setIsdeleteModal(false)}
         handleDelete={handleDelete}
       />
-<EditTransfer
+      <EditTransfer
         singleTransfer={singleTransfer}
         isOpen={isEditTransferModal}
         onClose={() => setIsEditTransferModal(false)}
