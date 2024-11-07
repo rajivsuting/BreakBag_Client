@@ -21,27 +21,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { Link } from "react-router-dom";
 import EditAgent from "../components/EditAgent";
 
-const data = [
-  {
-    name: "John Doe",
-    email: "john@example.com",
-    role: "Admin",
-    status: "Active",
-  },
-  {
-    name: "Jane Smith",
-    email: "jane@example.com",
-    role: "Editor",
-    status: "Inactive",
-  },
-  {
-    name: "Tom Johnson",
-    email: "tom@example.com",
-    role: "Viewer",
-    status: "Active",
-  },
-];
-
 const Agents = () => {
   const [isAddAgentsModal, setIsAddAgentsModal] = useState(false);
   const [singleAgent, setSingleAgent] = useState({});
@@ -58,11 +37,12 @@ const Agents = () => {
       setteamLeadAll(res.data.data);
     });
   };
+
   const options = teamLeadAll.map((agent) => ({
     value: agent._id,
     label: agent.name,
   }));
-  console.log(options);
+
   useEffect(() => {
     getAllDataTeamlead();
     return () => {
@@ -91,21 +71,19 @@ const Agents = () => {
   }, [selectedRole]);
 
   useEffect(() => {
-    if (selectedTeamLead) {
-      axios
-        .post(
-          `${serverUrl}/api/agent/team-lead/${selectedTeamLead}/assign-agents`,
-          [selectedAgent]
-        )
-        .then((res) => {
-          toast.success("Team lead assigned");
-        })
-        .catch((err) => {
-          console.log(err);
-          toast.success("Something went wrong");
-        });
-    }
-  }, [selectedTeamLead]);
+    axios
+      .post(
+        `${serverUrl}/api/agent/team-lead/${selectedTeamLead}/assign-agents`,
+        [selectedAgent]
+      )
+      .then((res) => {
+        toast.success("Team lead assigned");
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.success("Something went wrong");
+      });
+  }, [selectedTeamLead,selectedAgent]);
 
   // console.log(selectedTeamLead,
   //   selectedAgent)
@@ -127,34 +105,11 @@ const Agents = () => {
 
             {/* Content on top of the background */}
             <div className="absolute inset-0 flex flex-col p-4 pb-0 justify-between z-10">
-              <div className="text-3xl text-white font-semibold">Agents and teamleads</div>
+              <div className="text-3xl text-white font-semibold">
+                Agents and teamleads
+              </div>
 
               <div className="flex justify-end items-center pb-2 gap-5 w-full">
-                {/* <div className="w-[50%]">
-                  <form className="flex justify-start items-center gap-5">
-                    <div className="w-[50%]">
-                      <div className="bg-white rounded-md">
-                        <Input
-                          label="Search any title..."
-                          name="password"
-                          required
-                          className="bg-white bg-opacity-70 text-black"
-                        />
-                      </div>
-                    </div>
-                    <Button type="submit" className="bg-main text-white">
-                      Search
-                    </Button>
-                    <Button
-                      type="button"
-                      className="bg-white text-main border border-main"
-                    >
-                      Clear
-                    </Button>
-                  </form>
-                </div> */}
-
-                {/* Pagination and Icons */}
                 <div className="flex justify-end items-center gap-5 text-white">
                   <div className="">
                     <LuPlusCircle
@@ -163,26 +118,6 @@ const Agents = () => {
                     />
                   </div>
                   <div className="flex justify-end items-center">
-                    {/* <div className="flex justify-center items-center">
-                      <RiArrowLeftSLine className={`text-lg cursor-pointer`} />
-                      <span className="px-5 font-medium">{0}</span>
-                      <RiArrowRightSLine
-                        className={`text-lg cursor-pointer text-gray-400 pointer-events-none`}
-                      />
-                    </div>
-                    <div>
-                      <div className="rounded-md p-2">
-                        <select
-                          className="border px-2 py-2 rounded-md text-black"
-                          value={0}
-                        >
-                          <option value="5">5 per page</option>
-                          <option value="10">10 per page</option>
-                          <option value="15">15 per page</option>
-                          <option value="20">20 per page</option>
-                        </select>
-                      </div>
-                    </div> */}
                     {localStorage.getItem("userRole") == "Team Lead" ? null : (
                       <div>
                         {/* Slightly dark background for the pagination select */}
@@ -221,7 +156,7 @@ const Agents = () => {
                   <th className="px-4 py-2"></th>
                 </tr>
               </thead>
-              
+
               <tbody>
                 {data?.map((user, index) => (
                   <tr
@@ -229,7 +164,12 @@ const Agents = () => {
                     className="hover:bg-gray-100 transition-colors duration-200"
                   >
                     <Link to={`/agent-details/${user._id}`}>
-                      <td onClick={()=>localStorage.setItem("agent",JSON.stringify(user))} className="px-4 py-4 hover:text-main hover:border-b-2 hover:border-main transition-all duration-200">
+                      <td
+                        onClick={() =>
+                          localStorage.setItem("agent", JSON.stringify(user))
+                        }
+                        className="px-4 py-4 hover:text-main hover:border-b-2 hover:border-main transition-all duration-200"
+                      >
                         {user.name}
                       </td>
                     </Link>
@@ -240,7 +180,7 @@ const Agents = () => {
                     localStorage.getItem("userRole") == "Agent" ? null : (
                       <td className="px-4 py-2">
                         <select
-                          value={selectedTeamLead}
+                          value={user.teamLead ? user.teamLead._id : ""}
                           onChange={(e) => {
                             setSelectedTeamLead(e.target.value);
                             setSelectedAgent(user._id);
@@ -257,37 +197,6 @@ const Agents = () => {
                         </select>
                       </td>
                     )}
-                    {/* <td className=" px-4 py-2">
-                      {user.isTeamlead ? (
-                        <div className="w-[80px] flex justify-start items-center gap-1 text-emerald-700 px-1 w-[60px] rounded-[50px] text-center mt-2 font-semibold text-xs">
-                          <span
-                            className={`w-2 h-2 border  rounded-[50%] bg-green-500`}
-                          ></span>{" "}
-                          <span className="">Team lead</span>
-                        </div>
-                      ) : (
-                        <div className="flex justify-start items-center gap-1 p-1 w-[80px] rounded-[50px] text-center text-rose-500 mt-2 font-semibold text-xs">
-                          <span
-                            className={`w-2 h-2 border rounded-[50%] bg-blue-500`}
-                          ></span>{" "}
-                          Agent
-                        </div>
-                      )}
-                    </td> */}
-                    {/* <td className="px-4 py-2 cursor-pointer relative group">
-                      <div onClick={handleToogle}>
-                        <ToogleTeamLead
-                          active={user.isTeamlead}
-                          id={user._id}
-                        />
-                      </div>
-                      <ul className="w-[150px] absolute right-0 shadow text-center hidden bg-white border rounded p-2 text-gray-700 group-hover:block z-10">
-                        <li className=" flex justify-center items-center gap-2 w-full text-xs font-semibold">
-                          <FiInfo className="font-bold" /> Make him{" "}
-                          {user.isTeamlead ? "Agent " : "Team lead"}
-                        </li>
-                      </ul>
-                    </td> */}
 
                     <td className="px-4 py-2">
                       <MdEdit
@@ -303,10 +212,10 @@ const Agents = () => {
               </tbody>
             </table>
             {data?.length == 0 ? (
-                  <div className="text-center mt-5 mb-5">
-                    No agent and teamlead found!!{" "}
-                  </div>
-                ) : null}
+              <div className="text-center mt-5 mb-5">
+                No agent and teamlead found!!{" "}
+              </div>
+            ) : null}
           </CardBody>
         </Card>
       </div>

@@ -143,6 +143,12 @@ const Agentroutes = () => {
         <Card className="overflow-hidden mt-5">
           <CardBody className="p-8">
             <div className=" w-[100%]">
+            <div
+        className="w-[70px] border-b cursor-pointer hover:border-b-blue text-maincolor2 mb-5"
+        onClick={() => window.history.back()}
+      >
+        Go back
+      </div>
               <div className="mt-5 mb-5 text-xl font-bold text0black">
                 Agent details
               </div>
