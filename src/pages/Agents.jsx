@@ -127,14 +127,12 @@ const Agents = () => {
 
             {/* Content on top of the background */}
             <div className="absolute inset-0 flex flex-col p-4 pb-0 justify-between z-10">
-              <div className="text-3xl text-white font-semibold">Agents</div>
+              <div className="text-3xl text-white font-semibold">Agents and teamleads</div>
 
-              <div className="flex justify-between items-center pb-2 gap-5 w-full">
-                {/* Search Form */}
-                <div className="w-[50%]">
+              <div className="flex justify-end items-center pb-2 gap-5 w-full">
+                {/* <div className="w-[50%]">
                   <form className="flex justify-start items-center gap-5">
                     <div className="w-[50%]">
-                      {/* Slightly dark background for the search box */}
                       <div className="bg-white rounded-md">
                         <Input
                           label="Search any title..."
@@ -154,7 +152,7 @@ const Agents = () => {
                       Clear
                     </Button>
                   </form>
-                </div>
+                </div> */}
 
                 {/* Pagination and Icons */}
                 <div className="flex justify-end items-center gap-5 text-white">
@@ -165,7 +163,7 @@ const Agents = () => {
                     />
                   </div>
                   <div className="flex justify-end items-center">
-                    <div className="flex justify-center items-center">
+                    {/* <div className="flex justify-center items-center">
                       <RiArrowLeftSLine className={`text-lg cursor-pointer`} />
                       <span className="px-5 font-medium">{0}</span>
                       <RiArrowRightSLine
@@ -173,7 +171,6 @@ const Agents = () => {
                       />
                     </div>
                     <div>
-                      {/* Slightly dark background for the pagination select */}
                       <div className="rounded-md p-2">
                         <select
                           className="border px-2 py-2 rounded-md text-black"
@@ -185,7 +182,7 @@ const Agents = () => {
                           <option value="20">20 per page</option>
                         </select>
                       </div>
-                    </div>
+                    </div> */}
                     {localStorage.getItem("userRole") == "Team Lead" ? null : (
                       <div>
                         {/* Slightly dark background for the pagination select */}
@@ -232,7 +229,7 @@ const Agents = () => {
                     className="hover:bg-gray-100 transition-colors duration-200"
                   >
                     <Link to={`/agent-details/${user._id}`}>
-                      <td className="px-4 py-4 hover:text-main hover:border-b-2 hover:border-main transition-all duration-200">
+                      <td onClick={()=>localStorage.setItem("agent",JSON.stringify(user))} className="px-4 py-4 hover:text-main hover:border-b-2 hover:border-main transition-all duration-200">
                         {user.name}
                       </td>
                     </Link>

@@ -109,11 +109,11 @@ const Agentroutes = () => {
     (el) => el.status == "Groups"
   ).length;
   const cnpQuote = data?.quotes?.filter((el) => el.status == "CNP").length;
-  
+
+  // console.log( localStorage.getItem("agent"))
 
   return (
     <div className="flex gap-5 ">
-  
       <div className="w-[100%] m-auto mt-3 rounded-md p-4">
         <div className="relative w-full">
           {/* Background Image with dark overlay */}
@@ -153,7 +153,9 @@ const Agentroutes = () => {
                   <div>{data?.user?.name}</div>
                 </div>
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-600 font-bold">Agent email address</div>
+                  <div className="text-gray-600 font-bold">
+                    Agent email address
+                  </div>
                   <div>{data?.user?.email}</div>
                 </div>
                 <div className="text-start w-[30%]">
@@ -161,105 +163,121 @@ const Agentroutes = () => {
                   <div>{data?.user?.phone}</div>
                 </div>
               </div>
-              {
-                !data?.quotes?.length ? <div className="mt-10 text-center text-black">No quotes found for this user.</div> : <><div className="mt-5 mb-5 text-xl font-bold text0black">
-                Performance
-              </div>
-              <div className="flex justify-between mt-5">
-              <div className="text-start w-[30%]">
-                  <div className="text-gray-600 font-bold">Total quotes</div>
-                  <div>{data?.totalQuotes || 0}</div>
+
+              <div className="flex justify-between gap-5 mt-5">
+                <div className="w-[20%] p-4 rounded shadow">
+                  <div className="text-xl font-bold text0black">
+                    Traveller list
+                  </div>
+                  {
+                    !JSON.parse(localStorage.getItem("agent"))?.travellers?.length ? <div className="mt-5">
+                    No traveller found !!
+                  </div> : 
+                  <div className="mt-2">
+                    {JSON.parse(localStorage.getItem("agent"))?.travellers?.map(
+                      (el) => {
+                        return <div>{el.name}</div>;
+                      }
+                    )}
+                  </div>
+                  }
                 </div>
-                <div className="text-start w-[30%]">
-                  <div className="text-gray-600 font-bold">Active</div>
-                  <div>{activeQuote || 0}</div>
-                </div>
-                <div className="text-start w-[30%]">
-                  <div className="text-gray-600 font-bold">Quoted</div>
-                  <div>{quotedQuote || 0}</div>
-                </div>
-              </div>
-              <div className="flex justify-between mt-5">
-                <div className="text-start w-[30%]">
-                  <div className="text-gray-600 font-bold">Follow Up</div>
-                  <div>{followUpQuote || 0}</div>
-                </div>
-                <div className="text-start w-[30%]">
-                  <div className="text-gray-600 font-bold">Confirmed</div>
-                  <div>{confirmedQuote}</div>
-                </div>
-                <div className="text-start w-[30%]">
-                  <div className="text-gray-600 font-bold">Cancelled</div>
-                  <div>{cancelledQuote || 0}</div>
-                </div>
-              </div>
-              <div className="flex justify-between mt-5">
-                <div className="text-start w-[30%]">
-                  <div className="text-gray-600 font-bold">CNP</div>
-                  <div>{cnpQuote || 0}</div>
-                </div>
-                <div className="text-start w-[30%]">
-                  <div className="text-gray-600 font-bold">Groups</div>
-                  <div>{groupsQuote || 0}</div>
-                </div>
-                <div className="text-start w-[30%]">
+                <div className="w-[80%] p-4 rounded shadow">
+                  <div className="text-xl font-bold text0black">
+                    Quote list
+                  </div>
+                  {!data?.quotes?.length ? (
+                    <div className="mt-5">
+                      No quotes found !!
+                    </div>
+                  ) : (
+                    <>
+                      <div className="mt-5 mb-5 text-xl font-bold text0black">
+                        Performance
+                      </div>
+                      <div className="flex justify-between mt-5">
+                        <div className="text-start w-[30%]">
+                          <div className="text-gray-600 font-bold">
+                            Total quotes
+                          </div>
+                          <div>{data?.totalQuotes || 0}</div>
+                        </div>
+                        <div className="text-start w-[30%]">
+                          <div className="text-gray-600 font-bold">Active</div>
+                          <div>{activeQuote || 0}</div>
+                        </div>
+                        <div className="text-start w-[30%]">
+                          <div className="text-gray-600 font-bold">Quoted</div>
+                          <div>{quotedQuote || 0}</div>
+                        </div>
+                      </div>
+                      <div className="flex justify-between mt-5">
+                        <div className="text-start w-[30%]">
+                          <div className="text-gray-600 font-bold">
+                            Follow Up
+                          </div>
+                          <div>{followUpQuote || 0}</div>
+                        </div>
+                        <div className="text-start w-[30%]">
+                          <div className="text-gray-600 font-bold">
+                            Confirmed
+                          </div>
+                          <div>{confirmedQuote}</div>
+                        </div>
+                        <div className="text-start w-[30%]">
+                          <div className="text-gray-600 font-bold">
+                            Cancelled
+                          </div>
+                          <div>{cancelledQuote || 0}</div>
+                        </div>
+                      </div>
+                      <div className="flex justify-between mt-5">
+                        <div className="text-start w-[30%]">
+                          <div className="text-gray-600 font-bold">CNP</div>
+                          <div>{cnpQuote || 0}</div>
+                        </div>
+                        <div className="text-start w-[30%]">
+                          <div className="text-gray-600 font-bold">Groups</div>
+                          <div>{groupsQuote || 0}</div>
+                        </div>
+                        <div className="text-start w-[30%]"></div>
+                      </div>
+
+                      {data?.length == 0 ? (
+                        <div className="text-center mt-5">
+                          You donot have any quote, please create one!!{" "}
+                        </div>
+                      ) : null}
+                      <table className="w-full table-auto text-left">
+                        <tbody>
+                          {data?.quotes?.map((user, index) => (
+                            <tr
+                              key={index}
+                              className="hover:bg-gray-100 transition-colors duration-200 border"
+                            >
+                              <td
+                                className={`w-[100px] text-center text-sm px-4 py-4 bg text-white ${getStatusColorbackground(
+                                  user.status
+                                )}`}
+                              >
+                                {user.status}
+                              </td>
+                              <Link to={`/quote-detail/${user.tripId}`}>
+                                <td className="px-4 py-4 hover:text-main hover:border-b-2 hover:border-main transition-all duration-200">
+                                  {user.tripId}
+                                </td>
+                              </Link>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </>
+                  )}
                 </div>
               </div>
 
-              <div className="mt-5 mb-5 text-xl font-bold text0black">
-                Quote list
-              </div>
-              {data?.length == 0 ? (
-                <div className="text-center mt-5">
-                  You donot have any quote, please create one!!{" "}
-                </div>
-              ) : null}
-              <table className="w-full table-auto text-left">
-                <tbody>
-                  {data?.quotes?.map((user, index) => (
-                    <tr
-                      key={index}
-                      className="hover:bg-gray-100 transition-colors duration-200 border"
-                    >
-                      <td
-                        className={`w-[100px] text-center text-sm px-4 py-4 bg text-white ${getStatusColorbackground(
-                          user.status
-                        )}`}
-                      >
-                        {user.status}
-                      </td>
-                      <Link to={`/quote-detail/${user.tripId}`}>
-                        <td className="px-4 py-4 hover:text-main hover:border-b-2 hover:border-main transition-all duration-200">
-                          {user.tripId}
-                        </td>
-                      </Link>
-                      {/* <td className="px-4 py-2 cursor-pointer">
-                        {user?.comments?.length == 0 ? (
-                          <div className="relative group">
-                            {data?.user?.name} haven't made any comment.
-                          </div>
-                        ) : (
-                          <div className="relative group">
-                            {data?.user?.name} has put a comment
-                            <ul className="w-[200px] absolute shadow text-center hidden bg-white border rounded p-2 text-gray-700 group-hover:block z-10 m-auto">
-                              <li className=" flex justify-center items-center gap-2 w-full text-xs font-semibold">
-                                {
-                                  user?.comments?.[user?.comments?.length - 1]
-                                    ?.content
-                                }
-                              </li>
-                            </ul>
-                          </div>
-                        )}
-                      </td> */}
-                    </tr>
-                  ))}
-                </tbody>
-              </table></>
-              }
               {/* {
                 data?.message ?               } */}
-              
             </div>
           </CardBody>
         </Card>

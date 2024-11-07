@@ -86,15 +86,17 @@ const Travellers = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    // axios
-    //   .get(`${serverUrl}/api/transfer/search/?keywords=${search}`)
-    //   .then((res) => {
-    //     console.log(res);
-    //     setData(res.data.data);
-    //   })
-    //   .catch((err) => {
-    //     toast.error(err.response.data.message);
-    //   });
+    console.log('jwdjwjd')
+    axios
+      .get(`${serverUrl}/api/traveller/search/?name=${search}`)
+      .then((res) => {
+        console.log(res);
+        setData(res.data.data);
+      })
+      .catch((err) => {
+        console.log(err)
+        toast.error(err.response.data.message);
+      });
   };
 
   const handleDelete = async () => {
@@ -181,7 +183,7 @@ const Travellers = () => {
                       {/* Slightly dark background for the search box */}
                       <div className="bg-white rounded-md">
                         <Input
-                          label="Search any inclusion..."
+                          label="Search any traveller..."
                           value={search}
                           onChange={(e) => setSearch(e.target.value)}
                           required
@@ -280,7 +282,6 @@ const Travellers = () => {
                 </tr>
               </thead>
               <tbody>
-                
                 {data?.map((user, index) => (
                   <tr
                     key={index}
@@ -315,10 +316,10 @@ const Travellers = () => {
               </tbody>
             </table>
             {data?.length == 0 ? (
-                  <div className="text-center mt-5 mb-5">
-                    No travellers found!!{" "}
-                  </div>
-                ) : null}
+              <div className="text-center mt-5 mb-5">
+                No travellers found!!{" "}
+              </div>
+            ) : null}
           </CardBody>
         </Card>
       </div>
