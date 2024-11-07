@@ -24,6 +24,7 @@ import EditAgent from "../components/EditAgent";
 const Agents = () => {
   const [isAddAgentsModal, setIsAddAgentsModal] = useState(false);
   const [singleAgent, setSingleAgent] = useState({});
+  const [updateing, setUpdating] = useState(false)
   const [isEditAgentModal, setIsEditAgentModal] = useState(false);
   const [data, setData] = useState([]);
   const [toogleLead, setToogleLead] = useState(false);
@@ -71,19 +72,23 @@ const Agents = () => {
   }, [selectedRole]);
 
   useEffect(() => {
-    axios
-      .post(
-        `${serverUrl}/api/agent/team-lead/${selectedTeamLead}/assign-agents`,
-        [selectedAgent]
-      )
-      .then((res) => {
-        toast.success("Team lead assigned");
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.success("Something went wrong");
-      });
-  }, [selectedTeamLead,selectedAgent]);
+    // setUpdating(!updateing)
+    if (selectedTeamLead) {
+      axios
+        .post(
+          `${serverUrl}/api/agent/team-lead/${selectedTeamLead}/assign-agents`,
+          [selectedAgent]
+        )
+        .then((res) => {
+          toast.success("Team lead assigned");
+        })
+        .catch((err) => {
+          console.log(err);
+          toast.success("Something went wrong");
+        });
+    }
+    // setUpdating(!updateing)
+  }, [selectedTeamLead]);
 
   // console.log(selectedTeamLead,
   //   selectedAgent)
@@ -184,6 +189,7 @@ const Agents = () => {
                           onChange={(e) => {
                             setSelectedTeamLead(e.target.value);
                             setSelectedAgent(user._id);
+                            setUpdating(!updateing)
                           }}
                         >
                           <option value="">Select a team lead</option>
