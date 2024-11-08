@@ -221,7 +221,7 @@ const AddTravelSummery = ({
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                required
+                required={!singleTravelSummery?.title}
               />
             </div>
             <div className="m-auto mt-5">
@@ -230,7 +230,7 @@ const AddTravelSummery = ({
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
-                required
+                required={!singleTravelSummery?.title}
               />
             </div>
             <div className="w-[90%] flex justify-center items-center text-center mt-5 m-auto">

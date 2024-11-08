@@ -143,14 +143,14 @@ import {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  required
+                  
                 />
                 <Input
                   label="Email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  required
+                  
                 />
               </div>
               <div className="flex justify-between items-center m-auto gap-10 mt-5">
@@ -159,14 +159,14 @@ import {
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  required
+                  
                 />
                 <Select
                   label="Role"
                   name="role"
                   value={formData.role}
                   onChange={handleRoleChange} // Update the role field
-                  required
+                  
                 >
                   <Option disabled>Select role</Option>
                   <Option value="Agent">Agent</Option>

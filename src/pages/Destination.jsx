@@ -181,7 +181,7 @@ const Destination = () => {
                       {/* Slightly dark background for the search box */}
                       <div className="bg-white rounded-md">
                         <Input
-                          label="Search any inclusion..."
+                          label="Search any destination..."
                           value={search}
                           onChange={(e) => setSearch(e.target.value)}
                           required

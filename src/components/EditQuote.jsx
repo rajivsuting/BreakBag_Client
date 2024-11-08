@@ -157,7 +157,7 @@ const EditQuote = ({ isOpen, onClose, singleQuote ,getAlldata}) => {
                   type="date"
                   value={formState.startDate}
                   onChange={handleInputChange}
-                  required
+                  
                 />
                 <Input
                   label="End date"
@@ -165,7 +165,7 @@ const EditQuote = ({ isOpen, onClose, singleQuote ,getAlldata}) => {
                   type="date"
                   value={formState.endDate}
                   onChange={handleInputChange}
-                  required
+                  
                 />
               </div>
               <div className="text-start w-[50%] mt-5 mb-5">

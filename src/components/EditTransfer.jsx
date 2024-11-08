@@ -103,7 +103,7 @@ const EditTransfer = ({ isOpen, onClose, getAlldata,singleTransfer }) => {
             name="title"
             onChange={(e) => handleChange(e)}
             // Adjusted height
-            required
+            
           />
 
           <Textarea
@@ -112,7 +112,7 @@ const EditTransfer = ({ isOpen, onClose, getAlldata,singleTransfer }) => {
             name="description"
             onChange={(e) => handleChange(e)}
             className="min-h-[50px] h-auto" // Adjusted height
-            required
+            
           />
 
           <div className="flex justify-center">

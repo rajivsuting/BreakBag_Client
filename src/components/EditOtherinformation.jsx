@@ -102,7 +102,7 @@ const EditOtherinformation = ({ isOpen, onClose, getAlldata ,singleOtherinformat
             name="title"
             onChange={(e) => handleChange(e)}
             // Adjusted height
-            required
+            
           />
 
           <Textarea
@@ -111,7 +111,7 @@ const EditOtherinformation = ({ isOpen, onClose, getAlldata ,singleOtherinformat
             name="description"
             onChange={(e) => handleChange(e)}
             className="min-h-[50px] h-auto" // Adjusted height
-            required
+            
           />
 
           <div className="flex justify-center">

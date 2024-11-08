@@ -10,6 +10,7 @@ import { AiOutlineClose } from "react-icons/ai";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { IoMdClose, IoMdSearch } from "react-icons/io";
+import { LuMinus } from "react-icons/lu";
 
 const CreateItinerary = () => {
   const { tripid } = useParams();
@@ -579,7 +580,20 @@ const CreateItinerary = () => {
     setAllInclusion(originalInclusion); // Reset to original data
   };
 
-  //inclusoon extra
+  const handleRemoveDescription = (inclusionIndex, descriptionIndex) => {
+    setSelectedInclusions((prev) =>
+      prev.map((inclusion, i) =>
+        i === inclusionIndex
+          ? {
+              ...inclusion,
+              description: inclusion.description.filter(
+                (_, j) => j !== descriptionIndex
+              ),
+            }
+          : inclusion
+      )
+    );
+  };
 
   // console.log(data);
 
@@ -1417,20 +1431,36 @@ const CreateItinerary = () => {
                             <div className="mt-5">
                               {inclusion.description.map(
                                 (desc, descriptionIndex) => (
-                                  <Textarea
+                                  <div
                                     key={descriptionIndex}
-                                    label={`Point ${descriptionIndex + 1}`}
-                                    name="description"
-                                    value={desc}
-                                    onChange={(e) =>
-                                      handleInputChangeInclusion(
-                                        e,
-                                        inclusionIndex,
-                                        descriptionIndex
-                                      )
-                                    }
-                                    className="min-h-[50px] h-auto w-full"
-                                  />
+                                    className="flex items-center gap-2"
+                                  >
+                                    <Textarea
+                                      label={`Point ${descriptionIndex + 1}`}
+                                      name="description"
+                                      value={desc}
+                                      onChange={(e) =>
+                                        handleInputChangeInclusion(
+                                          e,
+                                          inclusionIndex,
+                                          descriptionIndex
+                                        )
+                                      }
+                                    />
+                                    <LuMinus className="text-main cursor-pointer" onClick={() =>
+                                        handleRemoveDescription(
+                                          inclusionIndex,
+                                          descriptionIndex
+                                        )
+                                      }/>
+                                    {/* <Button
+                                      type="button"
+                                      
+                                      className="p-1 text-red-500 hover:text-red-700"
+                                    >
+                                      Delete
+                                    </Button> */}
+                                  </div>
                                 )
                               )}
                             </div>
@@ -1977,206 +2007,3 @@ const CreateItinerary = () => {
 };
 
 export default CreateItinerary;
-
-{
-  /* {selectedCategory === "Activity" && (
-                  <>
-                    {data?.duration > activityPerDay?.length ? (
-                      <div className="flex justify-between items-center gap-5 mb-4">
-                        <Button
-                          onClick={addActivityDay}
-                          className="bg-main text-white"
-                        >
-                          Add Another Day
-                        </Button>
-                      </div>
-                    ) : null}
-                    {activityPerDay.map((item, index) => (
-                      <div key={index} className="mb-4">
-                        <div className="mt-5 mb-5 text-lg font-normal">
-                          Day {item.day}
-                        </div>
-
-                        <div className="flex justify-between items-center gap-5">
-                          <div className="w-[70%]">
-                            <Select
-                              options={optionsActivity}
-                              value={optionsActivity.find(
-                                (option) =>
-                                  option.value === item.selectedSummary
-                              )}
-                              onChange={(selectedOption) =>
-                                handleSelectChangeActivity(
-                                  selectedOption,
-                                  index
-                                )
-                              }
-                              placeholder="Select an activity"
-                              isSearchable={true}
-                              isClearable={true}
-                            />
-                          </div>
-                        </div>
-
-                        {item.selectedSummary && (
-                          <div className="flex flex-col gap-4 mt-4">
-                            <Input
-                              label={`Title ${index + 1}`}
-                              value={item.summaryDetails.title}
-                              onChange={(e) =>
-                                handleInputChangeActivity(e, "title", index)
-                              }
-                              placeholder="Edit activity title"
-                            />
-
-            
-                            {item.summaryDetails.description?.map(
-                              (desc, descIndex) => (
-                                <Textarea
-                                  key={descIndex}
-                                  value={desc}
-                                  onChange={(e) =>
-                                    handleInputChangeActivity(
-                                      e,
-                                      "description",
-                                      index,
-                                      descIndex
-                                    )
-                                  }
-                                  label={`Description ${index + 1} - Part ${
-                                    descIndex + 1
-                                  }`}
-                                  className="min-h-[50px] h-auto"
-                                />
-                              )
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </>
-                )} */
-}
-
-{
-  /* {selectedCategory === "Other Information" && (
-                  <>
-                    <div className="mt-5 mb-5 text-lg font-normal">
-                      Other Information details
-                    </div>
-                    <div className="flex flex-col w-full hover:bg-gray-100 p-2">
-                      <div className="w-full">
-                        {otherinformation?.map((el, index) => (
-                          <div
-                            key={index}
-                            className="w-[100%] flex flex-col gap-4 mt-4"
-                          >
-                            <div className="w-[100%] ">
-                              <Textarea
-                                label={`Description ${index + 1}`}
-                                value={el}
-                                onChange={(e) =>
-                                  handleOtherInfoChange(e, index)
-                                }
-                                className="min-h-[50px] h-auto"
-                              />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="m-auto flex justify-center items-center">
-                      <Button
-                        onClick={handleFinalSubmit}
-                        className={"bg-main text-white m-auto w-[200px]"}
-                      >
-                        Final submit
-                      </Button>
-                    </div>
-                  </>
-                )} */
-}
-
-{
-  /* {selectedCategory === "Transfers" && (
-                  <>
-                    <div className="mt-5 mb-5 text-lg font-normal">
-                      Transfer details
-                    </div>
-                    <div className="flex flex-col w-full hover:bg-gray-100 p-2">
-                      <div className="w-full">
-                        {transfer?.map((el, index) => (
-                          <div
-                            key={index}
-                            className="w-full flex flex-col gap-4 mt-4"
-                          >
-                            <Textarea
-                              label={`Description ${index + 1}`}
-                              value={el}
-                              onChange={(e) =>
-                                handleOtherInfoChangeTransfer(
-                                  e,
-
-                                  index
-                                )
-                              }
-                              className="min-h-[50px] h-auto"
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </>
-                )} */
-}
-
-{
-  /* {selectedCategory === "Inclusion" && (
-                  <div className="flex">
-                 
-                    <div className="w-[20%] border-r pr-4">
-                      <h3 className="font-bold">Titles</h3>
-                      <div className="w-[100%] h-full bg-gray-100 p-4 rounded-lg overflow-y-auto">
-                        {inclusionAll?.map((item, index) => (
-                          <div
-                            key={index}
-                            className={`p-2 cursor-pointer ${
-                              selectedIndex === index
-                                ? "border-b-2 border-main text-main font-semibold"
-                                : ""
-                            }`}
-                            onClick={() => {
-                              setSelectedTitle(item.title);
-                              setSelectedIndex(index);
-                            }}
-                          >
-                            {item.title}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-         
-                    <div className="w-[80%] pl-4">
-                      <h3 className="font-bold mb-4">
-                        Descriptions for "{selectedTitle}"
-                      </h3>
-                      {inclusionAll[selectedIndex]?.description?.map(
-                        (desc, descIndex) => (
-                          <div key={descIndex} className="flex gap-5 mb-4">
-                            <Textarea
-                              label={`Description ${descIndex + 1}`}
-                              value={desc}
-                              onChange={(e) =>
-                                handleDescriptionChange(e, descIndex)
-                              }
-                              className="min-h-[50px] h-auto" // Adjusted height
-                              required
-                            />
-                          </div>
-                        )
-                      )}
-                    </div>
-                  </div>
-                )} */
-}

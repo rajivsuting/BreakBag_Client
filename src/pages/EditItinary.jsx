@@ -10,6 +10,7 @@ import { AiOutlineClose } from "react-icons/ai";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { IoMdClose, IoMdSearch } from "react-icons/io";
+import { LuMinus } from "react-icons/lu";
 
 const EditItinary = () => {
   const { tripid } = useParams();
@@ -573,9 +574,20 @@ const EditItinary = () => {
     setAllInclusion(originalInclusion); // Reset to original data
   };
 
-  //inclusoon extra
-
-  console.log(data);
+  const handleRemoveDescription = (inclusionIndex, descriptionIndex) => {
+    setSelectedInclusions((prev) =>
+      prev.map((inclusion, i) =>
+        i === inclusionIndex
+          ? {
+              ...inclusion,
+              description: inclusion.description.filter(
+                (_, j) => j !== descriptionIndex
+              ),
+            }
+          : inclusion
+      )
+    );
+  };
 
   const handleFinalSubmit = () => {
     // Send the POST request with your itinerary data
@@ -1411,8 +1423,11 @@ const EditItinary = () => {
                             <div className="mt-5">
                               {inclusion.description.map(
                                 (desc, descriptionIndex) => (
+                                  <div
+                                  key={descriptionIndex}
+                                  className="flex items-center gap-2"
+                                >
                                   <Textarea
-                                    key={descriptionIndex}
                                     label={`Point ${descriptionIndex + 1}`}
                                     name="description"
                                     value={desc}
@@ -1423,8 +1438,14 @@ const EditItinary = () => {
                                         descriptionIndex
                                       )
                                     }
-                                    className="min-h-[50px] h-auto w-full"
                                   />
+                                <LuMinus className="text-main cursor-pointer" onClick={() =>
+                                        handleRemoveDescription(
+                                          inclusionIndex,
+                                          descriptionIndex
+                                        )
+                                      }/>
+                                </div>
                                 )
                               )}
                             </div>

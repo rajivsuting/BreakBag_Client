@@ -8,7 +8,7 @@ import Select from "react-select";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const EditActivity = ({ isOpen, onClose, getAlldata,singleActivity }) => {
+const EditActivity = ({ isOpen, onClose, getAlldata, singleActivity }) => {
   usePreventScrollOnNumberInput();
 
   const [formData, setFormData] = useState({
@@ -31,11 +31,24 @@ const EditActivity = ({ isOpen, onClose, getAlldata,singleActivity }) => {
     if (singleActivity) {
       setFormData(singleActivity);
       setFiles(singleActivity?.images);
-      setSelectedDestination(singleActivity?.destination?._id)
+      setSelectedDestination(singleActivity?.destination?._id);
     }
   }, [singleActivity]);
 
-  console.log(singleActivity)
+  useEffect(() => {
+    if (singleActivity && destinationAll.length > 0) {
+      // Find the option that matches the existing destination ID
+      const existingDestination = destinationAll.find(
+        (dest) => dest._id === singleActivity.destination?._id
+      );
+      if (existingDestination) {
+        setSelectedDestination({
+          value: existingDestination._id,
+          label: existingDestination.title,
+        });
+      }
+    }
+  }, [singleActivity, destinationAll]);
 
   useEffect(() => {
     const fetchDestinations = async () => {
@@ -55,11 +68,6 @@ const EditActivity = ({ isOpen, onClose, getAlldata,singleActivity }) => {
         ...prevState,
         destination: selectedDestination.value,
       }));
-    } else {
-        setFormData((prevState) => ({
-            ...prevState,
-            destination: singleActivity?.destination?._id,
-          }));
     }
   }, [selectedDestination]);
 
@@ -185,6 +193,9 @@ const EditActivity = ({ isOpen, onClose, getAlldata,singleActivity }) => {
     }
   };
 
+  console.log(files);
+  
+
   if (!isOpen) return null;
 
   return (
@@ -205,13 +216,10 @@ const EditActivity = ({ isOpen, onClose, getAlldata,singleActivity }) => {
             <div className="flex justify-between items-center m-auto gap-10 mt-5">
               <div className="w-[100%]">
                 <Select
-                  options={options}
                   value={selectedDestination}
                   onChange={setSelectedDestination}
+                  options={options}
                   placeholder="Select a destination"
-                  isSearchable={true}
-                  isClearable={true}
-                  
                 />
               </div>
               <Input
@@ -219,7 +227,6 @@ const EditActivity = ({ isOpen, onClose, getAlldata,singleActivity }) => {
                 name="title"
                 value={formData.title}
                 onChange={handleChangeInput}
-                
               />
             </div>
             <div className="flex flex-col gap-2 mt-5">
@@ -229,8 +236,8 @@ const EditActivity = ({ isOpen, onClose, getAlldata,singleActivity }) => {
                 name="file"
                 type="file"
                 multiple
-                disabled={files?.length == 3}
-                required={files?.length == 3}
+                disabled={files?.length >= 3}
+                required={files?.length >= 3}
                 onChange={handleFileChange}
                 className={`${fileError ? "border-red-500" : ""}`}
               />
@@ -252,11 +259,20 @@ const EditActivity = ({ isOpen, onClose, getAlldata,singleActivity }) => {
                 {/* Reduced margin-top */}
                 {files?.map((file, index) => (
                   <li key={index} className="flex items-center">
-                   <img src={file} className="w-32 mb-2" alt="" /> 
+                    {
+                      file?.name ? <div>{file?.name}</div> : 
+                    <img src={file} className="w-32 mb-2" alt="" />
+                    }
                     <button
-                    type="button"
+                      type="button"
                       onClick={() => {
                         setFiles(files.filter((_, i) => i !== index));
+                        if (file.slice(0,4) == "http"){
+                          axios.patch(`${serverUrl}/api/activity/activities/${singleActivity?._id}/remove-images`,{imageUrl:file})
+                          .then((res)=>{
+                            console.log(res)
+                          })
+                        }
                       }}
                       className="text-red-500 underline ml-2"
                     >
@@ -279,7 +295,6 @@ const EditActivity = ({ isOpen, onClose, getAlldata,singleActivity }) => {
                     onChange={(e) =>
                       handleDescriptionChange(index, e.target.value)
                     }
-                    
                   />
                   {index > 0 ? (
                     <div>
