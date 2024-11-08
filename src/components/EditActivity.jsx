@@ -21,6 +21,7 @@ const EditActivity = ({ isOpen, onClose, getAlldata, singleActivity }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [destinationAll, setDestinationAll] = useState([]);
   const [selectedDestination, setSelectedDestination] = useState(null);
+  const [previews, setPreviews] = useState([]);
 
   const options = destinationAll.map((destination) => ({
     value: destination._id,
@@ -194,7 +195,32 @@ const EditActivity = ({ isOpen, onClose, getAlldata, singleActivity }) => {
   };
 
   console.log(files);
-  
+
+  useEffect(() => {
+    const generatePreviews = async () => {
+      const previewUrls = await Promise.all(
+        files.map((file) => {
+          if (typeof file === "string") {
+            // If it's a CDN link, use it directly
+            return file;
+          } else if (file instanceof File) {
+            // If it's a File object, read it using FileReader
+            return new Promise((resolve) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(reader.result);
+              reader.readAsDataURL(file);
+            });
+          }
+          return null;
+        })
+      );
+      setPreviews(previewUrls);
+    };
+
+    generatePreviews();
+  }, [files]);
+
+  // console.log(previews);
 
   if (!isOpen) return null;
 
@@ -255,23 +281,31 @@ const EditActivity = ({ isOpen, onClose, getAlldata, singleActivity }) => {
               </p>
               {/* Display selected file names with reduced spacing */}
               <ul className="text-sm mt-1">
-                {" "}
-                {/* Reduced margin-top */}
-                {files?.map((file, index) => (
+                {/* {" "}
+                {previews.map((src, index) => (
+                src && <img key={index} src={src} className="w-32 mb-2" alt={`preview-${index}`} />
+            ))} */}
+                {previews?.map((file, index) => (
                   <li key={index} className="flex items-center">
-                    {
-                      file?.name ? <div>{file?.name}</div> : 
-                    <img src={file} className="w-32 mb-2" alt="" />
-                    }
+                    <img
+                      key={index}
+                      src={file}
+                      className="w-32 mb-2"
+                      alt={`preview-${index}`}
+                    />
                     <button
                       type="button"
                       onClick={() => {
                         setFiles(files.filter((_, i) => i !== index));
-                        if (file.slice(0,4) == "http"){
-                          axios.patch(`${serverUrl}/api/activity/activities/${singleActivity?._id}/remove-images`,{imageUrl:file})
-                          .then((res)=>{
-                            console.log(res)
-                          })
+                        if (file.slice(0, 4) == "http") {
+                          axios
+                            .patch(
+                              `${serverUrl}/api/activity/activities/${singleActivity?._id}/remove-images`,
+                              { imageUrl: file }
+                            )
+                            .then((res) => {
+                              console.log(res);
+                            });
                         }
                       }}
                       className="text-red-500 underline ml-2"
