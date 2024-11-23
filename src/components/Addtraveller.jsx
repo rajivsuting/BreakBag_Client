@@ -35,9 +35,15 @@ const Addtraveller = ({ isOpen, onClose, getAlldata }) => {
   const [selectedAgent, setSelectedAgent] = useState(""); // null initially
 
   const getAllData = () => {
-    axios.get(`${serverUrl}/api/agent/all/?role=Agent`).then((res) => {
-      setAgentAll(res.data.data);
-    });
+    axios
+      .get(`${serverUrl}/api/agent/all/?role=Agent`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+      .then((res) => {
+        setAgentAll(res.data.data);
+      });
   };
   const options = agentAll.map((agent) => ({
     value: agent._id,
