@@ -182,7 +182,7 @@ const AllRoutes = () => {
       <Route 
         path="/travellers" 
         element={
-          <ProtectedRoute role={role} allowedRoles={['Agent', 'Admin']}>
+          <ProtectedRoute role={role} allowedRoles={['Agent', 'Admin', "Team Lead"]}>
             <Travellers />
           </ProtectedRoute>
         } 

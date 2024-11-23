@@ -53,7 +53,13 @@ const Agents = () => {
 
   const getAllData = () => {
     axios
-      .get(`${serverUrl}/api/agent/all/?role=${selectedRole}`)
+      .get(`${serverUrl}/api/agent/all/?role=${selectedRole}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      )
       .then((res) => {
         console.log(res);
         setData(res.data.data);

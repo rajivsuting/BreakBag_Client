@@ -229,16 +229,18 @@ console.log(formData)
                 value={formData.email}
                 onChange={handleChange}
               />
-              <MaterialSelect
+              <select
                 label="User type"
                 name="userType"
                 value={formData.userType}
-                onChange={(value) => handleSelectChange(value)}
+                className="border border-gray-400 rounded w-[80%] px-5 py-2"
+                onChange={handleChange}
+                required
               >
-                <Option>Select user type</Option>
-                <Option value="Adult">Adult</Option>
-                <Option value="Child">Child</Option>
-              </MaterialSelect>
+                <option>Select user type</option>
+                <option value="Adult">Adult</option>
+                <option value="Child">Child</option>
+              </select>
               <div className="w-[100%]">
                 <Select
                   value={selectedAgent}

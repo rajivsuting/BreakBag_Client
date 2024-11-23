@@ -20,16 +20,19 @@ const AddQuote = () => {
     destination: "",
     startDate: "",
     endDate: "",
+    numberOfTravellers: "",
   });
 
   useEffect(() => {
-    axios.get(`${serverUrl}/api/traveller/all`,{
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    }).then((res) => {
-      setData(res.data.travellers);
-    });
+    axios
+      .get(`${serverUrl}/api/traveller/all`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+      .then((res) => {
+        setData(res.data.travellers);
+      });
     axios.get(`${serverUrl}/api/destination/destinaions`).then((res) => {
       setDestinationAll(res.data.data);
     });
@@ -69,11 +72,12 @@ const AddQuote = () => {
       destination: formState.destination,
       startDate: formState.startDate,
       endDate: formState.endDate,
+      numberOfTravellers:formState.numberOfTravellers,
       travellers: selectedTravellers.map((t) => t.id),
     };
 
     axios
-      .post(`${serverUrl}/api/quote/quotes`, formData,{
+      .post(`${serverUrl}/api/quote/quotes`, formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -81,7 +85,7 @@ const AddQuote = () => {
       .then((res) => {
         setIsLoading(false);
         toast.success("Quote added successfully");
-        navigate("/quote")
+        navigate("/quote");
       })
       .catch((error) => {
         setIsLoading(false);
@@ -127,7 +131,6 @@ const AddQuote = () => {
 
   return (
     <div className="flex gap-5">
-      
       <div className="w-[100%] m-auto mt-3 rounded-md p-4">
         <form className="space-y-5" onSubmit={handleSubmit}>
           <div className="relative w-full">
@@ -154,8 +157,8 @@ const AddQuote = () => {
             {/* Left side: Form fields and selected travelers */}
             <div className="w-[70%]">
               <div className="flex justify-between items-center m-auto gap-10 mt-5">
-                <div className="w-[100%]">
-                  {/* react-select component */}
+                {/* react-select component */}
+                <div className="w-[50%]">
                   <Select
                     options={options} // The options fetched from API
                     value={options.find(
@@ -167,6 +170,18 @@ const AddQuote = () => {
                     isClearable={true} // Allows clearing the selection
                   />
                 </div>
+                <div className="w-[50%]">
+                  <Input
+                    label="No. of travellers"
+                    name="numberOfTravellers"
+                    type="number"
+                    value={formState.numberOfTravellers}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="flex justify-between items-center m-auto gap-10 mt-5">
                 <Input
                   label="Start date"
                   name="startDate"
@@ -200,16 +215,16 @@ const AddQuote = () => {
 
             {/* Separator */}
             <div className="border border-2 border-gray"></div>
-
-            {/* Right side: Traveller list */}
             <div className="w-[30%] overflow-y-auto">
               <div className="text-start mt-5 mb-5">
                 <strong>Traveller list:</strong>
               </div>
+              <div className="h-[350px] overflow-y-scroll sidebar">
+
               {data?.map((el) => {
                 return (
                   <div
-                    className="flex justify-start items-center m-auto gap-10 mt-5"
+                    className="flex justify-start items-center m-auto gap-10 mt-5 "
                     key={el._id}
                   >
                     <input
@@ -221,6 +236,7 @@ const AddQuote = () => {
                   </div>
                 );
               })}
+              </div>
             </div>
           </div>
 

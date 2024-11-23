@@ -69,7 +69,7 @@ const Addtraveller = ({ isOpen, onClose, getAlldata }) => {
   const handleAgentChange = (option) => {
     const agentValue = option ? option.value : null;
     setSelectedAgent(agentValue);
-  
+
     // Directly update formData when agent is selected
     setFormData((prevState) => ({
       ...prevState,
@@ -80,7 +80,7 @@ const Addtraveller = ({ isOpen, onClose, getAlldata }) => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-console.log(formData);
+    console.log(formData);
 
     try {
       // Make the API call to submit the form data
@@ -108,7 +108,7 @@ console.log(formData);
         userType: "",
       });
 
-      setSelectedAgent("")
+      setSelectedAgent("");
 
       // Close the modal
       onClose();
@@ -116,8 +116,9 @@ console.log(formData);
       // Handle different types of errors
       if (error.response) {
         const status = error.response.status;
-        const errorMessage = error.response.data.message || "Something went wrong";
-  
+        const errorMessage =
+          error.response.data.message || "Something went wrong";
+
         // Show custom error messages based on status codes
         switch (status) {
           case 400:
@@ -127,10 +128,14 @@ console.log(formData);
             toast.error("Unauthorized: Please log in again.");
             break;
           case 403:
-            toast.error("Forbidden: You do not have permission to perform this action.");
+            toast.error(
+              "Forbidden: You do not have permission to perform this action."
+            );
             break;
           case 404:
-            toast.error("Not Found: The requested resource could not be found.");
+            toast.error(
+              "Not Found: The requested resource could not be found."
+            );
             break;
           case 500:
             toast.error("Server Error: Please try again later.");
@@ -200,26 +205,29 @@ console.log(formData);
                 onChange={handleChange}
                 required
               />
-              <MaterialSelect
+              <select
                 label="User type"
                 name="userType"
                 value={formData.userType}
-                onChange={(value) => handleSelectChange(value)}
+                className="border border-gray-400 rounded w-[80%] px-5 py-2"
+                onChange={handleChange}
                 required
               >
-                <Option>Select user type</Option>
-                <Option value="Adult">Adult</Option>
-                <Option value="Child">Child</Option>
-              </MaterialSelect>
+                <option>Select user type</option>
+                <option value="Adult">Adult</option>
+                <option value="Child">Child</option>
+              </select>
               <div className="w-[100%]">
-              <Select
-  options={options}
-  value={options.find((option) => option.value === selectedAgent)}
-  onChange={handleAgentChange} // Use the updated handler
-  placeholder="Select an agent"
-  isSearchable={true}
-  isClearable={true}
-/>
+                <Select
+                  options={options}
+                  value={options.find(
+                    (option) => option.value === selectedAgent
+                  )}
+                  onChange={handleAgentChange} // Use the updated handler
+                  placeholder="Select an agent"
+                  isSearchable={true}
+                  isClearable={true}
+                />
               </div>
             </div>
             <div className="m-auto mt-5">

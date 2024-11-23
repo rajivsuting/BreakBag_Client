@@ -174,14 +174,24 @@ const Sidebar = () => {
         ) : null}
 
         {localStorage.getItem("userRole") == "Team Lead" ? (
-          <Link
-            to="/agent" // Link updated to '/other-information'
-            className={`block p-2 flex justify-start items-center gap-2 p-2 pl-4 hover:text-main ${
-              isActive("/agent") ? "text-main" : ""
-            }`}
-          >
-            <MdCardTravel className="h-5 w-5" /> Agent
-          </Link>
+          <>
+            <Link
+              to="/agent" // Link updated to '/other-information'
+              className={`block p-2 flex justify-start items-center gap-2 p-2 pl-4 hover:text-main ${
+                isActive("/agent") ? "text-main" : ""
+              }`}
+            >
+              <MdCardTravel className="h-5 w-5" /> Agent
+            </Link>
+            <Link
+              to="/travellers" // Link updated to '/other-information'
+              className={`block p-2 flex justify-start items-center gap-2 p-2 pl-4 hover:text-main ${
+                isActive("/travellers") ? "text-main" : ""
+              }`}
+            >
+              <MdOutlinePeople className="h-5 w-5" /> Traveller
+            </Link>
+          </>
         ) : null}
 
         <Link
