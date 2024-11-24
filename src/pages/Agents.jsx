@@ -24,7 +24,7 @@ import EditAgent from "../components/EditAgent";
 const Agents = () => {
   const [isAddAgentsModal, setIsAddAgentsModal] = useState(false);
   const [singleAgent, setSingleAgent] = useState({});
-  const [updateing, setUpdating] = useState(false)
+  const [updateing, setUpdating] = useState(false);
   const [isEditAgentModal, setIsEditAgentModal] = useState(false);
   const [data, setData] = useState([]);
   const [toogleLead, setToogleLead] = useState(false);
@@ -34,9 +34,15 @@ const Agents = () => {
   const [selectedTeamLead, setSelectedTeamLead] = useState(""); // null initially
 
   const getAllDataTeamlead = () => {
-    axios.get(`${serverUrl}/api/agent/all/?role=${"Team Lead"}`).then((res) => {
-      setteamLeadAll(res.data.data);
-    });
+    axios
+      .get(`${serverUrl}/api/agent/all/?role=${"Team Lead"}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+      .then((res) => {
+        setteamLeadAll(res.data.data);
+      });
   };
 
   const options = teamLeadAll.map((agent) => ({
@@ -53,13 +59,11 @@ const Agents = () => {
 
   const getAllData = () => {
     axios
-      .get(`${serverUrl}/api/agent/all/?role=${selectedRole}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      )
+      .get(`${serverUrl}/api/agent/all/?role=${selectedRole}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
       .then((res) => {
         console.log(res);
         setData(res.data.data);
@@ -195,7 +199,7 @@ const Agents = () => {
                           onChange={(e) => {
                             setSelectedTeamLead(e.target.value);
                             setSelectedAgent(user._id);
-                            setUpdating(!updateing)
+                            setUpdating(!updateing);
                           }}
                         >
                           <option value="">Select a team lead</option>
