@@ -54,9 +54,9 @@ const EditItinary = () => {
   const [selectedInclusions, setSelectedInclusions] = useState([]);
   const [searchTermInclusion, setSearchTermInclusion] = useState("");
   const [name, setName] = useState("");
-  const [adultPrice, setAdultPrice] = useState(""); // Default adult price
-  const [childPrice, setChildPrice] = useState(""); // Default child price
-  const [priceDetails, setPriceDetails] = useState([]); // To store the formatted data
+  const [adultPrice, setAdultPrice] = useState("");
+  const [childPrice, setChildPrice] = useState("");
+  const [priceDetails, setPriceDetails] = useState([]);
 
   // State to manage travel summaries per day
   const [travelSummaryPerDay, setTravelSummaryPerDay] = useState([]);
@@ -248,15 +248,15 @@ const EditItinary = () => {
   }, []);
 
   useEffect(() => {
-    setTravelSummaryPerDay(data?.itenerary?.travelSummaryPerDay)
-    setActivityPerDay(data?.itenerary?.activityPerDay)
-    setPriceDetails(data?.itenerary?.priceDetails)
+    setTravelSummaryPerDay(data?.itenerary?.travelSummaryPerDay);
+    setActivityPerDay(data?.itenerary?.activityPerDay);
+    // setPriceDetails(data?.itenerary?.priceDetails);
     // console.log(data?.itenerary?.priceDetails);
-    setSelectedHotel(data?.itenerary?.selectedHotel)
-    setSelectedExclusions(data?.itenerary?.selectedExclusions)
-    setSelectedOtherInformation(data?.itenerary?.selectedOtherInformation)
-    setSelectedTransfer(data?.itenerary?.selectedTransfers)
-    setSelectedInclusions(data?.itenerary?.selectedInclusions)
+    setSelectedHotel(data?.itenerary?.selectedHotel);
+    setSelectedExclusions(data?.itenerary?.selectedExclusions);
+    setSelectedOtherInformation(data?.itenerary?.selectedOtherInformation);
+    setSelectedTransfer(data?.itenerary?.selectedTransfers);
+    setSelectedInclusions(data?.itenerary?.selectedInclusions);
   }, [data]);
 
   const categories = [
@@ -488,23 +488,35 @@ const EditItinary = () => {
     setSelectedCategory(category);
   };
 
+  useEffect(() => {
+    if (data?.itenerary?.priceDetails) {
+      setPriceDetails(data.itenerary.priceDetails);
+
+      const adultData = data.itenerary.priceDetails.find(
+        (item) => item.userType === "Adult"
+      );
+      const childData = data.itenerary.priceDetails.find(
+        (item) => item.userType === "Child"
+      );
+
+      // Set initial prices from the database
+      setAdultPrice(adultData?.price || "");
+      setChildPrice(childData?.price || "");
+    }
+  }, [data]);
+
+  // Function to calculate the total cost
   const calculateTotal = () => {
-    return (
-      data?.travellers?.filter((el) => el.userType === "Adult").length *
-        adultPrice +
-      data?.travellers?.filter((el) => el.userType === "Child").length *
-        childPrice
-    );
+    const adultCount = data?.numberOfAdultTravellers || 0;
+    const childCount = data?.numberChildTravellers || 0;
+
+    return adultCount * (adultPrice || 0) + childCount * (childPrice || 0);
   };
 
-  // Function to update the price details in the desired format
+  // Function to update the price details
   const updatePriceDetails = () => {
-    const adultCount = data?.travellers?.filter(
-      (el) => el.userType === "Adult"
-    )?.length;
-    const childCount = data?.travellers?.filter(
-      (el) => el.userType === "Child"
-    )?.length;
+    const adultCount = data?.numberOfAdultTravellers || 0;
+    const childCount = data?.numberChildTravellers || 0;
 
     const newPriceDetails = [
       {
@@ -698,12 +710,35 @@ const EditItinary = () => {
           />
         </div>
         <Card className="overflow-hidden mt-5">
-          <div className="p-8 pb-0 flex justify-between">
+          <div
+            className="w-[70px] border-b cursor-pointer hover:border-b-blue text-maincolor2 m-3 ml-8"
+            onClick={() => window.history.back()}
+          >
+            Go back
+          </div>
+          <div className="p-8 pt-2 pb-0 flex justify-between">
             <div className="w-[50%] text-xl text-semibold">
               <span className="px-4 py-2 rounded-md text-sm text-white bg-green-500">
                 Active
               </span>{" "}
               {tripid}
+            </div>
+            <div className="flex justify-center items-center">
+              <Button
+                className={`bg-main m-auto ${
+                  loadingItinery ? "cursor-not-allowed opacity-75" : ""
+                }`}
+                onClick={handleFinalSubmit}
+                disabled={loadingItinery}
+              >
+                {loadingItinery ? (
+                  <span className="flex items-center gap-2">
+                    <FaSpinner className="animate-spin" /> Generating pdf...
+                  </span>
+                ) : (
+                  "Save and generate pdf"
+                )}
+              </Button>
             </div>
           </div>
           <CardBody className="p-4">
@@ -1059,18 +1094,8 @@ const EditItinary = () => {
                     Cost (Adult, child) details
                     <div className="p-5">
                       <h2 className="text-lg font-bold mb-4">
-                        {
-                          data?.travellers?.filter(
-                            (el) => el.userType === "Adult"
-                          )?.length
-                        }{" "}
-                        Adults and{" "}
-                        {
-                          data?.travellers?.filter(
-                            (el) => el.userType === "Child"
-                          )?.length
-                        }{" "}
-                        Child
+                        {data?.numberOfAdultTravellers} Adults and{" "}
+                        {data?.numberChildTravellers} Child
                       </h2>
 
                       <div className="flex justify-between items-center mb-2 gap-5">
@@ -1101,7 +1126,7 @@ const EditItinary = () => {
                         </p>
                       </div>
 
-                      <div className="flex justify-center items-center">
+                      {/* <div className="flex justify-center items-center">
                         <Button
                           className={`bg-main m-auto mt-5 ${
                             loadingItinery
@@ -1120,7 +1145,7 @@ const EditItinary = () => {
                             "Final Submit"
                           )}
                         </Button>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 )}
@@ -1424,28 +1449,31 @@ const EditItinary = () => {
                               {inclusion.description.map(
                                 (desc, descriptionIndex) => (
                                   <div
-                                  key={descriptionIndex}
-                                  className="flex items-center gap-2"
-                                >
-                                  <Textarea
-                                    label={`Point ${descriptionIndex + 1}`}
-                                    name="description"
-                                    value={desc}
-                                    onChange={(e) =>
-                                      handleInputChangeInclusion(
-                                        e,
-                                        inclusionIndex,
-                                        descriptionIndex
-                                      )
-                                    }
-                                  />
-                                <LuMinus className="text-main cursor-pointer" onClick={() =>
+                                    key={descriptionIndex}
+                                    className="flex items-center gap-2"
+                                  >
+                                    <Textarea
+                                      label={`Point ${descriptionIndex + 1}`}
+                                      name="description"
+                                      value={desc}
+                                      onChange={(e) =>
+                                        handleInputChangeInclusion(
+                                          e,
+                                          inclusionIndex,
+                                          descriptionIndex
+                                        )
+                                      }
+                                    />
+                                    <LuMinus
+                                      className="text-main cursor-pointer"
+                                      onClick={() =>
                                         handleRemoveDescription(
                                           inclusionIndex,
                                           descriptionIndex
                                         )
-                                      }/>
-                                </div>
+                                      }
+                                    />
+                                  </div>
                                 )
                               )}
                             </div>

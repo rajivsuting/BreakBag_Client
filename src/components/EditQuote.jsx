@@ -9,8 +9,10 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const EditQuote = ({ isOpen, onClose, singleQuote, getAlldata }) => {
-  const [data, setData] = useState([]); // List of travelers
-  const [selectedTravellers, setSelectedTravellers] = useState([]); // Selected travelers
+  const [data, setData] = useState([]); // List of travellers
+  const [filteredData, setFilteredData] = useState([]); // Filtered traveller list
+  const [selectedTraveller, setSelectedTraveller] = useState(null); // Selected traveller
+  const [searchQuery, setSearchQuery] = useState(""); // Search query
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [destinationAll, setDestinationAll] = useState([]);
@@ -33,8 +35,13 @@ const EditQuote = ({ isOpen, onClose, singleQuote, getAlldata }) => {
         numberOfTravellers: singleQuote.numberOfTravellers,
         numberChildTravellers: singleQuote.numberChildTravellers,
       });
-      setSelectedTravellers(
-        singleQuote.travellers?.map((t) => ({ id: t._id, name: t.name }))
+      setSelectedTraveller(
+        singleQuote.travellers?.[0]
+          ? {
+              id: singleQuote.travellers[0]._id,
+              name: singleQuote.travellers[0].name,
+            }
+          : null
       );
     }
   }, [singleQuote]);
@@ -48,6 +55,7 @@ const EditQuote = ({ isOpen, onClose, singleQuote, getAlldata }) => {
       })
       .then((res) => {
         setData(res.data.travellers);
+        setFilteredData(res.data.travellers);
       });
 
     axios.get(`${serverUrl}/api/destination/destinaions`).then((res) => {
@@ -55,14 +63,24 @@ const EditQuote = ({ isOpen, onClose, singleQuote, getAlldata }) => {
     });
   }, []);
 
+  const handleSearch = () => {
+    const filtered = data.filter((traveller) =>
+      traveller.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredData(filtered);
+  };
+
+  const handleResetSearch = () => {
+    setSearchQuery("");
+    setFilteredData(data); // Reset to full list
+  };
+
   const handleTravelerSelection = (travellerId, travellerName) => {
-    setSelectedTravellers((prevSelected) => {
-      if (prevSelected.some((t) => t.id === travellerId)) {
-        return prevSelected.filter((t) => t.id !== travellerId);
-      } else {
-        return [...prevSelected, { id: travellerId, name: travellerName }];
-      }
-    });
+    if (selectedTraveller && selectedTraveller.id === travellerId) {
+      setSelectedTraveller(null);
+    } else {
+      setSelectedTraveller({ id: travellerId, name: travellerName });
+    }
   };
 
   const handleInputChange = (e) => {
@@ -85,7 +103,7 @@ const EditQuote = ({ isOpen, onClose, singleQuote, getAlldata }) => {
       destination: formState.destination,
       startDate: formState.startDate,
       endDate: formState.endDate,
-      travellers: selectedTravellers.map((t) => t.id),
+      travellers: selectedTraveller ? [selectedTraveller.id] : [],
       numberOfTravellers:
         Number(formState.numberChildTravellers) +
         Number(formState.numberOfAdultTravellers),
@@ -99,47 +117,15 @@ const EditQuote = ({ isOpen, onClose, singleQuote, getAlldata }) => {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       })
-      .then((res) => {
+      .then(() => {
         setIsLoading(false);
         toast.success("Quote updated successfully");
         getAlldata();
         onClose();
       })
       .catch((error) => {
-        console.log(error);
         setIsLoading(false);
-        if (error.response) {
-          const status = error.response.status;
-          const errorMessage =
-            error.response.data.message || "Something went wrong";
-          switch (status) {
-            case 400:
-              toast.error(`Bad Request: ${errorMessage}`);
-              break;
-            case 401:
-              toast.error("Unauthorized: Please log in again.");
-              break;
-            case 403:
-              toast.error(
-                "Forbidden: You do not have permission to perform this action."
-              );
-              break;
-            case 404:
-              toast.error(
-                "Not Found: The requested resource could not be found."
-              );
-              break;
-            case 500:
-              toast.error("Server Error: Please try again later.");
-              break;
-            default:
-              toast.error(`Error: ${errorMessage}`);
-          }
-        } else if (error.request) {
-          toast.error("Network Error: No response received from the server.");
-        } else {
-          toast.error(`Error: ${error.message}`);
-        }
+        toast.error(error.response?.data?.message || "Something went wrong");
       });
   };
 
@@ -148,23 +134,25 @@ const EditQuote = ({ isOpen, onClose, singleQuote, getAlldata }) => {
     label: destination.title,
   }));
 
+  console.log(selectedTraveller)
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-[999] grid h-screen w-screen place-items-center bg-black bg-opacity-60 backdrop-blur-sm transition-opacity duration-300">
-      <div className="sidebar relative m-4 w-4/5 max-w-[90%] max-h-[90vh] overflow-y-auto rounded-lg bg-white text-blue-gray-500 shadow-2xl p-8">
-        <div className="flex items-center justify-end font-sans text-2xl font-semibold text-blue-gray-900">
+      <div className="relative m-4 w-4/5 max-w-[90%] max-h-[90vh] overflow-y-auto rounded-lg bg-white text-blue-gray-500 shadow-2xl p-8">
+        <div className="flex items-center justify-end text-2xl font-semibold">
           <AiOutlineClose
-            className="cursor-pointer text-sm text-red-500 hover:bg-main hover:text-white rounded-[50%] p-1"
+            className="cursor-pointer text-red-500 hover:text-white hover:bg-main rounded-full p-1"
             size={24}
             onClick={onClose}
           />
         </div>
         <form className="space-y-5" onSubmit={handleSubmit}>
-          <div className="flex justify-between m-auto gap-10 mt-5">
+          <div className="flex gap-10">
             <div className="w-[70%]">
+              {/* Destination, dates, and traveler counts */}
               <div className="flex justify-between items-center m-auto gap-10 mt-5">
-                {/* react-select component */}
                 <div className="w-[50%]">
                   <Select
                     options={options}
@@ -180,9 +168,9 @@ const EditQuote = ({ isOpen, onClose, singleQuote, getAlldata }) => {
                 <div className="w-[50%]">
                   <Input
                     label="No. of adult travellers"
-                    name="numberChildTravellers"
                     type="number"
-                    value={formState.numberChildTravellers}
+                    name="numberOfAdultTravellers"
+                    value={formState.numberOfAdultTravellers}
                     onChange={handleInputChange}
                     required
                   />
@@ -190,9 +178,9 @@ const EditQuote = ({ isOpen, onClose, singleQuote, getAlldata }) => {
                 <div className="w-[50%]">
                   <Input
                     label="No. of child travellers"
-                    name="numberOfAdultTravellers"
+                    name="numberChildTravellers"
                     type="number"
-                    value={formState.numberOfAdultTravellers}
+                    value={formState.numberChildTravellers}
                     onChange={handleInputChange}
                     required
                   />
@@ -205,6 +193,7 @@ const EditQuote = ({ isOpen, onClose, singleQuote, getAlldata }) => {
                   type="date"
                   value={formState.startDate}
                   onChange={handleInputChange}
+                  required
                 />
                 <Input
                   label="End date"
@@ -212,37 +201,48 @@ const EditQuote = ({ isOpen, onClose, singleQuote, getAlldata }) => {
                   type="date"
                   value={formState.endDate}
                   onChange={handleInputChange}
+                  required
                 />
               </div>
-
-              <div className="text-start w-[50%] mt-5 mb-5">
-                <strong>Selected travellers:</strong>
-                <ul>
-                  {selectedTravellers.map((traveller) => (
-                    <li key={traveller.id} className="mt-1">
-                      {traveller.name}
-                    </li>
-                  ))}
-                </ul>
+              <div className="text-start w-[50%] mt-5 mb-5 flex justify-start item-center gap-1">
+                <strong>Selected traveller : </strong>
+                <div>{" " + selectedTraveller?.name}</div>
               </div>
             </div>
             <div className="border border-2 border-gray"></div>
-            <div className="w-[30%] overflow-y-auto">
-              <div className="text-start mt-5 mb-5">
+            <div className="w-[30%] overflow-y-auto mt-5">
+              <div className="flex items-center mb-3 relative">
+                <Input
+                  label="Search Travellers"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pr-10" // Add padding-right to avoid overlapping the icon
+                />
+                {searchQuery && (
+                  <AiOutlineClose
+                    className="absolute right-32 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+                    onClick={handleResetSearch}
+                  />
+                )}
+                <Button onClick={handleSearch} className="ml-3">
+                  Search
+                </Button>
+              </div>
+              <div className="text-start mt-5 flex items-center">
                 <strong>Traveller list:</strong>
               </div>
-              <div className="h-[350px] overflow-y-scroll sidebar">
-                {data?.map((el) => (
+              <div className="mt-3 h-[280px] overflow-y-auto  sidebar">
+                {filteredData.map((el) => (
                   <div
-                    className="flex justify-start items-center m-auto gap-10 mt-5"
                     key={el._id}
+                    className="flex justify-start items-center m-auto gap-5 mt-5"
                   >
                     <input
-                      type="checkbox"
-                      checked={selectedTravellers.some((t) => t.id === el._id)}
+                      type="radio"
+                      checked={selectedTraveller?.id === el._id}
                       onChange={() => handleTravelerSelection(el._id, el.name)}
                     />
-                    <div>{el.name}</div>
+                    <span>{el.name}</span>
                   </div>
                 ))}
               </div>
@@ -250,7 +250,7 @@ const EditQuote = ({ isOpen, onClose, singleQuote, getAlldata }) => {
           </div>
           <div className="flex justify-center">
             <Button className="bg-main" type="submit" disabled={isLoading}>
-              {isLoading ? "Updating Quote..." : "Update Quote"}
+            {isLoading ? "Updating..." : "Update Quote"}
             </Button>
           </div>
         </form>

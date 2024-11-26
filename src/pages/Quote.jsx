@@ -253,6 +253,12 @@ const Travellers = () => {
                     </td>
                   </Link>
                   <td className="px-4 py-2 cursor-pointer">
+                  {user?.travellers?.map((participant, index) => (
+                      <div key={index}>
+                        {participant.name}
+                        {/* {index < 1 && data?.travellers?.length >= 2 ? ", " : ""} */}
+                      </div>
+                    ))}
                     {/* {user?.comments?.length == 0 ? null : (
                       <div className="relative group">
                         {

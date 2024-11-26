@@ -106,7 +106,13 @@ const QuoteDetail = () => {
         </div>
 
         <Card className="overflow-hidden mt-5">
-          <div className="p-8 pb-0 flex justify-between">
+        <div
+            className="w-[70px] border-b cursor-pointer hover:border-b-blue text-maincolor2 m-3 ml-8"
+            onClick={() => window.history.back()}
+          >
+            Go back
+          </div>
+          <div className="p-8 pt-2 pb-0 flex justify-between">
             <div className=" w-[50%] text-xl text-semibold">
               <span
                 className={`px-4 py-2 rounded-md text-sm text-white ${getStatusColorbackground(
@@ -153,7 +159,7 @@ const QuoteDetail = () => {
                   <div>{data?.destination?.title}</div>
                 </div>
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-600 font-bold">Total travellers</div>
+                  <div className="text-gray-600 font-bold">Total traveller</div>
                   <div>{data?.numberOfTravellers}</div>
                 </div>
               </div>
@@ -169,17 +175,17 @@ const QuoteDetail = () => {
               </div>
               <div className="flex justify-between mt-5">
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-600 font-bold">No. of adult travellers</div>
+                  <div className="text-gray-600 font-bold">No. of adult traveller</div>
                   <div>{data?.numberOfAdultTravellers || "-"}</div>
                 </div>
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-600 font-bold">No. of child travellers</div>
+                  <div className="text-gray-600 font-bold">No. of child traveller</div>
                   <div>{data?.numberChildTravellers || "-"}</div>
                 </div>
               </div>
               <div className="flex justify-between mt-5">
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-600 font-bold">Travellers</div>
+                  <div className="text-gray-600 font-bold">Traveller</div>
                   <div>
                     {data?.travellers?.map((participant, index) => (
                       <div key={index}>

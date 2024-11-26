@@ -496,21 +496,15 @@ const CreateItinerary = () => {
 
   const calculateTotal = () => {
     return (
-      data?.numberOfAdultTravellers *
-        adultPrice +
-      data?.numberChildTravellers *
-        childPrice
+      data?.numberOfAdultTravellers * adultPrice +
+      data?.numberChildTravellers * childPrice
     );
   };
 
   // Function to update the price details in the desired format
   const updatePriceDetails = () => {
-    const adultCount = data?.travellers?.filter(
-      (el) => el.userType === "Adult"
-    )?.length;
-    const childCount = data?.travellers?.filter(
-      (el) => el.userType === "Child"
-    )?.length;
+    const adultCount = data?.numberOfAdultTravellers;
+    const childCount = data?.numberChildTravellers;
 
     const newPriceDetails = [
       {
@@ -526,7 +520,6 @@ const CreateItinerary = () => {
         amount: childPrice * childCount,
       },
     ];
-
     setPriceDetails(newPriceDetails);
   };
 
@@ -629,6 +622,9 @@ const CreateItinerary = () => {
         },
         {
           responseType: "blob", // Important: To receive the PDF as binary data (Blob)
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         }
       )
       .then((res) => {
@@ -706,12 +702,35 @@ const CreateItinerary = () => {
           />
         </div>
         <Card className="overflow-hidden mt-5">
-          <div className="p-8 pb-0 flex justify-between">
+          <div
+            className="w-[70px] border-b cursor-pointer hover:border-b-blue text-maincolor2 m-3 ml-8"
+            onClick={() => window.history.back()}
+          >
+            Go back
+          </div>
+          <div className="p-8 pt-2 pb-0 flex justify-between">
             <div className="w-[50%] text-xl text-semibold">
               <span className="px-4 py-2 rounded-md text-sm text-white bg-green-500">
                 Active
               </span>{" "}
               {tripid}
+            </div>
+            <div className="flex justify-center items-center">
+              <Button
+                className={`bg-main m-auto ${
+                  loadingItinery ? "cursor-not-allowed opacity-75" : ""
+                }`}
+                onClick={handleFinalSubmit}
+                disabled={loadingItinery}
+              >
+                {loadingItinery ? (
+                  <span className="flex items-center gap-2">
+                    <FaSpinner className="animate-spin" /> Generating pdf...
+                  </span>
+                ) : (
+                  "Final Submit"
+                )}
+              </Button>
             </div>
           </div>
           <CardBody className="p-4">
@@ -1067,14 +1086,8 @@ const CreateItinerary = () => {
                     Cost (Adult, child) details
                     <div className="p-5">
                       <h2 className="text-lg font-bold mb-4">
-                        {
-                          data?.numberOfAdultTravellers
-                        }{" "}
-                        Adults and{" "}
-                        {
-                          data?.numberChildTravellers
-                        }{" "}
-                        Child
+                        {data?.numberOfAdultTravellers} Adults and{" "}
+                        {data?.numberChildTravellers} Child
                       </h2>
 
                       <div className="flex justify-between items-center mb-2 gap-5">
@@ -1103,27 +1116,6 @@ const CreateItinerary = () => {
                         <p className="text-xl font-bold">
                           Rs. {calculateTotal()}
                         </p>
-                      </div>
-
-                      <div className="flex justify-center items-center">
-                        <Button
-                          className={`bg-main m-auto mt-5 ${
-                            loadingItinery
-                              ? "cursor-not-allowed opacity-75"
-                              : ""
-                          }`}
-                          onClick={handleFinalSubmit}
-                          disabled={loadingItinery}
-                        >
-                          {loadingItinery ? (
-                            <span className="flex items-center gap-2">
-                              <FaSpinner className="animate-spin" /> Generating
-                              pdf...
-                            </span>
-                          ) : (
-                            "Final Submit"
-                          )}
-                        </Button>
                       </div>
                     </div>
                   </div>
@@ -1443,12 +1435,15 @@ const CreateItinerary = () => {
                                         )
                                       }
                                     />
-                                    <LuMinus className="text-main cursor-pointer" onClick={() =>
+                                    <LuMinus
+                                      className="text-main cursor-pointer"
+                                      onClick={() =>
                                         handleRemoveDescription(
                                           inclusionIndex,
                                           descriptionIndex
                                         )
-                                      }/>
+                                      }
+                                    />
                                     {/* <Button
                                       type="button"
                                       
@@ -1979,6 +1974,7 @@ const CreateItinerary = () => {
                   </div>
                 </div>
               )}
+
               {/* <div className="mt-4 p-4 border">
     <h2 className="text-xl font-bold">Submitted Data</h2>
     <pre className="whitespace-pre-wrap bg-gray-100 p-2 rounded">
