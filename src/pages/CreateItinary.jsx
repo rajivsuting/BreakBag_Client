@@ -496,9 +496,9 @@ const CreateItinerary = () => {
 
   const calculateTotal = () => {
     return (
-      data?.travellers?.filter((el) => el.userType === "Adult").length *
+      data?.numberOfAdultTravellers *
         adultPrice +
-      data?.travellers?.filter((el) => el.userType === "Child").length *
+      data?.numberChildTravellers *
         childPrice
     );
   };
@@ -1068,15 +1068,11 @@ const CreateItinerary = () => {
                     <div className="p-5">
                       <h2 className="text-lg font-bold mb-4">
                         {
-                          data?.travellers?.filter(
-                            (el) => el.userType === "Adult"
-                          )?.length
+                          data?.numberOfAdultTravellers
                         }{" "}
                         Adults and{" "}
                         {
-                          data?.travellers?.filter(
-                            (el) => el.userType === "Child"
-                          )?.length
+                          data?.numberChildTravellers
                         }{" "}
                         Child
                       </h2>

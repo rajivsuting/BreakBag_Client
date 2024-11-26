@@ -18,7 +18,9 @@ const EditQuote = ({ isOpen, onClose, singleQuote, getAlldata }) => {
     destination: "",
     startDate: "",
     endDate: "",
-    numberOfTravellers: "",
+    numberChildTravellers: "",
+    numberOfTravellers: 0,
+    numberOfAdultTravellers: "",
   });
 
   useEffect(() => {
@@ -27,7 +29,9 @@ const EditQuote = ({ isOpen, onClose, singleQuote, getAlldata }) => {
         destination: singleQuote.destination?._id || "",
         startDate: singleQuote.startDate?.split("T")[0] || "",
         endDate: singleQuote.endDate?.split("T")[0] || "",
-        numberOfTravellers: singleQuote.numberOfTravellers
+        numberOfAdultTravellers: singleQuote.numberOfAdultTravellers,
+        numberOfTravellers: singleQuote.numberOfTravellers,
+        numberChildTravellers: singleQuote.numberChildTravellers,
       });
       setSelectedTravellers(
         singleQuote.travellers?.map((t) => ({ id: t._id, name: t.name }))
@@ -82,7 +86,11 @@ const EditQuote = ({ isOpen, onClose, singleQuote, getAlldata }) => {
       startDate: formState.startDate,
       endDate: formState.endDate,
       travellers: selectedTravellers.map((t) => t.id),
-      numberOfTravellers:formState.numberOfTravellers,
+      numberOfTravellers:
+        Number(formState.numberChildTravellers) +
+        Number(formState.numberOfAdultTravellers),
+      numberChildTravellers: formState.numberChildTravellers,
+      numberOfAdultTravellers: formState.numberOfAdultTravellers,
     };
 
     axios
@@ -171,11 +179,22 @@ const EditQuote = ({ isOpen, onClose, singleQuote, getAlldata }) => {
                 </div>
                 <div className="w-[50%]">
                   <Input
-                    label="No. of travellers"
-                    name="numberOfTravellers"
+                    label="No. of adult travellers"
+                    name="numberChildTravellers"
                     type="number"
-                    value={formState.numberOfTravellers}
+                    value={formState.numberChildTravellers}
                     onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div className="w-[50%]">
+                  <Input
+                    label="No. of child travellers"
+                    name="numberOfAdultTravellers"
+                    type="number"
+                    value={formState.numberOfAdultTravellers}
+                    onChange={handleInputChange}
+                    required
                   />
                 </div>
               </div>
@@ -213,19 +232,19 @@ const EditQuote = ({ isOpen, onClose, singleQuote, getAlldata }) => {
                 <strong>Traveller list:</strong>
               </div>
               <div className="h-[350px] overflow-y-scroll sidebar">
-              {data?.map((el) => (
-                <div
-                  className="flex justify-start items-center m-auto gap-10 mt-5"
-                  key={el._id}
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedTravellers.some((t) => t.id === el._id)}
-                    onChange={() => handleTravelerSelection(el._id, el.name)}
-                  />
-                  <div>{el.name}</div>
-                </div>
-              ))}
+                {data?.map((el) => (
+                  <div
+                    className="flex justify-start items-center m-auto gap-10 mt-5"
+                    key={el._id}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedTravellers.some((t) => t.id === el._id)}
+                      onChange={() => handleTravelerSelection(el._id, el.name)}
+                    />
+                    <div>{el.name}</div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

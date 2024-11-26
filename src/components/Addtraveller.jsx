@@ -96,6 +96,7 @@ const Addtraveller = ({ isOpen, onClose, getAlldata }) => {
         {
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
@@ -113,10 +114,7 @@ const Addtraveller = ({ isOpen, onClose, getAlldata }) => {
         // dateOfBirth: "",
         userType: "",
       });
-
       setSelectedAgent("");
-
-      // Close the modal
       onClose();
     } catch (error) {
       // Handle different types of errors
@@ -223,6 +221,8 @@ const Addtraveller = ({ isOpen, onClose, getAlldata }) => {
                 <option value="Adult">Adult</option>
                 <option value="Child">Child</option>
               </select>
+              {
+                localStorage.getItem("userRole") == "Agent" ? null : 
               <div className="w-[100%]">
                 <Select
                   options={options}
@@ -235,6 +235,7 @@ const Addtraveller = ({ isOpen, onClose, getAlldata }) => {
                   isClearable={true}
                 />
               </div>
+              }
             </div>
             <div className="m-auto mt-5">
               <Textarea

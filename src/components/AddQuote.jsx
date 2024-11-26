@@ -20,7 +20,9 @@ const AddQuote = () => {
     destination: "",
     startDate: "",
     endDate: "",
-    numberOfTravellers: "",
+    numberChildTravellers: "",
+    numberOfTravellers:0,
+    numberOfAdultTravellers: "",
   });
 
   useEffect(() => {
@@ -72,8 +74,11 @@ const AddQuote = () => {
       destination: formState.destination,
       startDate: formState.startDate,
       endDate: formState.endDate,
-      numberOfTravellers:formState.numberOfTravellers,
       travellers: selectedTravellers.map((t) => t.id),
+      numberOfTravellers: Number(formState.numberChildTravellers) + Number(formState.numberOfAdultTravellers),
+      numberChildTravellers: formState.numberChildTravellers,
+numberOfAdultTravellers: formState.numberOfAdultTravellers,
+      
     };
 
     axios
@@ -172,10 +177,20 @@ const AddQuote = () => {
                 </div>
                 <div className="w-[50%]">
                   <Input
-                    label="No. of travellers"
-                    name="numberOfTravellers"
+                    label="No. of adult travellers"
+                    name="numberChildTravellers"
                     type="number"
-                    value={formState.numberOfTravellers}
+                    value={formState.numberChildTravellers}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div className="w-[50%]">
+                  <Input
+                    label="No. of child travellers"
+                    name="numberOfAdultTravellers"
+                    type="number"
+                    value={formState.numberOfAdultTravellers}
                     onChange={handleInputChange}
                     required
                   />
@@ -220,22 +235,23 @@ const AddQuote = () => {
                 <strong>Traveller list:</strong>
               </div>
               <div className="h-[350px] overflow-y-scroll sidebar">
-
-              {data?.map((el) => {
-                return (
-                  <div
-                    className="flex justify-start items-center m-auto gap-10 mt-5 "
-                    key={el._id}
-                  >
-                    <input
-                      type="checkbox"
-                      value={el._id}
-                      onChange={() => handleTravelerSelection(el._id, el.name)}
-                    />
-                    <div>{el.name}</div>
-                  </div>
-                );
-              })}
+                {data?.map((el) => {
+                  return (
+                    <div
+                      className="flex justify-start items-center m-auto gap-10 mt-5 "
+                      key={el._id}
+                    >
+                      <input
+                        type="checkbox"
+                        value={el._id}
+                        onChange={() =>
+                          handleTravelerSelection(el._id, el.name)
+                        }
+                      />
+                      <div>{el.name}</div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>

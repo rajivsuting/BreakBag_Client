@@ -155,7 +155,17 @@ const Addagents = ({ isOpen, onClose, getAllData }) => {
                 onChange={handleChange}
                 required
               />
-              <Select
+              <select
+                name="role"
+                value={formData.role}
+                className="w-[95%] border border-gray-500 rounded px-2 py-2"
+                onChange={handleChange}
+              >
+                <option disabled>Select role</option>
+                <option value="Agent">Agent</option>
+                <option value="Team Lead">Team Lead</option>
+              </select>
+              {/* <Select
                 label="Role"
                 name="role"
                 value={formData.role}
@@ -165,7 +175,7 @@ const Addagents = ({ isOpen, onClose, getAllData }) => {
                 <Option disabled>Select role</Option>
                 <Option value="Agent">Agent</Option>
                 <Option value="Team Lead">Team Lead</Option>
-              </Select>
+              </Select> */}
             </div>
             <div className="w-[90%] flex justify-center items-center text-center mt-5 m-auto">
               <Button className="bg-main" type="submit" disabled={isLoading}>

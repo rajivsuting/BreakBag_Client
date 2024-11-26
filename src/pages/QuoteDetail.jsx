@@ -153,7 +153,7 @@ const QuoteDetail = () => {
                   <div>{data?.destination?.title}</div>
                 </div>
                 <div className="text-start w-[30%]">
-                  <div className="text-gray-600 font-bold">No. of traveller</div>
+                  <div className="text-gray-600 font-bold">Total travellers</div>
                   <div>{data?.numberOfTravellers}</div>
                 </div>
               </div>
@@ -165,6 +165,16 @@ const QuoteDetail = () => {
                 <div className="text-start w-[30%]">
                   <div className="text-gray-600 font-bold">Created by</div>
                   <div>{data?.createdBy?.name || "Unknown"}</div>
+                </div>
+              </div>
+              <div className="flex justify-between mt-5">
+                <div className="text-start w-[30%]">
+                  <div className="text-gray-600 font-bold">No. of adult travellers</div>
+                  <div>{data?.numberOfAdultTravellers || "-"}</div>
+                </div>
+                <div className="text-start w-[30%]">
+                  <div className="text-gray-600 font-bold">No. of child travellers</div>
+                  <div>{data?.numberChildTravellers || "-"}</div>
                 </div>
               </div>
               <div className="flex justify-between mt-5">
