@@ -297,10 +297,8 @@ const Acitivities = () => {
               </tbody>
             </table>
             {data?.length == 0 ? (
-                  <div className="text-center mt-5 mb-5">
-                    No activity found!!{" "}
-                  </div>
-                ) : null}
+              <div className="text-center mt-5 mb-5">No activity found!! </div>
+            ) : null}
           </CardBody>
         </Card>
       </div>

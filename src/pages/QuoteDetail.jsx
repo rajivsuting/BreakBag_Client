@@ -130,12 +130,12 @@ const QuoteDetail = () => {
               {
                 data?.itenerary ? <Link to={`/edit-intinary/${tripid}`}>
                 <Button type="submit" className="bg-main text-white">
-                   Edit itinary
+                   Edit itinerary
                 </Button>
               </Link> : 
               <Link to={`/create-intinary/${tripid}`}>
                 <Button type="submit" className="bg-main text-white">
-                Create itinary
+                Create itinerary
                 </Button>
               </Link>
               }

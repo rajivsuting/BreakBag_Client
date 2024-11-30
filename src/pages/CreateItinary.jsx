@@ -694,12 +694,23 @@ const CreateItinerary = () => {
   return (
     <div className="flex gap-5">
       <div className="w-[100%] m-auto mt-3 rounded-md p-4">
-        <div>
-          <img
-            src="/img/lanscape2.jpg"
-            className="w-full h-[200px] mb-5 rounded-md"
-            alt=""
-          />
+      <div className="relative w-full">
+          {/* Background Image with dark overlay */}
+          <div
+            className="inset-0 bg-cover bg-center rounded-md relative"
+            style={{
+              backgroundImage: 'url("/img/lanscape2.jpg")',
+              height: "200px", // Adjust height as needed
+            }}
+          >
+            {/* Dark Overlay on the background image */}
+            <div className="absolute inset-0 bg-black opacity-50 rounded-md pointer-events-none"></div>
+            <div className="absolute inset-0 flex flex-col p-4 pb-0 justify-between z-10">
+              <div className="text-3xl text-white font-semibold">
+                Create itinerary
+              </div>
+            </div>
+          </div>
         </div>
         <Card className="overflow-hidden mt-5">
           <div
