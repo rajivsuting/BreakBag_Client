@@ -53,7 +53,7 @@ const Travellers = () => {
         }
       )
       .then((res) => {
-        setData(res.data.data);
+        setData(res.data.data.quotes);
         console.log(res);
       });
   };
@@ -165,7 +165,7 @@ const Travellers = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     axios
-      .get(`${serverUrl}/api/quote/search/?keyword=${search}`)
+      .get(`${serverUrl}/api/quote/search/?search=${search}`)
       .then((res) => {
         console.log(res);
         setData(res.data.data);
