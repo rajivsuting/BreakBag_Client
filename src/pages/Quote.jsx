@@ -20,36 +20,42 @@ import "react-toastify/dist/ReactToastify.css";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import Addcomment from "../components/Addcomment";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
+import AddQuote from "../components/AddQuote";
 
 const Travellers = () => {
   const navigate = useNavigate();
   const [commentModalOpen, setCommentModalOpen] = useState(false);
   const [quoteDeleteModal, setQuoteDeleteModal] = useState(false);
-  const [singleQuote, setSinglequote] = useState({})
+  const [singleQuote, setSinglequote] = useState({});
   const [selectedQuote, setSelectedQuote] = useState("");
-  const [selectedId, setSelctedId] = useState("")
+  const [selectedId, setSelctedId] = useState("");
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
   const [searchParams, setsearchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(
     Number(searchParams.get("page")) || 1
   );
+  const [isAddTravelSummeryModal, setIsAddTravelSummeryModal] = useState(false);
   const [limit, setLimit] = useState(Number(searchParams.get("limit")) || 10); // default limit
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
 
-
   const getAlldata = () => {
-    axios.get(`${serverUrl}/api/quote/quotes/?page=${currentPage}&limit=${limit}`,{
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    }).then((res) => {
-      setData(res.data.data);
-      console.log(res);
-    });
+    axios
+      .get(
+        `${serverUrl}/api/quote/quotes/?page=${currentPage}&limit=${limit}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      )
+      .then((res) => {
+        setData(res.data.data);
+        console.log(res);
+      });
   };
 
   useEffect(() => {
@@ -62,19 +68,23 @@ const Travellers = () => {
 
   const handleEdit = () => {};
 
-  useMemo(()=>{
-    if (selectedQuote && selectedId){
-      axios.patch(`${serverUrl}/api/quote/edit/${selectedId}`,{status:selectedQuote})
-      .then((res)=>{
-      toast.success("Status updated");
-        getAlldata(); 
-      }).catch((err)=>{
-        toast.error("Failed to update status, please try again")
-      })
+  useMemo(() => {
+    if (selectedQuote && selectedId) {
+      axios
+        .patch(`${serverUrl}/api/quote/edit/${selectedId}`, {
+          status: selectedQuote,
+        })
+        .then((res) => {
+          toast.success("Status updated");
+          getAlldata();
+        })
+        .catch((err) => {
+          toast.error("Failed to update status, please try again");
+        });
     }
-  },[selectedQuote,selectedId])
+  }, [selectedQuote, selectedId]);
 
-  const handleDelete = async() => {
+  const handleDelete = async () => {
     try {
       // Make the API call to submit the form data
       const response = await axios.delete(
@@ -188,7 +198,10 @@ const Travellers = () => {
               <div className="flex justify-between items-center pb-2 gap-5 w-full">
                 {/* Search Form */}
                 <div className="w-[50%]">
-                  <form className="flex justify-start items-center gap-5"onSubmit={handleSearch}>
+                  <form
+                    className="flex justify-start items-center gap-5"
+                    onSubmit={handleSearch}
+                  >
                     <div className="w-[50%]">
                       {/* Slightly dark background for the search box */}
                       <div className="bg-white rounded-md">
@@ -205,12 +218,12 @@ const Travellers = () => {
                       Search
                     </Button>
                     <Button
-                    onClick={() => {
-                      setSearch("");
-                      getAlldata();
-                      setCurrentPage(1);
-                      setLimit(10);
-                    }}
+                      onClick={() => {
+                        setSearch("");
+                        getAlldata();
+                        setCurrentPage(1);
+                        setLimit(10);
+                      }}
                       type="button"
                       disabled={!search}
                       className="bg-white text-main border border-main"
@@ -225,6 +238,7 @@ const Travellers = () => {
                   <div className="">
                     <LuPlusCircle
                       onClick={() => {
+                        navigate("/add-quote");
                         setIsAddTravelSummeryModal(true);
                         setSingleActivity({});
                       }}
@@ -307,7 +321,7 @@ const Travellers = () => {
                     </td>
                   </Link>
                   <td className="px-4 py-2 cursor-pointer">
-                  {user?.travellers?.map((participant, index) => (
+                    {user?.travellers?.map((participant, index) => (
                       <div key={index}>
                         {participant.name}
                         {/* {index < 1 && data?.travellers?.length >= 2 ? ", " : ""} */}
@@ -332,23 +346,28 @@ const Travellers = () => {
                     )} */}
                   </td>
                   <td className="px-4 py-2 flex justify-center items-center gap-2">
-                    <span className={`w-2 h-2 rounded-[50%]  ${getStatusColorbackground(
-                      user.status
-                    )}`}></span>
-                        <select
-                          value={user.status}
-                          onChange={(e) => {setSelectedQuote(e.target.value);setSelctedId(user._id)}}
-                        >
-                          <option value="">Select a status</option>
-                          <option value="Active">Active</option>
-                          <option value="Quoted">Quoted</option>
-                          <option value="Follow Up">Follow Up</option>
-                          <option value="Confirmed">Confirmed</option>
-                          <option value="Cancelled">Cancelled</option>
-                          <option value="CNP">CNP</option>
-                          <option value="Groups">Groups</option>
-                        </select>
-                      </td>
+                    <span
+                      className={`w-2 h-2 rounded-[50%]  ${getStatusColorbackground(
+                        user.status
+                      )}`}
+                    ></span>
+                    <select
+                      value={user.status}
+                      onChange={(e) => {
+                        setSelectedQuote(e.target.value);
+                        setSelctedId(user._id);
+                      }}
+                    >
+                      <option value="">Select a status</option>
+                      <option value="Active">Active</option>
+                      <option value="Quoted">Quoted</option>
+                      <option value="Follow Up">Follow Up</option>
+                      <option value="Confirmed">Confirmed</option>
+                      <option value="Cancelled">Cancelled</option>
+                      <option value="CNP">CNP</option>
+                      <option value="Groups">Groups</option>
+                    </select>
+                  </td>
                   {/* <td
                     onClick={() => handleComment(user._id)}
                     className="cursor-pointer px-4 py-2"
@@ -357,7 +376,10 @@ const Travellers = () => {
                   </td> */}
                   <td className="px-4 py-2">
                     <MdDelete
-                      onClick={() => {setQuoteDeleteModal(true);setSinglequote(user)}}
+                      onClick={() => {
+                        setQuoteDeleteModal(true);
+                        setSinglequote(user);
+                      }}
                       className="h-5 w-5 text-main cursor-pointer"
                     />
                   </td>
@@ -372,6 +394,11 @@ const Travellers = () => {
         onClose={() => setQuoteDeleteModal(false)}
         handleDelete={handleDelete}
       />
+      {/* <AddQuote
+        isOpen={isAddTravelSummeryModal}
+        onClose={() => setIsAddTravelSummeryModal(false)}
+        getAlldata={getAlldata}
+      /> */}
       {/* <Addcomment
         isOpen={commentModalOpen}
         onClose={() => setCommentModalOpen(false)}
