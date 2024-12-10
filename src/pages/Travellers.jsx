@@ -86,7 +86,6 @@ const Travellers = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    console.log('jwdjwjd')
     axios
       .get(`${serverUrl}/api/traveller/search/?name=${search}`)
       .then((res) => {

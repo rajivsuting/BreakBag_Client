@@ -168,7 +168,7 @@ const EditAgent = ({ isOpen, onClose, getAllData, singleAgent }) => {
                 className="w-[95%] border border-gray-500 rounded px-2 py-2"
                 onChange={handleChange}
               >
-                <option disabled>Select role</option>
+                <option>Select role</option>
                 <option value="Agent">Agent</option>
                 <option value="Team Lead">Team Lead</option>
               </select>
